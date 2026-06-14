@@ -1,6 +1,6 @@
 // main.js — Точка входа: инициализация приложения
 
-import { auth, signInWithPopup,
+import { auth, provider, signInWithPopup,
          onAuthStateChanged, signOut }     from "./config.js";
 import { MAPS, ADMIN_UID }                from "./constants.js";
 import { state }                          from "./state.js";
