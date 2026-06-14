@@ -72,7 +72,7 @@ export function resetView() {
   if (!state.pz) return;
   const iw = mapImg.naturalWidth, ih = mapImg.naturalHeight;
   if (!iw || !ih) return;
-  const vw = mapEl.clientWidth, vh = mapEl.clientHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
   const scale = Math.min(vw / iw, vh / ih);
   state.pz.zoom(scale, { animate: false });
   state.pz.pan((vw - iw * scale) / 2, (vh - ih * scale) / 2, { animate: false });
