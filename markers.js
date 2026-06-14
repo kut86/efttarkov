@@ -10,7 +10,7 @@ import { mapEl, mapWrapper, filterSel,
          addExtraFields, addConfirm,
          addCancel, addModeBtn, toast,
          esc, isMobile }                    from "./ui.js";
-import { setLevel }                        from "./map.js";
+
 import { openModal }                       from "./modal.js";
 
 /* ── Firebase подписка ── */
@@ -187,7 +187,7 @@ export function checkUrlHash() {
     const m = state.allMarkers[id];
     if (m) {
       const markerLevel = m.level ?? 0;
-      if (markerLevel !== state.currentLevel) setLevel(markerLevel);
+      state._pendingLevel = markerLevel !== state.currentLevel ? markerLevel : null;
       render();
       waitAndOpen(id, m);
     } else toast("Маркер не найден", true);
