@@ -1,4 +1,4 @@
-// map.js — Логика карты: уровни, panzoom, переключение карт
+/* map.js — Логика карты: уровни, panzoom, переключение карт*/
 
 import { MAPS }                          from "./constants.js";
 import { state }                          from "./state.js";
