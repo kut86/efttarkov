@@ -2,6 +2,7 @@
 
 import { auth, provider, signInWithPopup,
          onAuthStateChanged, signOut }     from "./config.js";
+import { toast }                          from "./ui.js";
 import { MAPS, ADMIN_UID }                from "./constants.js";
 import { state }                          from "./state.js";
 import { loginBtn, logoutBtn, adminBadge,
