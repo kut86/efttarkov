@@ -2,14 +2,13 @@
 
 import { auth, provider, signInWithPopup,
          onAuthStateChanged, signOut }     from "./config.js";
-import { toast }                          from "./ui.js";
 import { MAPS, ADMIN_UID }                from "./constants.js";
 import { state }                          from "./state.js";
-import { loginBtn, logoutBtn, adminBadge,
+import { toast, loginBtn, logoutBtn, adminBadge,
          addModeBtn, mapSelect,
          addEmojiPicker, addEmojiInput,
          editEmojiPicker, editEmojiInput } from "./ui.js";
-import { switchMap }                      from "./map.js";
+import { switchMap, setLevel }            from "./map.js";
 import { exitAddMode, buildEmojiPicker,
          checkUrlHash }                    from "./markers.js";
 
@@ -39,6 +38,10 @@ const startMap = (savedMap && MAPS[savedMap]) ? savedMap : "groundzero";
 mapSelect.value = startMap;
 switchMap(startMap);
 checkUrlHash();
+if (state._pendingLevel !== null && state._pendingLevel !== undefined) {
+  setLevel(state._pendingLevel);
+  state._pendingLevel = null;
+}
 
 /* ── Quill (последними, после DOM) ── */
 state.addQuill = new Quill("#addQuillEditor", {
