@@ -1,4 +1,4 @@
-// main.js — Точка входа: инициализация приложения 
+/* main.js — Точка входа: инициализация приложения */
 
 import { auth, provider, signInWithPopup,
          onAuthStateChanged, signOut }     from "./config.js";
