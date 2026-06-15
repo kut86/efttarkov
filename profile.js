@@ -233,5 +233,5 @@ onAuthStateChanged(auth, user => {
     else toast("Введите URL фото", true);
   };
 
-  logoutBtn.onclick = () => signOut(auth).then(() => location.href = "map.html");
+  logoutBtn.onclick = () => signOut(auth).then(() => location.href = "index.html");
 });
