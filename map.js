@@ -62,11 +62,9 @@ levelDown.onclick = () => {
 export function initPanzoom() {
   if (state.pz) { state.pz.destroy(); state.pz = null; }
   state.pz = Panzoom(mapEl, { maxScale: 8, minScale: 0.5, contain: "outside" });
-  setTimeout(() => {
-    resetView();
-    state.pz.zoom(state.pz.getScale(), { animate: false });
-  }, 200);
+  requestAnimationFrame(() => requestAnimationFrame(() => resetView()));
 }
+
 
 export function resetView() {
   if (!state.pz) return;
