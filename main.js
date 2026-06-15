@@ -2,7 +2,7 @@
 
 import { auth, provider, signInWithPopup,
          onAuthStateChanged, signOut }     from "./config.js";
-import { MAPS, ADMIN_UID }                from "./constants.js";
+import { MAPS }                           from "./constants.js";
 import { state }                          from "./state.js";
 import { toast, loginBtn, logoutBtn, adminBadge,
          addModeBtn, mapSelect,
@@ -17,12 +17,9 @@ import { initAuthGuard, updateMenuProfile } from "./auth-guard.js";
 buildEmojiPicker(addEmojiPicker, addEmojiInput);
 buildEmojiPicker(editEmojiPicker, editEmojiInput);
 
-
-
 /* ── Auth + запуск карты ── */
-loginBtn.onclick = () => signInWithPopup(auth, provider)
+loginBtn.onclick  = () => signInWithPopup(auth, provider)
   .catch(e => toast(e.message, true));
-
 logoutBtn.onclick = () => signOut(auth).then(() => location.reload());
 
 initAuthGuard((user, profile) => {
@@ -37,21 +34,8 @@ initAuthGuard((user, profile) => {
   addModeBtn.style.display = state.isAdmin ? "" : "none";
 
   updateMenuProfile(profile);
-
   if (!state.isAdmin) exitAddMode();
-         
-  /* ── Quill ── */
-state.addQuill = new Quill("#addQuillEditor", {
-  theme: "snow",
-  placeholder: "Подробное описание...",
-  modules: { toolbar: "#addQuillToolbar" }
-});
 
-state.editQuill = new Quill("#editQuillEditor", {
-  theme: "snow",
-  placeholder: "Описание...",
-  modules: { toolbar: "#editQuillToolbar" }
-});
   /* ── Старт карты ── */
   const savedMap = localStorage.getItem("lastMap");
   const startMap = (savedMap && MAPS[savedMap]) ? savedMap : "groundzero";
@@ -63,4 +47,16 @@ state.editQuill = new Quill("#editQuillEditor", {
     setLevel(state._pendingLevel);
     state._pendingLevel = null;
   }
+
+  /* ── Quill — последними ── */
+  state.addQuill = new Quill("#addQuillEditor", {
+    theme: "snow",
+    placeholder: "Подробное описание...",
+    modules: { toolbar: "#addQuillToolbar" }
+  });
+  state.editQuill = new Quill("#editQuillEditor", {
+    theme: "snow",
+    placeholder: "Описание...",
+    modules: { toolbar: "#editQuillToolbar" }
+  });
 });
