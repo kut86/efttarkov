@@ -120,9 +120,6 @@ export function initAuthGuard(onReady) {
       hideOverlay();
       updateMenuProfile(profile);
 
-      hideOverlay();
-      updateMenuProfile(profile);
-
       if (!initialized) {
         initialized = true;
         onReady(user, profile);
