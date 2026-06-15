@@ -17,18 +17,7 @@ import { initAuthGuard, updateMenuProfile } from "./auth-guard.js";
 buildEmojiPicker(addEmojiPicker, addEmojiInput);
 buildEmojiPicker(editEmojiPicker, editEmojiInput);
 
-/* ── Quill ── */
-state.addQuill = new Quill("#addQuillEditor", {
-  theme: "snow",
-  placeholder: "Подробное описание...",
-  modules: { toolbar: "#addQuillToolbar" }
-});
 
-state.editQuill = new Quill("#editQuillEditor", {
-  theme: "snow",
-  placeholder: "Описание...",
-  modules: { toolbar: "#editQuillToolbar" }
-});
 
 /* ── Auth + запуск карты ── */
 loginBtn.onclick = () => signInWithPopup(auth, provider)
@@ -50,7 +39,19 @@ initAuthGuard((user, profile) => {
   updateMenuProfile(profile);
 
   if (!state.isAdmin) exitAddMode();
+         
+  /* ── Quill ── */
+state.addQuill = new Quill("#addQuillEditor", {
+  theme: "snow",
+  placeholder: "Подробное описание...",
+  modules: { toolbar: "#addQuillToolbar" }
+});
 
+state.editQuill = new Quill("#editQuillEditor", {
+  theme: "snow",
+  placeholder: "Описание...",
+  modules: { toolbar: "#editQuillToolbar" }
+});
   /* ── Старт карты ── */
   const savedMap = localStorage.getItem("lastMap");
   const startMap = (savedMap && MAPS[savedMap]) ? savedMap : "groundzero";
