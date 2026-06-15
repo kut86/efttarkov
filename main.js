@@ -1,13 +1,44 @@
-// main.js — добавить в начало импортов:
+// main.js — Точка входа: инициализация приложения
+
+import { auth, provider, signInWithPopup,
+         onAuthStateChanged, signOut }     from "./config.js";
+import { MAPS, ADMIN_UID }                from "./constants.js";
+import { state }                          from "./state.js";
+import { toast, loginBtn, logoutBtn, adminBadge,
+         addModeBtn, mapSelect,
+         addEmojiPicker, addEmojiInput,
+         editEmojiPicker, editEmojiInput } from "./ui.js";
+import { switchMap, setLevel }            from "./map.js";
+import { exitAddMode, buildEmojiPicker,
+         checkUrlHash }                    from "./markers.js";
 import { initAuthGuard, updateMenuProfile } from "./auth-guard.js";
 
-// Убрать старый onAuthStateChanged и заменить на:
+/* ── Emoji pickers ── */
+buildEmojiPicker(addEmojiPicker, addEmojiInput);
+buildEmojiPicker(editEmojiPicker, editEmojiInput);
+
+/* ── Quill ── */
+state.addQuill = new Quill("#addQuillEditor", {
+  theme: "snow",
+  placeholder: "Подробное описание...",
+  modules: { toolbar: "#addQuillToolbar" }
+});
+
+state.editQuill = new Quill("#editQuillEditor", {
+  theme: "snow",
+  placeholder: "Описание...",
+  modules: { toolbar: "#editQuillToolbar" }
+});
+
+/* ── Auth + запуск карты ── */
+loginBtn.onclick = () => signInWithPopup(auth, provider)
+  .catch(e => toast(e.message, true));
+
+logoutBtn.onclick = () => signOut(auth).then(() => location.reload());
 
 initAuthGuard((user, profile) => {
-  // Пользователь авторизован и не забанен
   state.isAdmin = profile.role === "admin";
 
-  // Показываем кнопки
   const profileBtn = document.getElementById("profileBtn");
   if (profileBtn) profileBtn.style.display = "flex";
 
@@ -16,28 +47,19 @@ initAuthGuard((user, profile) => {
   adminBadge.style.display = state.isAdmin ? "" : "none";
   addModeBtn.style.display = state.isAdmin ? "" : "none";
 
-  // Обновляем профиль в меню
   updateMenuProfile(profile);
 
-  // Запускаем карту
+  if (!state.isAdmin) exitAddMode();
+
+  /* ── Старт карты ── */
   const savedMap = localStorage.getItem("lastMap");
   const startMap = (savedMap && MAPS[savedMap]) ? savedMap : "groundzero";
   mapSelect.value = startMap;
   switchMap(startMap);
   checkUrlHash();
 
-  // Quill
-  state.addQuill = new Quill("#addQuillEditor", {
-    theme: "snow",
-    placeholder: "Подробное описание...",
-    modules: { toolbar: "#addQuillToolbar" }
-  });
-  state.editQuill = new Quill("#editQuillEditor", {
-    theme: "snow",
-    placeholder: "Описание...",
-    modules: { toolbar: "#editQuillToolbar" }
-  });
+  if (state._pendingLevel !== null && state._pendingLevel !== undefined) {
+    setLevel(state._pendingLevel);
+    state._pendingLevel = null;
+  }
 });
-
-// logoutBtn
-logoutBtn.onclick = () => signOut(auth).then(() => location.reload());
