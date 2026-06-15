@@ -122,13 +122,21 @@ function renderUsers(users, currentUid) {
         const action = btn.dataset.action;
         const uRef   = ref(db, `users/${uid}`);
         if (action === "ban") {
-          update(uRef, { banned: !u.banned })
-            .then(() => toast(u.banned ? "Пользователь разбанен" : "Пользователь заблокирован"));
-        }
+  if (u.email === "pinachet160@gmail.com") {
+    toast("Нельзя заблокировать главного администратора", true);
+    return;
+  }
+  update(uRef, { banned: !u.banned })
+    .then(() => toast(u.banned ? "Пользователь разбанен" : "Пользователь заблокирован"));
+}
         if (action === "role") {
-          update(uRef, { role: isAdmin ? "user" : "admin" })
-            .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"));
-        }
+  if (u.email === "pinachet160@gmail.com") {
+    toast("Нельзя изменить роль главного администратора", true);
+    return;
+  }
+  update(uRef, { role: isAdmin ? "user" : "admin" })
+    .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"));
+}
       };
     });
 
