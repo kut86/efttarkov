@@ -107,9 +107,12 @@ export function initAuthGuard(onReady) {
   createOverlay();
   showOverlay();
 
+  let initialized = false;
+
   onAuthStateChanged(auth, user => {
     if (!user) {
       showOverlay();
+      initialized = false;
       return;
     }
 
@@ -121,7 +124,11 @@ export function initAuthGuard(onReady) {
 
       hideOverlay();
       updateMenuProfile(profile);
-      onReady(user, profile);
+
+      if (!initialized) {
+        initialized = true;
+        onReady(user, profile);
+      }
     });
   });
 }
