@@ -66,15 +66,20 @@ function loadUserProfile(user, callback) {
   onValue(userRef, snap => {
     const data = snap.val();
     if (!data) {
-      /* Первый вход — создаём профиль */
       update(userRef, {
         nickname: user.displayName?.slice(0, 20) || "Сталкер",
         photoURL: user.photoURL || "",
         role:     "user",
         banned:   false,
         email:    user.email || "",
-      }).then(() => {
-        onValue(userRef, s => callback(s.val()), { onlyOnce: true });
+      });
+      /* не ждём — callback с дефолтным профилем */
+      callback({
+        nickname: user.displayName?.slice(0, 20) || "Сталкер",
+        photoURL: user.photoURL || "",
+        role:     "user",
+        banned:   false,
+        email:    user.email || "",
       });
     } else {
       callback(data);
