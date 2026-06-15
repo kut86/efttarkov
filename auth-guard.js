@@ -112,9 +112,13 @@ export function initAuthGuard(onReady) {
 
     loadUserProfile(user, profile => {
       if (profile.banned) {
+        showOverlay();
         showBanScreen();
         return;
       }
+
+      hideOverlay();
+      updateMenuProfile(profile);
 
       hideOverlay();
       updateMenuProfile(profile);
