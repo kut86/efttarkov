@@ -12,7 +12,7 @@ function createOverlay() {
   el.id = OVERLAY_ID;
   el.innerHTML = `
     <div class="auth-box">
-      <div class="auth-logo">ТАКТИК</div>
+      <div class="auth-logo">панель авторизации</div>
       <div class="auth-sub">Интерактивная карта Escape from Tarkov</div>
       <button id="authGoogleBtn" class="btn btn-login auth-btn">
         <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:8px;vertical-align:middle">
