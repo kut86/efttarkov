@@ -1,0 +1,345 @@
+/* profile.css — Стили профиля и auth-оверлея */
+
+/* ══════════════════════════════════════════
+   AUTH OVERLAY
+══════════════════════════════════════════ */
+#authOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(8,10,8,.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.auth-box {
+  background: var(--surface, #0e1210);
+  border: 1px solid var(--border2, #3a4838);
+  border-top: 2px solid var(--accent, #ff6600);
+  border-radius: 14px;
+  padding: 36px 32px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.8);
+  animation: authIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes authIn {
+  from { transform: translateY(20px) scale(.96); opacity: 0; }
+  to   { transform: translateY(0) scale(1);      opacity: 1; }
+}
+
+.auth-logo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: var(--accent, #ff6600);
+  text-transform: uppercase;
+}
+
+.auth-sub {
+  font-size: 13px;
+  color: var(--text-dim, #6a7868);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-color: var(--accent, #ff6600);
+  color: var(--accent, #ff6600);
+}
+.auth-btn:hover {
+  background: var(--accent, #ff6600);
+  color: #000;
+}
+
+.auth-note {
+  font-size: 11px;
+  color: var(--text-dim, #6a7868);
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════════════ */
+#profilePage {
+  min-height: 100dvh;
+  background: var(--bg, #080a08);
+  padding: 0 0 40px;
+  overflow-y: auto;
+}
+
+/* Шапка */
+.profile-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8,10,8,.95);
+  border-bottom: 1px solid var(--border, #2a3428);
+  backdrop-filter: blur(10px);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-back {
+  text-decoration: none;
+  color: var(--text-dim, #6a7868);
+  border-color: var(--border, #2a3428);
+  font-size: 12px;
+}
+.profile-back:hover { color: var(--text, #d0ccc0); }
+
+.profile-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: .2em;
+  color: var(--accent, #ff6600);
+}
+
+/* Карточка профиля */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--border, #2a3428);
+}
+
+.profile-avatar-wrap {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  position: relative;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent, #ff6600);
+  display: none;
+}
+
+.profile-avatar-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--surface2, #161c18);
+  border: 2px solid var(--border2, #3a4838);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-nickname {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright, #ede9e0);
+  letter-spacing: .04em;
+}
+
+.profile-email {
+  font-size: 12px;
+  color: var(--text-dim, #6a7868);
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.profile-role {
+  font-size: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  margin-top: 2px;
+}
+.role-admin { color: var(--accent, #ff6600); }
+.role-user  { color: var(--text-dim, #6a7868); }
+
+/* Секции */
+.profile-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border, #2a3428);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile-section-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--text-dim, #6a7868);
+  text-transform: uppercase;
+}
+
+.profile-hint {
+  font-size: 11px;
+  color: var(--text-dim, #6a7868);
+  margin-top: 3px;
+}
+
+/* ══════════════════════════════════════════
+   ADMIN PANEL
+══════════════════════════════════════════ */
+.admin-search {
+  margin-bottom: 4px;
+}
+.admin-search input {
+  width: 100%;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: var(--surface2, #161c18);
+  border: 1px solid var(--border2, #3a4838);
+  border-radius: var(--radius, 6px);
+  color: var(--text, #d0ccc0);
+  outline: none;
+}
+.admin-search input:focus {
+  border-color: var(--accent, #ff6600);
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.user-card {
+  background: var(--surface2, #161c18);
+  border: 1px solid var(--border, #2a3428);
+  border-radius: var(--radius, 6px);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.user-card.user-banned {
+  border-color: rgba(192,57,43,.4);
+  background: rgba(192,57,43,.06);
+}
+
+.user-card-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.user-card-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border2, #3a4838);
+  flex-shrink: 0;
+}
+
+.user-card-text {
+  min-width: 0;
+}
+
+.user-card-nick {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-bright, #ede9e0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-self {
+  font-size: 11px;
+  color: var(--accent, #ff6600);
+  font-weight: 400;
+}
+
+.user-card-email {
+  font-size: 11px;
+  color: var(--text-dim, #6a7868);
+  font-family: 'Share Tech Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-role {
+  font-size: 11px;
+  color: var(--text-dim, #6a7868);
+  margin-top: 2px;
+}
+
+.user-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   MENU AVATAR (в карте)
+══════════════════════════════════════════ */
+.menu-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: var(--radius, 6px);
+  border: 1px solid var(--border, #2a3428);
+  background: transparent;
+  transition: background .15s, border-color .15s;
+}
+.menu-profile-btn:hover {
+  background: var(--surface2, #161c18);
+  border-color: var(--accent, #ff6600);
+}
+
+#menuAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--accent, #ff6600);
+  display: none;
+}
+
+#menuNickname {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--text, #d0ccc0);
+}
+
+/* ══════════════════════════════════════════
+   MOBILE
+══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .profile-card { flex-direction: column; align-items: flex-start; }
+  .user-card    { flex-direction: column; align-items: flex-start; }
+  .user-card-actions { width: 100%; justify-content: flex-end; }
+}
