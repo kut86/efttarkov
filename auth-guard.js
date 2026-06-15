@@ -26,6 +26,7 @@ function createOverlay() {
       <div class="auth-note">Требуется для доступа к карте</div>
     </div>
   `;
+  el.style.display = "none";
   document.body.appendChild(el);
 
   document.getElementById("authGoogleBtn").onclick = () => {
@@ -105,7 +106,6 @@ export function updateMenuProfile(profile) {
 /* ── Главная функция — вызывается в main.js ── */
 export function initAuthGuard(onReady) {
   createOverlay();
-  showOverlay();
 
   let initialized = false;
 
