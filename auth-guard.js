@@ -29,10 +29,10 @@ function createOverlay() {
   document.body.appendChild(el);
 
   document.getElementById("authGoogleBtn").onclick = () => {
-    import("./config.js").then(({ auth, provider, signInWithPopup }) => {
-      signInWithPopup(auth, provider).catch(e => alert(e.message));
-    });
-  };
+  import("./config.js").then(m => {
+    m.signInWithPopup(m.auth, m.provider).catch(e => alert(e.message));
+  });
+};
 }
 
 /* ── Экран бана ── */
