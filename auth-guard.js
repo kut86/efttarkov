@@ -67,25 +67,19 @@ function loadUserProfile(user, callback) {
   onValue(userRef, snap => {
     const data = snap.val();
     if (!data) {
-      update(userRef, {
+      const profile = {
         nickname: user.displayName?.slice(0, 20) || "Сталкер",
         photoURL: user.photoURL || "",
         role:     "user",
         banned:   false,
         email:    user.email || "",
-      });
-      /* не ждём — callback с дефолтным профилем */
-      callback({
-        nickname: user.displayName?.slice(0, 20) || "Сталкер",
-        photoURL: user.photoURL || "",
-        role:     "user",
-        banned:   false,
-        email:    user.email || "",
-      });
+      };
+      update(userRef, profile);
+      callback(profile);
     } else {
       callback(data);
     }
-  }, { onlyOnce: true });
+  });
 }
 
 /* ── Обновить аватар в меню карты ── */
