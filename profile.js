@@ -60,6 +60,96 @@ function renderRole(role) {
   profileRoleEl.className   = "profile-role role-" + (role || "user");
 }
 
+/* ── Уровни доступа ── */
+const LEVELS = {
+  0: { name: "Standard",           icon: "🪖" },
+  1: { name: "Left Behind",        icon: "🎯" },
+  2: { name: "Prepare for Escape", icon: "⚔️" },
+  3: { name: "Edge of Darkness",   icon: "💀" },
+  4: { name: "Unheard",            icon: "👁" },
+};
+
+/* ── Баннер уровня доступа ── */
+function renderAccessBanner(profile) {
+  /* Удаляем старый баннер если есть */
+  const old = document.getElementById("accessBanner");
+  if (old) old.remove();
+
+  const level = profile.accessLevel ?? 0;
+  const expiry = profile.accessExpiry;
+  const now = Date.now();
+  const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+
+  /* Создаём блок уровня доступа */
+  const banner = document.createElement("div");
+  banner.id = "accessBanner";
+  banner.style.cssText = `
+    margin: 0 20px 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  `;
+
+  let bannerHTML = `
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;
+                color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;
+                margin-bottom:2px">Уровень доступа</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text-bright)">
+      ${LEVELS[level]?.icon} ${LEVELS[level]?.name}
+    </div>
+  `;
+
+  if (expiry && level > 0) {
+    const diff = expiry - now;
+    const days = Math.ceil(diff / (24 * 60 * 60 * 1000));
+
+    if (diff < 0) {
+      /* Истёк */
+      bannerHTML += `
+        <div style="background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);
+                    border-radius:6px;padding:8px 12px;font-size:12px;color:#c0392b;margin-top:4px">
+          ⛔ Срок доступа истёк. Обратитесь к администратору.
+        </div>`;
+      banner.style.background = "rgba(192,57,43,.05)";
+      banner.style.border = "1px solid rgba(192,57,43,.3)";
+    } else if (diff < THREE_DAYS) {
+      /* Скоро истекает */
+      bannerHTML += `
+        <div style="background:rgba(230,126,34,.15);border:1px solid rgba(230,126,34,.4);
+                    border-radius:6px;padding:8px 12px;font-size:12px;color:#e67e22;margin-top:4px">
+          ⚠️ Доступ истекает через ${days} ${days === 1 ? "день" : days < 5 ? "дня" : "дней"} 
+          — ${new Date(expiry).toLocaleDateString("ru-RU")}
+        </div>`;
+      banner.style.background = "rgba(230,126,34,.05)";
+      banner.style.border = "1px solid rgba(230,126,34,.3)";
+    } else {
+      /* Всё нормально */
+      bannerHTML += `
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px">
+          Действует до ${new Date(expiry).toLocaleDateString("ru-RU")}
+        </div>`;
+      banner.style.background = "var(--surface2)";
+      banner.style.border = "1px solid var(--border)";
+    }
+  } else if (level > 0) {
+    bannerHTML += `
+      <div style="font-size:12px;color:var(--text-dim);margin-top:2px">∞ Бессрочно</div>`;
+    banner.style.background = "var(--surface2)";
+    banner.style.border = "1px solid var(--border)";
+  } else {
+    banner.style.background = "var(--surface2)";
+    banner.style.border = "1px solid var(--border)";
+  }
+
+  banner.innerHTML = bannerHTML;
+
+  /* Вставляем после карточки профиля */
+  const card = document.querySelector(".profile-card");
+  if (card) card.after(banner);
+}
+
 /* ── Загрузить список пользователей (только для админа) ── */
 function loadUsers(currentUid) {
   const usersRef = ref(db, "users");
@@ -205,6 +295,7 @@ onAuthStateChanged(auth, user => {
     nicknameInput.value         = profile.nickname || "";
     photoInput.value            = profile.photoURL || "";
     renderRole(profile.role);
+    renderAccessBanner(profile);
 
     /* Админ-панель */
     if (profile.role === "admin") {
