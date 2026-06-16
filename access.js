@@ -1,4 +1,4 @@
-// access.js — Управление уровнями доступа 
+/* access.js — Управление уровнями доступа */
 
 import { auth, db, provider,
          ref, onValue, update,
