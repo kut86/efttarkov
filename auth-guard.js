@@ -77,8 +77,14 @@ function loadUserProfile(user, callback) {
       update(userRef, profile);
       callback(profile);
     } else {
-      callback(data);
+    /* Проверяем срок доступа */
+    if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
+      /* Срок истёк — сбрасываем уровень */
+      update(ref(db, `users/${user.uid}`), { accessLevel: 0 });
+      data.accessLevel = 0;
     }
+    callback(data);
+  }
   });
 }
 
