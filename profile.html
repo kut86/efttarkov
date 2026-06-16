@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Профиль — ЧВК</title>
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="menu.css">
   <link rel="stylesheet" href="profile.css">
 </head>
 <body>
@@ -34,7 +32,7 @@
     </div>
 
     <div class="profile-info">
-      <div class="profile-nickname" id="profileNicknameDisplay">Сталкер</div>
+      <div class="profile-nickname" id="profileNicknameDisplay">Дикий</div>
       <div class="profile-email"    id="profileEmail"></div>
       <div class="profile-role"     id="profileRole"></div>
     </div>
@@ -73,12 +71,13 @@
   <!-- Админ-панель (видна только админу) -->
   <div class="profile-section" id="adminPanel" style="display:none">
     <div class="profile-section-title" style="color:var(--accent)">⚙️ Администрирование</div>
-    <a href="access.html" class="btn btn-sm">⚙️ Управление доступом</a>
+    
+    
 
     <div class="admin-search">
       <input id="adminSearch" type="text" placeholder="Поиск по никнейму или email">
     </div>
-
+<a href="access.html" class="btn btn-sm">⚙️ Управление доступом</a>
     <div id="usersList" class="users-list"></div>
   </div>
 
