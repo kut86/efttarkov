@@ -2,7 +2,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getDatabase, ref, push, onValue, update, remove
+  getDatabase, ref, get, push, onValue, update, remove
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import {
   getAuth, GoogleAuthProvider,
@@ -26,6 +26,6 @@ const provider = new GoogleAuthProvider();
 
 export {
   db, auth, provider,
-  ref, push, onValue, update, remove,
+  ref, get, push, onValue, update, remove,
   signInWithPopup, onAuthStateChanged, signOut
 };
