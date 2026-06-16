@@ -1,7 +1,7 @@
 // auth-guard.js — Проверка авторизации, бана, загрузка профиля
 
 import { auth, db, onAuthStateChanged,
-         ref, onValue, update }           from "./config.js";
+         ref, get, update }              from "./config.js";
 
 const OVERLAY_ID = "authOverlay";
 
@@ -62,30 +62,32 @@ function showOverlay() {
 }
 
 /* ── Загрузить/создать профиль пользователя ── */
-function loadUserProfile(user, callback) {
+async function loadUserProfile(user, callback) {
   const userRef = ref(db, `users/${user.uid}`);
-  onValue(userRef, snap => {
-    const data = snap.val();
-    if (!data) {
-      const profile = {
-        nickname: user.displayName?.slice(0, 20) || "Сталкер",
-        photoURL: user.photoURL || "",
-        role:     "user",
-        banned:   false,
-        email:    user.email || "",
-      };
-      update(userRef, profile);
-      callback(profile);
-    } else {
-    /* Проверяем срок доступа */
-    if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
-      /* Срок истёк — сбрасываем уровень */
-      update(ref(db, `users/${user.uid}`), { accessLevel: 0 });
-      data.accessLevel = 0;
-    }
-    callback(data);
+  const snap = await get(userRef);   // однократное чтение, без подписки
+  const data = snap.val();
+
+  if (!data) {
+    const profile = {
+      nickname: user.displayName?.slice(0, 20) || "Сталкер",
+      photoURL: user.photoURL || "",
+      role:     "user",
+      banned:   false,
+      email:    user.email || "",
+    };
+    await update(userRef, profile);
+    callback(profile);
+    return;
   }
-  });
+
+  /* Проверяем срок доступа */
+  if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
+    /* Срок истёк — сбрасываем уровень */
+    await update(userRef, { accessLevel: 0 });
+    data.accessLevel = 0;
+  }
+
+  callback(data);
 }
 
 /* ── Обновить аватар в меню карты ── */
@@ -130,6 +132,9 @@ export function initAuthGuard(onReady) {
         initialized = true;
         onReady(user, profile);
       }
+    }).catch(err => {
+      console.error("Ошибка загрузки профиля:", err);
+      showOverlay();   // оставляем пользователя на экране входа, не ломаем UI
     });
   });
 }
