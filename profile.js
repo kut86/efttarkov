@@ -1,4 +1,4 @@
-// profile.js — Логика страницы профиля
+// profile.js — Логика страницы профиля 
 
 import { auth, db, provider,
          ref, onValue, update,
