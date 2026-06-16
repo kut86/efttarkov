@@ -1,4 +1,4 @@
-// auth-guard.js — Проверка авторизации, бана, загрузка профиля
+/* auth-guard.js — Проверка авторизации, бана, загрузка профиля*/
 
 import { auth, db, onAuthStateChanged,
          ref, get, update }              from "./config.js";
