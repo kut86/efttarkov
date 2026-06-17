@@ -58,9 +58,9 @@ function setAvatar(url) {
 
 /* ── Роль ── */
 function renderRole(role) {
-  const labels = { admin: "⚙️ Администратор", user: "👤 Пользователь" };
+  const labels = { admin: "⚙️ Администратор", users: "👤 Пользователь" };
   profileRoleEl.textContent = labels[role] || role;
-  profileRoleEl.className   = "profile-role role-" + (role || "user");
+  profileRoleEl.className   = "profile-role role-" + (role || "users");
 }
 
 /* ── Баннер уровня доступа ── */
@@ -151,7 +151,7 @@ function loadUsers(currentUid) {
 
   adminSearch.addEventListener("input", () => {
     const q = adminSearch.value.toLowerCase();
-    usersList.querySelectorAll(".user-card").forEach(card => {
+    usersList.querySelectorAll(".users-card").forEach(card => {
       card.style.display = card.textContent.toLowerCase().includes(q) ? "" : "none";
     });
   });
@@ -166,19 +166,19 @@ function renderUsers(users, currentUid) {
     const lvlInfo = LEVELS[u.accessLevel ?? 0] ?? LEVELS[0];
 
     const card = document.createElement("div");
-    card.className = "user-card" + (u.banned ? " user-banned" : "");
+    card.className = "users-card" + (u.banned ? " users-banned" : "");
     card.innerHTML = `
-      <div class="user-card-info">
-        <img class="user-card-avatar" src="${u.photoURL || ""}"
+      <div class="users-card-info">
+        <img class="users-card-avatar" src="${u.photoURL || ""}"
              onerror="this.style.display='none'"
              style="${u.photoURL ? "" : "display:none"}">
-        <div class="user-card-text">
-          <div class="user-card-nick">
+        <div class="users-card-text">
+          <div class="users-card-nick">
             ${esc(u.nickname || "—")}
-            ${isSelf ? "<span class='user-self'>(вы)</span>" : ""}
+            ${isSelf ? "<span class='users-self'>(вы)</span>" : ""}
           </div>
-          <div class="user-card-email">${esc(u.email || "")}</div>
-          <div class="user-card-role">
+          <div class="users-card-email">${esc(u.email || "")}</div>
+          <div class="users-card-role">
             ${isAdmin ? "⚙️ Админ" : "👤 Пользователь"}
             · ${lvlInfo.icon} ${lvlInfo.name}
             ${u.banned ? "· 🔴 Заблокирован" : ""}
@@ -186,7 +186,7 @@ function renderUsers(users, currentUid) {
         </div>
       </div>
       ${!isSelf ? `
-      <div class="user-card-actions">
+      <div class="users-card-actions">
         <button class="btn btn-sm ${u.banned ? "btn-primary" : "btn-danger"}"
                 data-uid="${u.uid}" data-action="ban">
           ${u.banned ? "Разбанить" : "Забанить"}
@@ -199,7 +199,7 @@ function renderUsers(users, currentUid) {
     `;
 
     card.querySelectorAll("button[data-action]").forEach(btn => {
-      btn.onclick = () => handleUserAction(btn, u, isAdmin);
+      btn.onclick = () => handleUsersAction(btn, u, isAdmin);
     });
 
     usersList.appendChild(card);
@@ -207,7 +207,7 @@ function renderUsers(users, currentUid) {
 }
 
 /* ── Действия с пользователем ── */
-function handleUserAction(btn, u, isAdmin) {
+function handleUsersAction(btn, u, isAdmin) {
   const PROTECTED_EMAIL = "pinachet160@gmail.com";
   if (u.email === PROTECTED_EMAIL) {
     toast("Нельзя изменить главного администратора", true);
@@ -221,7 +221,7 @@ function handleUserAction(btn, u, isAdmin) {
       .catch(e => toast(e.message, true));
   }
   if (btn.dataset.action === "role") {
-    update(uRef, { role: isAdmin ? "user" : "admin" })
+    update(uRef, { role: isAdmin ? "users" : "admin" })
       .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"))
       .catch(e => toast(e.message, true));
   }
@@ -236,8 +236,8 @@ function esc(s) {
 /* ──────────────────────────────────────────────
    ОСНОВНОЙ ПОТОК
    ────────────────────────────────────────────── */
-onAuthStateChanged(auth, async user => {
-  if (!user) {
+onAuthStateChanged(auth, async users => {
+  if (!users) {
     authOverlay.innerHTML = `
       <div class="auth-box">
         <div class="auth-logo">ТАКТИК</div>
@@ -250,12 +250,12 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  const userRef = ref(db, `users/${user.uid}`);
+  const userRef = ref(db, `users/${users.uid}`);
 
   /* Однократное чтение профиля */
   let profile;
   try {
-    const snap = await get(userRef);
+    const snap = await get(usersRef);
     profile    = snap.val();
   } catch (e) {
     toast("Ошибка загрузки профиля", true);
@@ -265,13 +265,13 @@ onAuthStateChanged(auth, async user => {
   /* Первый вход — создаём профиль */
   if (!profile) {
     profile = {
-      nickname: (user.displayName || "Сталкер").slice(0, 20),
-      photoURL: user.photoURL || "",
-      role:     "user",
+      nickname: (users.displayName || "Сталкер").slice(0, 20),
+      photoURL: users.photoURL || "",
+      role:     "users",
       banned:   false,
-      email:    user.email || "",
+      email:    users.email || "",
     };
-    await update(userRef, profile);
+    await update(usersRef, profile);
   }
 
   /* Бан */
@@ -292,7 +292,7 @@ onAuthStateChanged(auth, async user => {
 
   setAvatar(profile.photoURL);
   profileNickname.textContent = profile.nickname || "Сталкер";
-  profileEmail.textContent    = user.email || "";
+  profileEmail.textContent    = users.email || "";
  /* nicknameInput.value         = profile.nickname || "";
   photoInput.value            = profile.photoURL || ""; */
   renderRole(profile.role);
@@ -300,7 +300,7 @@ onAuthStateChanged(auth, async user => {
 
   if (profile.role === "admin") {
     adminPanel.style.display = "block";
-    loadUsers(user.uid);
+    loadUsers(users.uid);
   }
 
   /* ── Кнопки ── */
@@ -309,7 +309,7 @@ onAuthStateChanged(auth, async user => {
     const err  = validateNickname(nick);
     if (err) { toast(err, true); return; }
     const photo = photoInput.value.trim();
-    update(userRef, { nickname: nick, photoURL: photo })
+    update(usersRef, { nickname: nick, photoURL: photo })
       .then(() => {
         toast("Профиль сохранён");
         setAvatar(photo);
@@ -319,7 +319,7 @@ onAuthStateChanged(auth, async user => {
   };
 
   resetPhotoBtn.onclick = () => {
-    photoInput.value = user.photoURL || "";
+    photoInput.value = users.photoURL || "";
     toast("Фото сброшено к Google-аккаунту");
   };
 
