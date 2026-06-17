@@ -62,27 +62,27 @@ function showOverlay() {
 }
 
 /* ── Загрузить/создать профиль пользователя ── */
-async function loadUserProfile(user, callback) {
-  const userRef = ref(db, `users/${user.uid}`);
+async function loadUsersProfile(users, callback) {
+  const usersRef = ref(db, `users/${users.uid}`);
   const snap    = await get(userRef);   // однократное чтение, без подписки
   const data    = snap.val();
 
   if (!data) {
     const profile = {
-      nickname:  user.displayName?.slice(0, 20) || "Сталкер",
-      photoURL:  user.photoURL || "",
-      role:      "user",
+      nickname:  users.displayName?.slice(0, 20) || "Сталкер",
+      photoURL:  users.photoURL || "",
+      role:      "users",
       banned:    false,
-      email:     user.email || "",
+      email:     users.email || "",
     };
-    await update(userRef, profile);
+    await update(usersRef, profile);
     callback(profile);
     return;
   }
 
   /* Проверяем срок доступа */
   if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
-    await update(userRef, { accessLevel: 0 });
+    await update(usersRef, { accessLevel: 0 });
     data.accessLevel = 0;
   }
 
@@ -110,17 +110,17 @@ export function initAuthGuard(onReady) {
 
   let initialized = false;
 
-  onAuthStateChanged(auth, user => {
-    if (!user) {
+  onAuthStateChanged(auth, users => {
+    if (!users) {
       /* Сбрасываем уровень доступа при выходе */
-      state.userAccess = 0;
+      state.usersAccess = 0;
       state.isAdmin    = false;
       showOverlay();
       initialized = false;
       return;
     }
 
-    loadUserProfile(user, profile => {
+    loadUsersProfile(users, profile => {
       if (profile.banned) {
         showOverlay();
         showBanScreen();
@@ -128,14 +128,14 @@ export function initAuthGuard(onReady) {
       }
 
       /* Пишем уровень доступа в глобальный state */
-      state.userAccess = profile.accessLevel ?? 0;
+      state.usersAccess = profile.accessLevel ?? 0;
 
       hideOverlay();
       updateMenuProfile(profile);
 
       if (!initialized) {
         initialized = true;
-        onReady(user, profile);
+        onReady(users, profile);
       }
     }).catch(err => {
       console.error("Ошибка загрузки профиля:", err);
