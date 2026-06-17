@@ -47,7 +47,7 @@ html, body {
   background: var(--bg);
   font-family: 'Rajdhani', sans-serif;
   color: var(--text);
-  users-select: none;
+  user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -87,7 +87,7 @@ body::before {
   width: 100%;
   pointer-events: none;
   image-rendering: crisp-edges;
-  -webkit-users-drag: none;
+  -webkit-user-drag: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -209,8 +209,8 @@ body::before {
 .marker img {
   -webkit-touch-callout: none;
   pointer-events: none;
-  users-select: none;
-  -webkit-users-drag: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -564,7 +564,7 @@ textarea { resize: vertical; min-height: 72px; }
   .marker-icon img {
     -webkit-touch-callout: none;
     pointer-events: none;
-    users-select: none;
+    user-select: none;
   }
 }
 
@@ -589,13 +589,6 @@ textarea { resize: vertical; min-height: 72px; }
   .modal-title { font-size: 18px; gap: 6px; }
   .modal-photo { max-height: 200px; }
   .modal-body  { padding: 12px 14px; }
-  
-  .marker-icon,
-  .marker-photo {
-    width: 6px;
-    height: 6px;
-    font-size: 4px;
-  }
 
   #addForm {
     bottom: 0;
@@ -613,20 +606,13 @@ textarea { resize: vertical; min-height: 72px; }
   input[type="url"],
   textarea, select { font-size: 16px !important; }
 
-  .zoom-btn { width: 44px; height: 44px; font-size: 30px; }
+  .zoom-btn { width: 44px; height: 44px; font-size: 22px; }
 }
 
 @media (max-width: 430px) {
   .modal-title { font-size: 16px; }
-  .modal-footer { gap: 5px; padding: 5px 8px; }
-  .modal-footer .btn { font-size: 12px; padding: 5px 8px; }
-  
-  .marker-icon,
-  .marker-photo {
-    width: 6px;
-    height: 6px;
-    font-size: 4px;
-  }
+  .modal-footer { gap: 6px; padding: 8px 12px; }
+  .modal-footer .btn { font-size: 12px; padding: 6px 10px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════

@@ -1,12 +1,11 @@
 // auth-guard.js — Проверка авторизации, бана, загрузка профиля
 
 import { auth, db, onAuthStateChanged,
-         ref, get, update }       from "./config.js";
-import { state }                  from "./state.js";
+         ref, onValue, update }           from "./config.js";
 
 const OVERLAY_ID = "authOverlay";
 
-/* ── Создаём оверлей входа ──  */
+/* ── Создаём оверлей входа ── */
 function createOverlay() {
   if (document.getElementById(OVERLAY_ID)) return;
   const el = document.createElement("div");
@@ -31,10 +30,10 @@ function createOverlay() {
   document.body.appendChild(el);
 
   document.getElementById("authGoogleBtn").onclick = () => {
-    import("./config.js").then(m => {
-      m.signInWithPopup(m.auth, m.provider).catch(e => alert(e.message));
-    });
-  };
+  import("./config.js").then(m => {
+    m.signInWithPopup(m.auth, m.provider).catch(e => alert(e.message));
+  });
+};
 }
 
 /* ── Экран бана ── */
@@ -49,12 +48,13 @@ function showBanScreen() {
   `;
 }
 
-/* ── Скрыть / показать оверлей ── */
+/* ── Скрыть оверлей ── */
 function hideOverlay() {
   const el = document.getElementById(OVERLAY_ID);
   if (el) el.style.display = "none";
 }
 
+/* ── Показать оверлей ── */
 function showOverlay() {
   let el = document.getElementById(OVERLAY_ID);
   if (!el) { createOverlay(); el = document.getElementById(OVERLAY_ID); }
@@ -62,31 +62,30 @@ function showOverlay() {
 }
 
 /* ── Загрузить/создать профиль пользователя ── */
-async function loadUsersProfile(users, callback) {
-  const usersRef = ref(db, `users/${users.uid}`);
-  const snap    = await get(userRef);   // однократное чтение, без подписки
-  const data    = snap.val();
-
-  if (!data) {
-    const profile = {
-      nickname:  users.displayName?.slice(0, 20) || "Сталкер",
-      photoURL:  users.photoURL || "",
-      role:      "users",
-      banned:    false,
-      email:     users.email || "",
-    };
-    await update(usersRef, profile);
-    callback(profile);
-    return;
+function loadUserProfile(user, callback) {
+  const userRef = ref(db, `users/${user.uid}`);
+  onValue(userRef, snap => {
+    const data = snap.val();
+    if (!data) {
+      const profile = {
+        nickname: user.displayName?.slice(0, 20) || "Сталкер",
+        photoURL: user.photoURL || "",
+        role:     "user",
+        banned:   false,
+        email:    user.email || "",
+      };
+      update(userRef, profile);
+      callback(profile);
+    } else {
+    /* Проверяем срок доступа */
+    if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
+      /* Срок истёк — сбрасываем уровень */
+      update(ref(db, `users/${user.uid}`), { accessLevel: 0 });
+      data.accessLevel = 0;
+    }
+    callback(data);
   }
-
-  /* Проверяем срок доступа */
-  if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
-    await update(usersRef, { accessLevel: 0 });
-    data.accessLevel = 0;
-  }
-
-  callback(data);
+  });
 }
 
 /* ── Обновить аватар в меню карты ── */
@@ -96,7 +95,7 @@ export function updateMenuProfile(profile) {
   if (nickEl)  nickEl.textContent = profile.nickname || "ЧВК";
   if (photoEl) {
     if (profile.photoURL) {
-      photoEl.src           = profile.photoURL;
+      photoEl.src = profile.photoURL;
       photoEl.style.display = "block";
     } else {
       photoEl.style.display = "none";
@@ -110,36 +109,27 @@ export function initAuthGuard(onReady) {
 
   let initialized = false;
 
-  onAuthStateChanged(auth, users => {
-    if (!users) {
-      /* Сбрасываем уровень доступа при выходе */
-      state.usersAccess = 0;
-      state.isAdmin    = false;
+  onAuthStateChanged(auth, user => {
+    if (!user) {
       showOverlay();
       initialized = false;
       return;
     }
 
-    loadUsersProfile(users, profile => {
+    loadUserProfile(user, profile => {
       if (profile.banned) {
         showOverlay();
         showBanScreen();
         return;
       }
 
-      /* Пишем уровень доступа в глобальный state */
-      state.usersAccess = profile.accessLevel ?? 0;
-
       hideOverlay();
       updateMenuProfile(profile);
 
       if (!initialized) {
         initialized = true;
-        onReady(users, profile);
+        onReady(user, profile);
       }
-    }).catch(err => {
-      console.error("Ошибка загрузки профиля:", err);
-      showOverlay();
     });
   });
 }

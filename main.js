@@ -1,41 +1,30 @@
-// main.js — Точка входа: инициализация приложения  
+// main.js — Точка входа: инициализация приложения
 
-import { auth, provider, signInWithPopup, signOut } from "./config.js";
-import { MAPS }                                      from "./constants.js";
-import { state }                                     from "./state.js";
+import { auth, provider, signInWithPopup,
+         onAuthStateChanged, signOut }     from "./config.js";
+import { MAPS }                           from "./constants.js";
+import { state }                          from "./state.js";
 import { toast, loginBtn, logoutBtn, adminBadge,
          addModeBtn, mapSelect,
          addEmojiPicker, addEmojiInput,
-         editEmojiPicker, editEmojiInput }           from "./ui.js";
-import { switchMap, setLevel }                       from "./map.js";
+         editEmojiPicker, editEmojiInput } from "./ui.js";
+import { switchMap, setLevel }            from "./map.js";
 import { exitAddMode, buildEmojiPicker,
-         checkUrlHash }                              from "./markers.js";
-import { initAuthGuard, updateMenuProfile }          from "./auth-guard.js";
+         checkUrlHash }                    from "./markers.js";
+import { initAuthGuard, updateMenuProfile } from "./auth-guard.js";
 
-/* ──────────────────────────────────────────────
-   EMOJI PICKERS
-   Строим до auth — они не зависят от пользователя
-   ────────────────────────────────────────────── */
-buildEmojiPicker(addEmojiPicker,  addEmojiInput);
+/* ── Emoji pickers ── */
+buildEmojiPicker(addEmojiPicker, addEmojiInput);
 buildEmojiPicker(editEmojiPicker, editEmojiInput);
 
-/* ──────────────────────────────────────────────
-   AUTH КНОПКИ
-   ────────────────────────────────────────────── */
-loginBtn.onclick  = () =>
-  signInWithPopup(auth, provider).catch(e => toast(e.message, true));
+/* ── Auth + запуск карты ── */
+loginBtn.onclick  = () => signInWithPopup(auth, provider)
+  .catch(e => toast(e.message, true));
+logoutBtn.onclick = () => signOut(auth).then(() => location.reload());
 
-logoutBtn.onclick = () =>
-  signOut(auth).then(() => location.reload());
-
-/* ──────────────────────────────────────────────
-   ИНИЦИАЛИЗАЦИЯ ПОСЛЕ АВТОРИЗАЦИИ
-   ────────────────────────────────────────────── */
-initAuthGuard((users, profile) => {
-  /* ── Права ── */
+initAuthGuard((user, profile) => {
   state.isAdmin = profile.role === "admin";
 
-  /* ── UI: показываем/скрываем элементы по роли ── */
   const profileBtn = document.getElementById("profileBtn");
   if (profileBtn) profileBtn.style.display = "flex";
 
@@ -44,40 +33,30 @@ initAuthGuard((users, profile) => {
   adminBadge.style.display = state.isAdmin ? "" : "none";
   addModeBtn.style.display = state.isAdmin ? "" : "none";
 
-  /* updateMenuProfile уже вызван внутри initAuthGuard,
-     повторный вызов здесь нужен чтобы применить nickname/photo
-     к элементам которые могли не существовать в момент первого вызова */
   updateMenuProfile(profile);
-
-  /* Не-админу режим добавления недоступен */
   if (!state.isAdmin) exitAddMode();
 
-  /* ── Карта ── */
+  /* ── Старт карты ── */
   const savedMap = localStorage.getItem("lastMap");
   const startMap = (savedMap && MAPS[savedMap]) ? savedMap : "groundzero";
   mapSelect.value = startMap;
   switchMap(startMap);
-
-  /* URL-хэш обрабатываем после switchMap */
   checkUrlHash();
 
-  /* Отложенный переход на этаж из URL-хэша */
   if (state._pendingLevel !== null && state._pendingLevel !== undefined) {
     setLevel(state._pendingLevel);
     state._pendingLevel = null;
   }
 
-  /* ── Quill-редакторы инициализируем последними ──
-     Quill требует чтобы контейнер был виден в DOM   */
+  /* ── Quill — последними ── */
   state.addQuill = new Quill("#addQuillEditor", {
-    theme:   "snow",
+    theme: "snow",
     placeholder: "Подробное описание...",
-    modules: { toolbar: "#addQuillToolbar" },
+    modules: { toolbar: "#addQuillToolbar" }
   });
-
   state.editQuill = new Quill("#editQuillEditor", {
-    theme:   "snow",
+    theme: "snow",
     placeholder: "Описание...",
-    modules: { toolbar: "#editQuillToolbar" },
+    modules: { toolbar: "#editQuillToolbar" }
   });
 });

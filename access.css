@@ -71,7 +71,7 @@
 }
 
 /* ── Карточка пользователя ── */
-.access-users-card {
+.access-user-card {
   background: var(--surface2, #161c18);
   border: 1px solid var(--border, #2a3428);
   border-radius: var(--radius, 6px);
@@ -83,21 +83,21 @@
   transition: border-color .15s;
 }
 
-.access-users-card:hover {
+.access-user-card:hover {
   border-color: var(--border2, #3a4838);
 }
 
-.access-users-card.expiring {
+.access-user-card.expiring {
   border-color: rgba(230,126,34,.4);
   background: rgba(230,126,34,.05);
 }
 
-.access-users-card.expired {
+.access-user-card.expired {
   border-color: rgba(192,57,43,.3);
   background: rgba(192,57,43,.04);
 }
 
-.access-users-card.banned {
+.access-user-card.banned {
   border-color: rgba(192,57,43,.4);
   background: rgba(192,57,43,.06);
   opacity: .7;
@@ -236,7 +236,7 @@
   background: var(--surface2, #161c18);
 }
 
-.access-users-info {
+.access-user-info {
   display: flex;
   align-items: center;
   gap: 12px;
