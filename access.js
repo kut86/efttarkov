@@ -1,45 +1,36 @@
-/* access.js — Управление уровнями доступа */
+// access.js — Управление уровнями доступа
 
 import { auth, db, provider,
-         ref, onValue, update,
+         ref, get, onValue, update,
          signInWithPopup, onAuthStateChanged } from "./config.js";
-
-const LEVELS = {
-  0: { name: "Standard",           icon: "🪖" },
-  1: { name: "Left Behind",        icon: "🎯" },
-  2: { name: "Prepare for Escape", icon: "⚔️" },
-  3: { name: "Edge of Darkness",   icon: "💀" },
-  4: { name: "Unheard",            icon: "👁" },
-};
-
-const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+import { LEVELS, THREE_DAYS_MS }              from "./constants.js";
+import { getExpiryStatus, formatExpiry }      from "./access-control.js";
 
 /* ── DOM ── */
-const authOverlay    = document.getElementById("authOverlay");
-const accessPage     = document.getElementById("accessPage");
-const usersList      = document.getElementById("usersList");
-const searchInput    = document.getElementById("searchInput");
-const levelFilter    = document.getElementById("levelFilter");
-const statusFilter   = document.getElementById("statusFilter");
-const accessModal    = document.getElementById("accessModal");
+const authOverlay       = document.getElementById("authOverlay");
+const accessPage        = document.getElementById("accessPage");
+const usersList         = document.getElementById("usersList");
+const searchInput       = document.getElementById("searchInput");
+const levelFilter       = document.getElementById("levelFilter");
+const statusFilter      = document.getElementById("statusFilter");
+const accessModal       = document.getElementById("accessModal");
 const accessModalClose  = document.getElementById("accessModalClose");
 const accessModalCancel = document.getElementById("accessModalCancel");
 const accessModalSave   = document.getElementById("accessModalSave");
-const levelButtons   = document.getElementById("levelButtons");
-const expiryDate     = document.getElementById("expiryDate");
-const accessNote     = document.getElementById("accessNote");
-const toastCont      = document.getElementById("toastContainer");
+const levelButtons      = document.getElementById("levelButtons");
+const expiryDate        = document.getElementById("expiryDate");
+const accessNote        = document.getElementById("accessNote");
+const toastCont         = document.getElementById("toastContainer");
 
-/* ── Stats DOM ── */
 const statTotal    = document.getElementById("statTotal");
 const statActive   = document.getElementById("statActive");
 const statExpiring = document.getElementById("statExpiring");
 const statBanned   = document.getElementById("statBanned");
 
 /* ── State ── */
-let allUsers     = [];
-let currentEdit  = null;
-let selectedLevel = 0;
+let allUsers      = [];
+let currentEdit   = null;
+let selectedLevel  = 0;
 let selectedExpiry = null;
 
 /* ── Toast ── */
@@ -51,61 +42,48 @@ function toast(msg, err = false) {
   setTimeout(() => t.remove(), 3200);
 }
 
-/* ── Форматирование даты ── */
-function formatDate(ts) {
-  if (!ts) return null;
-  return new Date(ts).toLocaleDateString("ru-RU", {
-    day: "2-digit", month: "2-digit", year: "numeric"
-  });
-}
-
-function getExpiryStatus(expiry) {
-  if (!expiry) return "forever";
-  const now  = Date.now();
-  const diff = expiry - now;
-  if (diff < 0)          return "expired";
-  if (diff < THREE_DAYS) return "soon";
-  return "ok";
-}
-
-/* ── Обновить статистику ── */
+/* ── Статистика ── */
 function updateStats(users) {
   const now = Date.now();
   let active = 0, expiring = 0, banned = 0;
+
   users.forEach(u => {
     if (u.banned) { banned++; return; }
     active++;
-    if (u.accessExpiry && (u.accessExpiry - now) < THREE_DAYS && (u.accessExpiry - now) > 0) {
-      expiring++;
+    if (u.accessExpiry) {
+      const diff = u.accessExpiry - now;
+      if (diff > 0 && diff < THREE_DAYS_MS) expiring++;
     }
   });
+
   statTotal.textContent    = users.length;
   statActive.textContent   = active;
   statExpiring.textContent = expiring;
   statBanned.textContent   = banned;
 }
 
-/* ── Рендер карточки ── */
+/* ── Рендер карточки пользователя ── */
 function renderCard(u) {
-  const card = document.createElement("div");
+  const card   = document.createElement("div");
   const status = getExpiryStatus(u.accessExpiry);
   const level  = u.accessLevel ?? 0;
 
-  let cardClass = "access-user-card";
-  if (u.banned)          cardClass += " banned";
-  else if (status === "expired") cardClass += " expired";
-  else if (status === "soon")    cardClass += " expiring";
-  card.className = cardClass;
+  let cls = "access-user-card";
+  if (u.banned)            cls += " banned";
+  else if (status === "expired") cls += " expired";
+  else if (status === "soon")    cls += " expiring";
+  card.className = cls;
 
+  /* Бейдж срока */
   let expiryHTML = "";
   if (!u.accessExpiry) {
     expiryHTML = `<span class="access-expiry-badge expiry-forever">∞ Бессрочно</span>`;
   } else if (status === "expired") {
-    expiryHTML = `<span class="access-expiry-badge expiry-expired">⛔ Истёк ${formatDate(u.accessExpiry)}</span>`;
+    expiryHTML = `<span class="access-expiry-badge expiry-expired">⛔ Истёк ${formatExpiry(u.accessExpiry)}</span>`;
   } else if (status === "soon") {
-    expiryHTML = `<span class="access-expiry-badge expiry-soon">⚠️ до ${formatDate(u.accessExpiry)}</span>`;
+    expiryHTML = `<span class="access-expiry-badge expiry-soon">⚠️ до ${formatExpiry(u.accessExpiry)}</span>`;
   } else {
-    expiryHTML = `<span class="access-expiry-badge expiry-ok">до ${formatDate(u.accessExpiry)}</span>`;
+    expiryHTML = `<span class="access-expiry-badge expiry-ok">до ${formatExpiry(u.accessExpiry)}</span>`;
   }
 
   card.innerHTML = `
@@ -122,7 +100,9 @@ function renderCard(u) {
             ${LEVELS[level]?.icon} ${LEVELS[level]?.name}
           </span>
           ${expiryHTML}
-          ${u.accessNote ? `<span class="access-expiry-badge expiry-ok">📝 ${esc(u.accessNote)}</span>` : ""}
+          ${u.accessNote
+            ? `<span class="access-expiry-badge expiry-ok">📝 ${esc(u.accessNote)}</span>`
+            : ""}
         </div>
       </div>
     </div>
@@ -140,55 +120,59 @@ function applyFilters() {
   const q      = searchInput.value.toLowerCase();
   const lvl    = levelFilter.value;
   const status = statusFilter.value;
-  const now    = Date.now();
 
   usersList.innerHTML = "";
   allUsers.forEach(u => {
-    if (q && !( (u.nickname||"").toLowerCase().includes(q) ||
-                (u.email||"").toLowerCase().includes(q) )) return;
+    /* Поиск по нику / email */
+    if (q && !(
+      (u.nickname || "").toLowerCase().includes(q) ||
+      (u.email    || "").toLowerCase().includes(q)
+    )) return;
+
+    /* Фильтр по уровню */
     if (lvl !== "all" && String(u.accessLevel ?? 0) !== lvl) return;
 
+    /* Фильтр по статусу */
     const es = getExpiryStatus(u.accessExpiry);
     if (status === "active"   && (u.banned || es === "expired")) return;
-    if (status === "expiring" && es !== "soon")    return;
-    if (status === "expired"  && es !== "expired") return;
-    if (status === "banned"   && !u.banned)        return;
+    if (status === "expiring" && es !== "soon")                  return;
+    if (status === "expired"  && es !== "expired")               return;
+    if (status === "banned"   && !u.banned)                      return;
 
     usersList.appendChild(renderCard(u));
   });
 }
 
-searchInput.addEventListener("input",  applyFilters);
-levelFilter.addEventListener("change", applyFilters);
-statusFilter.addEventListener("change",applyFilters);
+searchInput.addEventListener("input",   applyFilters);
+levelFilter.addEventListener("change",  applyFilters);
+statusFilter.addEventListener("change", applyFilters);
 
-/* ── Открыть модалку ── */
+/* ── Открыть модалку редактирования ── */
 function openModal(u) {
   currentEdit    = u;
-  selectedLevel  = u.accessLevel ?? 0;
-  selectedExpiry = u.accessExpiry || null;
+  selectedLevel  = u.accessLevel  ?? 0;
+  selectedExpiry = u.accessExpiry ?? null;
 
   document.getElementById("modalUserNick").textContent  = u.nickname || "—";
   document.getElementById("modalUserEmail").textContent = u.email    || "";
+
   const av = document.getElementById("modalUserAvatar");
-  av.src = u.photoURL || "";
+  av.src           = u.photoURL || "";
   av.style.display = u.photoURL ? "" : "none";
 
   accessNote.value = u.accessNote || "";
 
   /* Кнопки уровней */
-  levelButtons.querySelectorAll(".level-btn").forEach(btn => {
-    btn.classList.toggle("active", Number(btn.dataset.level) === selectedLevel);
-  });
+  levelButtons.querySelectorAll(".level-btn").forEach(btn =>
+    btn.classList.toggle("active", Number(btn.dataset.level) === selectedLevel)
+  );
 
   /* Дата */
   expiryDate.value = selectedExpiry
     ? new Date(selectedExpiry).toISOString().split("T")[0]
     : "";
 
-  /* Сброс активных expiry-btn */
   document.querySelectorAll(".expiry-btn").forEach(b => b.classList.remove("active"));
-
   accessModal.style.display = "flex";
 }
 
@@ -201,8 +185,9 @@ function closeModal() {
 accessModalClose.onclick  = closeModal;
 accessModalCancel.onclick = closeModal;
 accessModal.addEventListener("click", e => { if (e.target === accessModal) closeModal(); });
+document.addEventListener("keydown",  e => { if (e.key === "Escape") closeModal(); });
 
-/* ── Выбор уровня ── */
+/* ── Выбор уровня доступа ── */
 levelButtons.querySelectorAll(".level-btn").forEach(btn => {
   btn.onclick = () => {
     selectedLevel = Number(btn.dataset.level);
@@ -219,16 +204,16 @@ document.querySelectorAll(".expiry-btn").forEach(btn => {
     btn.classList.add("active");
     const days = Number(btn.dataset.days);
     if (days === 0) {
-      selectedExpiry = null;
+      selectedExpiry   = null;
       expiryDate.value = "";
     } else {
-      selectedExpiry = Date.now() + days * 24 * 60 * 60 * 1000;
+      selectedExpiry   = Date.now() + days * 24 * 60 * 60 * 1000;
       expiryDate.value = new Date(selectedExpiry).toISOString().split("T")[0];
     }
   };
 });
 
-/* ── Изменение даты вручную ── */
+/* ── Ручной ввод даты ── */
 expiryDate.addEventListener("change", () => {
   document.querySelectorAll(".expiry-btn").forEach(b => b.classList.remove("active"));
   selectedExpiry = expiryDate.value
@@ -236,11 +221,10 @@ expiryDate.addEventListener("change", () => {
     : null;
 });
 
-/* ── Сохранить ── */
+/* ── Сохранить доступ ── */
 accessModalSave.onclick = () => {
   if (!currentEdit) return;
-  const uRef = ref(db, `users/${currentEdit.uid}`);
-  update(uRef, {
+  update(ref(db, `users/${currentEdit.uid}`), {
     accessLevel:  selectedLevel,
     accessExpiry: selectedExpiry || null,
     accessNote:   accessNote.value.trim() || null,
@@ -251,18 +235,16 @@ accessModalSave.onclick = () => {
 };
 
 /* ── Escape ── */
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeModal();
-});
-
 function esc(s) {
   return String(s ?? "")
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/* ── Auth ── */
-onAuthStateChanged(auth, user => {
+/* ──────────────────────────────────────────────
+   AUTH — однократная проверка роли через get()
+   ────────────────────────────────────────────── */
+onAuthStateChanged(auth, async user => {
   if (!user) {
     authOverlay.innerHTML = `
       <div class="auth-box">
@@ -276,33 +258,37 @@ onAuthStateChanged(auth, user => {
     return;
   }
 
-  /* Проверяем что это админ */
-  const userRef = ref(db, `users/${user.uid}`);
-  onValue(userRef, snap => {
-    const profile = snap.val();
-    if (!profile || profile.role !== "admin") {
-      authOverlay.innerHTML = `
-        <div class="auth-box">
-          <div class="auth-logo" style="color:#c0392b">⛔ НЕТ ДОСТУПА</div>
-          <div class="auth-sub">Эта страница только для администраторов.</div>
-          <a href="index.html" class="btn btn-sm" style="margin-top:8px">← На карту</a>
-        </div>`;
-      authOverlay.style.display = "flex";
-      return;
-    }
+  /* Однократная проверка роли — без постоянной подписки */
+  let profile;
+  try {
+    const snap = await get(ref(db, `users/${user.uid}`));
+    profile    = snap.val();
+  } catch (e) {
+    toast("Ошибка проверки доступа", true);
+    return;
+  }
 
-    authOverlay.style.display = "none";
-    accessPage.style.display  = "block";
+  if (!profile || profile.role !== "admin") {
+    authOverlay.innerHTML = `
+      <div class="auth-box">
+        <div class="auth-logo" style="color:#c0392b">⛔ НЕТ ДОСТУПА</div>
+        <div class="auth-sub">Эта страница только для администраторов.</div>
+        <a href="index.html" class="btn btn-sm" style="margin-top:8px">← На карту</a>
+      </div>`;
+    authOverlay.style.display = "flex";
+    return;
+  }
 
-    /* Загружаем пользователей */
-    const usersRef = ref(db, "users");
-    onValue(usersRef, snap => {
-      allUsers = [];
-      snap.forEach(child => {
-        allUsers.push({ uid: child.key, ...child.val() });
-      });
-      updateStats(allUsers);
-      applyFilters();
-    });
-  }, { onlyOnce: true });
+  /* Доступ разрешён — показываем страницу */
+  authOverlay.style.display = "none";
+  accessPage.style.display  = "block";
+
+  /* Подписка на список пользователей — живая, это нужно для актуальности */
+  onValue(ref(db, "users"), snap => {
+    allUsers = [];
+    snap.forEach(child => allUsers.push({ uid: child.key, ...child.val() }));
+    updateStats(allUsers);
+    applyFilters();
+  });
 });
+           
