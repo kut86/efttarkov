@@ -1,28 +1,30 @@
-// profile.js — Логика страницы профиля 
+// profile.js — Логика страницы профиля
 
 import { auth, db, provider,
-         ref, onValue, update,
+         ref, get, update,
          signInWithPopup, onAuthStateChanged,
-         signOut }                         from "./config.js";
+         signOut }                              from "./config.js";
+import { LEVELS, THREE_DAYS_MS }               from "./constants.js";
+import { getExpiryStatus, formatExpiry }       from "./access-control.js";
 
 /* ── DOM ── */
-const profilePage      = document.getElementById("profilePage");
-const authOverlay      = document.getElementById("authOverlay");
-const profileAvatar    = document.getElementById("profileAvatar");
-const profileAvatarPh  = document.getElementById("profileAvatarPlaceholder");
-const profileNickname  = document.getElementById("profileNicknameDisplay");
-const profileEmail     = document.getElementById("profileEmail");
-const profileRoleEl    = document.getElementById("profileRole");
-const nicknameInput    = document.getElementById("nicknameInput");
-const photoInput       = document.getElementById("photoInput");
-const photoPreviewBtn  = document.getElementById("photoPreviewBtn");
-const saveProfileBtn   = document.getElementById("saveProfileBtn");
-const resetPhotoBtn    = document.getElementById("resetPhotoBtn");
-const logoutBtn        = document.getElementById("logoutBtn");
-const adminPanel       = document.getElementById("adminPanel");
-const usersList        = document.getElementById("usersList");
-const adminSearch      = document.getElementById("adminSearch");
-const toastCont        = document.getElementById("toastContainer");
+const profilePage     = document.getElementById("profilePage");
+const authOverlay     = document.getElementById("authOverlay");
+const profileAvatar   = document.getElementById("profileAvatar");
+const profileAvatarPh = document.getElementById("profileAvatarPlaceholder");
+const profileNickname = document.getElementById("profileNicknameDisplay");
+const profileEmail    = document.getElementById("profileEmail");
+const profileRoleEl   = document.getElementById("profileRole");
+const nicknameInput   = document.getElementById("nicknameInput");
+const photoInput      = document.getElementById("photoInput");
+const photoPreviewBtn = document.getElementById("photoPreviewBtn");
+const saveProfileBtn  = document.getElementById("saveProfileBtn");
+const resetPhotoBtn   = document.getElementById("resetPhotoBtn");
+const logoutBtn       = document.getElementById("logoutBtn");
+const adminPanel      = document.getElementById("adminPanel");
+const usersList       = document.getElementById("usersList");
+const adminSearch     = document.getElementById("adminSearch");
+const toastCont       = document.getElementById("toastContainer");
 
 /* ── Toast ── */
 function toast(msg, err = false) {
@@ -35,52 +37,42 @@ function toast(msg, err = false) {
 
 /* ── Валидация никнейма ── */
 function validateNickname(val) {
-  if (!val) return "Никнейм не может быть пустым";
+  if (!val)         return "Никнейм не может быть пустым";
   if (val.length > 20) return "Максимум 20 символов";
-  if (!/^[a-zA-Zа-яёА-ЯЁ0-9_\- ]+$/.test(val)) return "Только буквы, цифры, пробел, _ и -";
+  if (!/^[a-zA-Zа-яёА-ЯЁ0-9_\- ]+$/.test(val))
+    return "Только буквы, цифры, пробел, _ и -";
   return null;
 }
 
-/* ── Обновить отображение аватара ── */
+/* ── Аватар ── */
 function setAvatar(url) {
   if (url) {
-    profileAvatar.src = url;
-    profileAvatar.style.display = "block";
-    profileAvatarPh.style.display = "none";
+    profileAvatar.src         = url;
+    profileAvatar.style.display    = "block";
+    profileAvatarPh.style.display  = "none";
   } else {
-    profileAvatar.style.display = "none";
-    profileAvatarPh.style.display = "flex";
+    profileAvatar.style.display    = "none";
+    profileAvatarPh.style.display  = "flex";
   }
 }
 
-/* ── Рендер роли ── */
+/* ── Роль ── */
 function renderRole(role) {
   const labels = { admin: "⚙️ Администратор", user: "👤 Пользователь" };
   profileRoleEl.textContent = labels[role] || role;
   profileRoleEl.className   = "profile-role role-" + (role || "user");
 }
 
-/* ── Уровни доступа ── */
-const LEVELS = {
-  0: { name: "Standard",           icon: "🪖" },
-  1: { name: "Left Behind",        icon: "🎯" },
-  2: { name: "Prepare for Escape", icon: "⚔️" },
-  3: { name: "Edge of Darkness",   icon: "💀" },
-  4: { name: "Unheard",            icon: "👁" },
-};
-
 /* ── Баннер уровня доступа ── */
 function renderAccessBanner(profile) {
-  /* Удаляем старый баннер если есть */
   const old = document.getElementById("accessBanner");
   if (old) old.remove();
 
-  const level = profile.accessLevel ?? 0;
-  const expiry = profile.accessExpiry;
-  const now = Date.now();
-  const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+  const level  = profile.accessLevel ?? 0;
+  const expiry = profile.accessExpiry ?? null;
+  const status = getExpiryStatus(expiry);
+  const info   = LEVELS[level] ?? LEVELS[0];
 
-  /* Создаём блок уровня доступа */
   const banner = document.createElement("div");
   banner.id = "accessBanner";
   banner.style.cssText = `
@@ -92,156 +84,161 @@ function renderAccessBanner(profile) {
     gap: 6px;
   `;
 
-  let bannerHTML = `
+  let inner = `
     <div style="font-family:'Share Tech Mono',monospace;font-size:10px;
                 color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;
                 margin-bottom:2px">Уровень доступа</div>
     <div style="font-size:16px;font-weight:700;color:var(--text-bright)">
-      ${LEVELS[level]?.icon} ${LEVELS[level]?.name}
-    </div>
-  `;
+      ${info.icon} ${info.name}
+    </div>`;
 
-  if (expiry && level > 0) {
-    const diff = expiry - now;
-    const days = Math.ceil(diff / (24 * 60 * 60 * 1000));
+  if (level > 0 && expiry) {
+    const days = Math.ceil((expiry - Date.now()) / (24 * 60 * 60 * 1000));
 
-    if (diff < 0) {
-      /* Истёк */
-      bannerHTML += `
+    if (status === "expired") {
+      inner += `
         <div style="background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);
                     border-radius:6px;padding:8px 12px;font-size:12px;color:#c0392b;margin-top:4px">
           ⛔ Срок доступа истёк. Обратитесь к администратору.
         </div>`;
       banner.style.background = "rgba(192,57,43,.05)";
-      banner.style.border = "1px solid rgba(192,57,43,.3)";
-    } else if (diff < THREE_DAYS) {
-      /* Скоро истекает */
-      bannerHTML += `
+      banner.style.border     = "1px solid rgba(192,57,43,.3)";
+    } else if (status === "soon") {
+      inner += `
         <div style="background:rgba(230,126,34,.15);border:1px solid rgba(230,126,34,.4);
                     border-radius:6px;padding:8px 12px;font-size:12px;color:#e67e22;margin-top:4px">
-          ⚠️ Доступ истекает через ${days} ${days === 1 ? "день" : days < 5 ? "дня" : "дней"} 
-          — ${new Date(expiry).toLocaleDateString("ru-RU")}
+          ⚠️ Доступ истекает через ${days} ${days === 1 ? "день" : days < 5 ? "дня" : "дней"}
+          — ${formatExpiry(expiry)}
         </div>`;
       banner.style.background = "rgba(230,126,34,.05)";
-      banner.style.border = "1px solid rgba(230,126,34,.3)";
+      banner.style.border     = "1px solid rgba(230,126,34,.3)";
     } else {
-      /* Всё нормально */
-      bannerHTML += `
+      inner += `
         <div style="font-size:12px;color:var(--text-dim);margin-top:2px">
-          Действует до ${new Date(expiry).toLocaleDateString("ru-RU")}
+          Действует до ${formatExpiry(expiry)}
         </div>`;
       banner.style.background = "var(--surface2)";
-      banner.style.border = "1px solid var(--border)";
+      banner.style.border     = "1px solid var(--border)";
     }
   } else if (level > 0) {
-    bannerHTML += `
+    inner += `
       <div style="font-size:12px;color:var(--text-dim);margin-top:2px">∞ Бессрочно</div>`;
     banner.style.background = "var(--surface2)";
-    banner.style.border = "1px solid var(--border)";
+    banner.style.border     = "1px solid var(--border)";
   } else {
     banner.style.background = "var(--surface2)";
-    banner.style.border = "1px solid var(--border)";
+    banner.style.border     = "1px solid var(--border)";
   }
 
-  banner.innerHTML = bannerHTML;
-
-  /* Вставляем после карточки профиля */
+  banner.innerHTML = inner;
   const card = document.querySelector(".profile-card");
   if (card) card.after(banner);
 }
 
-/* ── Загрузить список пользователей (только для админа) ── */
+/* ── Список пользователей (только для админа) ── */
+let usersUnsubscribe = null;   // храним отписку чтобы не дублировать подписку
+
 function loadUsers(currentUid) {
-  const usersRef = ref(db, "users");
-  onValue(usersRef, snap => {
-    const all = [];
-    snap.forEach(child => {
-      all.push({ uid: child.key, ...child.val() });
+  /* Защита от повторного вызова */
+  if (usersUnsubscribe) return;
+
+  import("./config.js").then(({ db, ref, onValue }) => {
+    const usersRef = ref(db, "users");
+    usersUnsubscribe = onValue(usersRef, snap => {
+      const all = [];
+      snap.forEach(child => all.push({ uid: child.key, ...child.val() }));
+      renderUsers(all, currentUid);
     });
-    renderUsers(all, currentUid);
   });
 
   adminSearch.addEventListener("input", () => {
     const q = adminSearch.value.toLowerCase();
-    const items = usersList.querySelectorAll(".user-card");
-    items.forEach(card => {
-      const text = card.textContent.toLowerCase();
-      card.style.display = text.includes(q) ? "" : "none";
+    usersList.querySelectorAll(".user-card").forEach(card => {
+      card.style.display = card.textContent.toLowerCase().includes(q) ? "" : "none";
     });
   });
 }
 
-/* ── Рендер карточек пользователей ── */
+/* ── Карточки пользователей ── */
 function renderUsers(users, currentUid) {
   usersList.innerHTML = "";
   users.forEach(u => {
+    const isAdmin = u.role === "admin";
+    const isSelf  = u.uid === currentUid;
+    const lvlInfo = LEVELS[u.accessLevel ?? 0] ?? LEVELS[0];
+
     const card = document.createElement("div");
     card.className = "user-card" + (u.banned ? " user-banned" : "");
-
-    const isAdmin  = u.role === "admin";
-    const isSelf   = u.uid === currentUid;
-
     card.innerHTML = `
       <div class="user-card-info">
-        <img class="user-card-avatar" src="${u.photoURL || ""}" 
+        <img class="user-card-avatar" src="${u.photoURL || ""}"
              onerror="this.style.display='none'"
              style="${u.photoURL ? "" : "display:none"}">
         <div class="user-card-text">
-          <div class="user-card-nick">${esc(u.nickname || "—")} ${isSelf ? "<span class='user-self'>(вы)</span>" : ""}</div>
+          <div class="user-card-nick">
+            ${esc(u.nickname || "—")}
+            ${isSelf ? "<span class='user-self'>(вы)</span>" : ""}
+          </div>
           <div class="user-card-email">${esc(u.email || "")}</div>
-          <div class="user-card-role">${isAdmin ? "⚙️ Админ" : "👤 Пользователь"} ${u.banned ? "· 🔴 Заблокирован" : ""}</div>
+          <div class="user-card-role">
+            ${isAdmin ? "⚙️ Админ" : "👤 Пользователь"}
+            · ${lvlInfo.icon} ${lvlInfo.name}
+            ${u.banned ? "· 🔴 Заблокирован" : ""}
+          </div>
         </div>
       </div>
+      ${!isSelf ? `
       <div class="user-card-actions">
-        ${!isSelf ? `
-          <button class="btn btn-sm ${u.banned ? "btn-primary" : "btn-danger"}" 
-                  data-uid="${u.uid}" data-action="ban">
-            ${u.banned ? "Разбанить" : "Забанить"}
-          </button>
-          <button class="btn btn-sm ${isAdmin ? "btn-danger" : ""}" 
-                  data-uid="${u.uid}" data-action="role">
-            ${isAdmin ? "Разжаловать" : "Сделать админом"}
-          </button>
-        ` : ""}
-      </div>
+        <button class="btn btn-sm ${u.banned ? "btn-primary" : "btn-danger"}"
+                data-uid="${u.uid}" data-action="ban">
+          ${u.banned ? "Разбанить" : "Забанить"}
+        </button>
+        <button class="btn btn-sm ${isAdmin ? "btn-danger" : ""}"
+                data-uid="${u.uid}" data-action="role">
+          ${isAdmin ? "Разжаловать" : "Сделать админом"}
+        </button>
+      </div>` : ""}
     `;
 
     card.querySelectorAll("button[data-action]").forEach(btn => {
-      btn.onclick = () => {
-        const uid    = btn.dataset.uid;
-        const action = btn.dataset.action;
-        const uRef   = ref(db, `users/${uid}`);
-        if (action === "ban") {
-  if (u.email === "pinachet160@gmail.com") {
-    toast("Нельзя заблокировать главного администратора", true);
-    return;
-  }
-  update(uRef, { banned: !u.banned })
-    .then(() => toast(u.banned ? "Пользователь разбанен" : "Пользователь заблокирован"));
-}
-        if (action === "role") {
-  if (u.email === "pinachet160@gmail.com") {
-    toast("Нельзя изменить роль главного администратора", true);
-    return;
-  }
-  update(uRef, { role: isAdmin ? "user" : "admin" })
-    .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"));
-}
-      };
+      btn.onclick = () => handleUserAction(btn, u, isAdmin);
     });
 
     usersList.appendChild(card);
   });
 }
 
+/* ── Действия с пользователем ── */
+function handleUserAction(btn, u, isAdmin) {
+  const PROTECTED_EMAIL = "pinachet160@gmail.com";
+  if (u.email === PROTECTED_EMAIL) {
+    toast("Нельзя изменить главного администратора", true);
+    return;
+  }
+
+  import("./config.js").then(({ db, ref, update }) => {
+    const uRef = ref(db, `users/${u.uid}`);
+    if (btn.dataset.action === "ban") {
+      update(uRef, { banned: !u.banned })
+        .then(() => toast(u.banned ? "Пользователь разбанен" : "Пользователь заблокирован"));
+    }
+    if (btn.dataset.action === "role") {
+      update(uRef, { role: isAdmin ? "user" : "admin" })
+        .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"));
+    }
+  });
+}
+
 function esc(s) {
   return String(s ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    .replace(/>/g, "&gt;").replace(/"/g,  "&quot;");
 }
 
-/* ── Основной поток ── */
-onAuthStateChanged(auth, user => {
+/* ──────────────────────────────────────────────
+   ОСНОВНОЙ ПОТОК
+   ────────────────────────────────────────────── */
+onAuthStateChanged(auth, async user => {
   if (!user) {
     authOverlay.innerHTML = `
       <div class="auth-box">
@@ -257,68 +254,70 @@ onAuthStateChanged(auth, user => {
 
   const userRef = ref(db, `users/${user.uid}`);
 
-  onValue(userRef, snap => {
-    let profile = snap.val();
+  /* ── Однократное чтение профиля ── */
+  let profile;
+  try {
+    const snap = await get(userRef);
+    profile    = snap.val();
+  } catch (e) {
+    toast("Ошибка загрузки профиля", true);
+    return;
+  }
 
-    /* Первый вход — создаём профиль */
-    if (!profile) {
-      profile = {
-        nickname: (user.displayName || "Сталкер").slice(0, 20),
-        photoURL: user.photoURL || "",
-        role:     "user",
-        banned:   false,
-        email:    user.email || "",
-      };
-      update(userRef, profile);
-    }
+  /* Первый вход — создаём профиль */
+  if (!profile) {
+    profile = {
+      nickname: (user.displayName || "Сталкер").slice(0, 20),
+      photoURL: user.photoURL || "",
+      role:     "user",
+      banned:   false,
+      email:    user.email || "",
+    };
+    await update(userRef, profile);
+  }
 
-    /* Бан */
-    if (profile.banned) {
-      authOverlay.innerHTML = `
-        <div class="auth-box">
-          <div class="auth-logo" style="color:#c0392b">⛔ ДОСТУП ЗАКРЫТ</div>
-          <div class="auth-sub">Ваш аккаунт заблокирован.</div>
-        </div>`;
-      authOverlay.style.display = "flex";
-      profilePage.style.display = "none";
-      return;
-    }
+  /* Бан */
+  if (profile.banned) {
+    authOverlay.innerHTML = `
+      <div class="auth-box">
+        <div class="auth-logo" style="color:#c0392b">⛔ ДОСТУП ЗАКРЫТ</div>
+        <div class="auth-sub">Ваш аккаунт заблокирован.</div>
+      </div>`;
+    authOverlay.style.display = "flex";
+    profilePage.style.display = "none";
+    return;
+  }
 
-    /* Показываем страницу */
-    authOverlay.style.display = "none";
-    profilePage.style.display = "block";
+  /* Показываем страницу */
+  authOverlay.style.display = "none";
+  profilePage.style.display = "block";
 
-    /* Заполняем данные */
-    setAvatar(profile.photoURL);
-    profileNickname.textContent = profile.nickname || "Сталкер";
-    profileEmail.textContent    = user.email || "";
-    nicknameInput.value         = profile.nickname || "";
-    photoInput.value            = profile.photoURL || "";
-    renderRole(profile.role);
-    renderAccessBanner(profile);
+  setAvatar(profile.photoURL);
+  profileNickname.textContent = profile.nickname || "Сталкер";
+  profileEmail.textContent    = user.email || "";
+  nicknameInput.value         = profile.nickname || "";
+  photoInput.value            = profile.photoURL || "";
+  renderRole(profile.role);
+  renderAccessBanner(profile);
 
-    /* Админ-панель */
-    if (profile.role === "admin") {
-      adminPanel.style.display = "block";
-      loadUsers(user.uid);
-    }
-  });
+  if (profile.role === "admin") {
+    adminPanel.style.display = "block";
+    loadUsers(user.uid);
+  }
 
-  /* Кнопки */
+  /* ── Кнопки ── */
   saveProfileBtn.onclick = () => {
     const nick = nicknameInput.value.trim();
     const err  = validateNickname(nick);
     if (err) { toast(err, true); return; }
-
     const photo = photoInput.value.trim();
-    update(ref(db, `users/${user.uid}`), {
-      nickname: nick,
-      photoURL: photo,
-    }).then(() => {
-      toast("Профиль сохранён");
-      setAvatar(photo);
-      profileNickname.textContent = nick;
-    }).catch(e => toast(e.message, true));
+    update(userRef, { nickname: nick, photoURL: photo })
+      .then(() => {
+        toast("Профиль сохранён");
+        setAvatar(photo);
+        profileNickname.textContent = nick;
+      })
+      .catch(e => toast(e.message, true));
   };
 
   resetPhotoBtn.onclick = () => {
@@ -328,8 +327,7 @@ onAuthStateChanged(auth, user => {
 
   photoPreviewBtn.onclick = () => {
     const url = photoInput.value.trim();
-    if (url) setAvatar(url);
-    else toast("Введите URL фото", true);
+    url ? setAvatar(url) : toast("Введите URL фото", true);
   };
 
   logoutBtn.onclick = () => signOut(auth).then(() => location.href = "index.html");
