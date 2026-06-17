@@ -31,7 +31,7 @@ logoutBtn.onclick = () =>
 /* ──────────────────────────────────────────────
    ИНИЦИАЛИЗАЦИЯ ПОСЛЕ АВТОРИЗАЦИИ
    ────────────────────────────────────────────── */
-initAuthGuard((user, profile) => {
+initAuthGuard((users, profile) => {
   /* ── Права ── */
   state.isAdmin = profile.role === "admin";
 
