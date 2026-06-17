@@ -20,7 +20,7 @@ import { LEVELS } from "./constants.js";
  */
 export function canView(minAccess = 0) {
   if (state.isAdmin) return true;            // админ видит всё
-  return (state.usersAccess ?? 0) >= minAccess;
+  return (state.userAccess ?? 0) >= minAccess;
 }
 
 /**
@@ -42,11 +42,11 @@ export function canEdit() {
  * @returns {{ name: string, icon: string }}
  *
  * @example
- * const { icon, name } = getUsersLevel();
+ * const { icon, name } = getUserLevel();
  * // → { icon: "⚔️", name: "Prepare for Escape" }
  */
-export function getUsersLevel() {
-  return LEVELS[state.usersAccess ?? 0] ?? LEVELS[0];
+export function getUserLevel() {
+  return LEVELS[state.userAccess ?? 0] ?? LEVELS[0];
 }
 
 /**

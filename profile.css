@@ -1,4 +1,8 @@
-/* profile.css — Стили профиля и auth-оверлея */
+/* profile.css — Оптимизированные стили профиля и auth-оверлея */
+html, body {
+  height: 100%;
+  overflow-y: auto;
+}
 
 /* ══════════════════════════════════════════
    AUTH OVERLAY
@@ -7,11 +11,12 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: rgba(8,10,8,.97);
+  background: rgba(8,10,8,.96);
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  transition: opacity .25s ease;
 }
 
 .auth-box {
@@ -20,19 +25,18 @@
   border-top: 2px solid var(--accent, #ff6600);
   border-radius: 14px;
   padding: 36px 32px;
-  width: 340px;
-  max-width: calc(100vw - 32px);
+  width: min(340px, 90vw);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   box-shadow: 0 24px 64px rgba(0,0,0,.8);
-  animation: authIn .25s cubic-bezier(.34,1.56,.64,1);
+  animation: authIn .3s cubic-bezier(.34,1.56,.64,1);
 }
 
 @keyframes authIn {
-  from { transform: translateY(20px) scale(.96); opacity: 0; }
-  to   { transform: translateY(0) scale(1);      opacity: 1; }
+  from { transform: translateY(20px) scale(.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .auth-logo {
@@ -48,7 +52,7 @@
   font-size: 13px;
   color: var(--text-dim, #6a7868);
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .auth-btn {
@@ -59,8 +63,10 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-color: var(--accent, #ff6600);
+  border: 1px solid var(--accent, #ff6600);
   color: var(--accent, #ff6600);
+  border-radius: 6px;
+  transition: all .2s ease;
 }
 .auth-btn:hover {
   background: var(--accent, #ff6600);
@@ -79,7 +85,7 @@
 #profilePage {
   min-height: 100dvh;
   background: var(--bg, #080a08);
-  padding: 0 0 40px;
+  padding-bottom: 40px;
   overflow-y: auto;
 }
 
@@ -100,8 +106,8 @@
 .profile-back {
   text-decoration: none;
   color: var(--text-dim, #6a7868);
-  border-color: var(--border, #2a3428);
   font-size: 12px;
+  transition: color .2s ease;
 }
 .profile-back:hover { color: var(--text, #d0ccc0); }
 
@@ -128,21 +134,18 @@
   position: relative;
 }
 
-.profile-avatar {
+.profile-avatar,
+.profile-avatar-placeholder {
   width: 72px;
   height: 72px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--accent, #ff6600);
-  display: none;
 }
 
 .profile-avatar-placeholder {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
   background: var(--surface2, #161c18);
-  border: 2px solid var(--border2, #3a4838);
+  border-color: var(--border2, #3a4838);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,19 +165,14 @@
   letter-spacing: .04em;
 }
 
-.profile-email {
-  font-size: 12px;
-  color: var(--text-dim, #6a7868);
-  font-family: 'Share Tech Mono', monospace;
-}
-
+.profile-email,
 .profile-role {
   font-size: 12px;
   font-family: 'Share Tech Mono', monospace;
-  margin-top: 2px;
+  color: var(--text-dim, #6a7868);
 }
+
 .role-admin { color: var(--accent, #ff6600); }
-.role-user  { color: var(--text-dim, #6a7868); }
 
 /* Секции */
 .profile-section {
@@ -202,9 +200,6 @@
 /* ══════════════════════════════════════════
    ADMIN PANEL
 ══════════════════════════════════════════ */
-.admin-search {
-  margin-bottom: 4px;
-}
 .admin-search input {
   width: 100%;
   font-family: 'Rajdhani', sans-serif;
@@ -212,9 +207,10 @@
   padding: 8px 12px;
   background: var(--surface2, #161c18);
   border: 1px solid var(--border2, #3a4838);
-  border-radius: var(--radius, 6px);
+  border-radius: 6px;
   color: var(--text, #d0ccc0);
   outline: none;
+  transition: border-color .2s ease;
 }
 .admin-search input:focus {
   border-color: var(--accent, #ff6600);
@@ -224,19 +220,22 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 60vh;
-  overflow-y: auto;
+  /* убрали max-height — список больше не обрезается */
 }
 
 .user-card {
   background: var(--surface2, #161c18);
   border: 1px solid var(--border, #2a3428);
-  border-radius: var(--radius, 6px);
+  border-radius: 6px;
   padding: 10px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  transition: border-color .2s ease, background .2s ease;
+}
+.user-card:hover {
+  border-color: var(--accent, #ff6600);
 }
 .user-card.user-banned {
   border-color: rgba(192,57,43,.4);
@@ -247,7 +246,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 0;
+  min-width: 0;      /* позволяет тексту внутри обрезаться */
+  flex: 1;
+}
+
+/* ── добавлен недостающий класс ── */
+.user-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;      /* обязателен для text-overflow на дочерних элементах */
 }
 
 .user-card-avatar {
@@ -257,10 +265,6 @@
   object-fit: cover;
   border: 1px solid var(--border2, #3a4838);
   flex-shrink: 0;
-}
-
-.user-card-text {
-  min-width: 0;
 }
 
 .user-card-nick {
@@ -275,10 +279,10 @@
 .user-self {
   font-size: 11px;
   color: var(--accent, #ff6600);
-  font-weight: 400;
 }
 
-.user-card-email {
+.user-card-email,
+.user-card-role {
   font-size: 11px;
   color: var(--text-dim, #6a7868);
   font-family: 'Share Tech Mono', monospace;
@@ -287,16 +291,10 @@
   text-overflow: ellipsis;
 }
 
-.user-card-role {
-  font-size: 11px;
-  color: var(--text-dim, #6a7868);
-  margin-top: 2px;
-}
-
 .user-card-actions {
   display: flex;
   gap: 6px;
-  flex-shrink: 0;
+  flex-shrink: 0;    /* кнопки не сжимаются */
 }
 
 /* ══════════════════════════════════════════
@@ -309,7 +307,7 @@
   cursor: pointer;
   text-decoration: none;
   padding: 4px 8px;
-  border-radius: var(--radius, 6px);
+  border-radius: 6px;
   border: 1px solid var(--border, #2a3428);
   background: transparent;
   transition: background .15s, border-color .15s;
@@ -325,7 +323,6 @@
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--accent, #ff6600);
-  display: none;
 }
 
 #menuNickname {
@@ -335,11 +332,184 @@
   color: var(--text, #d0ccc0);
 }
 
+#logoutBtn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Share Tech Mono', monospace;
+  color: #fff;
+  background: linear-gradient(135deg, #ff4d00, #ff6600);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  transition: transform .2s ease, box-shadow .2s ease, background .3s ease;
+}
+#logoutBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.5);
+  background: linear-gradient(135deg, #ff6600, #ff8533);
+}
+#logoutBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+#photoInput {
+  width: 100%;
+  max-width: 360px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text, #d0ccc0);
+  background: var(--surface2, #161c18);
+  border: 1px solid var(--border2, #3a4838);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+#photoInput::placeholder {
+  color: var(--text-dim, #6a7868);
+  font-style: italic;
+}
+#photoInput:focus {
+  border-color: var(--accent, #ff6600);
+  box-shadow: 0 0 0 3px rgba(255,102,0,.3);
+}
+
+#nicknameInput {
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text, #d0ccc0);
+  background: var(--surface2, #161c18);
+  border: 1px solid var(--border2, #3a4838);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+#nicknameInput::placeholder {
+  color: var(--text-dim, #6a7868);
+  font-style: italic;
+}
+#nicknameInput:focus {
+  border-color: var(--accent, #ff6600);
+  box-shadow: 0 0 0 3px rgba(255,102,0,.3);
+}
+
+#photoPreviewBtn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Share Tech Mono', monospace;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6600, #ff8533);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .3s ease;
+}
+#photoPreviewBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  background: linear-gradient(135deg, #ff8533, #ffa366);
+}
+#photoPreviewBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+#saveProfileBtn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Share Tech Mono', monospace;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6600, #ff8533);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .3s ease;
+}
+#saveProfileBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  background: linear-gradient(135deg, #ff8533, #ffa366);
+}
+#saveProfileBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+#resetPhotoBtn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-dim, #6a7868);
+  background: var(--surface2, #161c18);
+  border: 1px solid var(--border2, #3a4838);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+#resetPhotoBtn:hover {
+  color: #fff;
+  border-color: var(--accent, #ff6600);
+  background: rgba(255,102,0,.1);
+}
+
+a.btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--accent, #ff6600);
+  background: var(--surface2, #161c18);
+  border: 1px solid var(--border2, #3a4838);
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+a.btn-sm:hover {
+  background: var(--accent, #ff6600);
+  color: #000;
+  border-color: var(--accent, #ff6600);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+a.btn-sm:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
 /* ══════════════════════════════════════════
    MOBILE
 ══════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .profile-card { flex-direction: column; align-items: flex-start; }
-  .user-card    { flex-direction: column; align-items: flex-start; }
-  .user-card-actions { width: 100%; justify-content: flex-end; }
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* user-card на мобильном — оставляем строчным,
+     только кнопки переносим под информацию */
+  .user-card {
+    flex-wrap: wrap;
+  }
+
+  .user-card-info {
+    flex: 1 1 100%;   /* занимает всю ширину */
+  }
+
+  .user-card-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
 }

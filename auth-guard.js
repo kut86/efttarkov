@@ -1,7 +1,8 @@
 // auth-guard.js — Проверка авторизации, бана, загрузка профиля
 
 import { auth, db, onAuthStateChanged,
-         ref, onValue, update }           from "./config.js";
+         ref, get, update }       from "./config.js";
+import { state }                  from "./state.js";
 
 const OVERLAY_ID = "authOverlay";
 
@@ -30,10 +31,10 @@ function createOverlay() {
   document.body.appendChild(el);
 
   document.getElementById("authGoogleBtn").onclick = () => {
-  import("./config.js").then(m => {
-    m.signInWithPopup(m.auth, m.provider).catch(e => alert(e.message));
-  });
-};
+    import("./config.js").then(m => {
+      m.signInWithPopup(m.auth, m.provider).catch(e => alert(e.message));
+    });
+  };
 }
 
 /* ── Экран бана ── */
@@ -48,13 +49,12 @@ function showBanScreen() {
   `;
 }
 
-/* ── Скрыть оверлей ── */
+/* ── Скрыть / показать оверлей ── */
 function hideOverlay() {
   const el = document.getElementById(OVERLAY_ID);
   if (el) el.style.display = "none";
 }
 
-/* ── Показать оверлей ── */
 function showOverlay() {
   let el = document.getElementById(OVERLAY_ID);
   if (!el) { createOverlay(); el = document.getElementById(OVERLAY_ID); }
@@ -62,30 +62,31 @@ function showOverlay() {
 }
 
 /* ── Загрузить/создать профиль пользователя ── */
-function loadUserProfile(user, callback) {
+async function loadUserProfile(user, callback) {
   const userRef = ref(db, `users/${user.uid}`);
-  onValue(userRef, snap => {
-    const data = snap.val();
-    if (!data) {
-      const profile = {
-        nickname: user.displayName?.slice(0, 20) || "Сталкер",
-        photoURL: user.photoURL || "",
-        role:     "user",
-        banned:   false,
-        email:    user.email || "",
-      };
-      update(userRef, profile);
-      callback(profile);
-    } else {
-    /* Проверяем срок доступа */
-    if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
-      /* Срок истёк — сбрасываем уровень */
-      update(ref(db, `users/${user.uid}`), { accessLevel: 0 });
-      data.accessLevel = 0;
-    }
-    callback(data);
+  const snap    = await get(userRef);   // однократное чтение, без подписки
+  const data    = snap.val();
+
+  if (!data) {
+    const profile = {
+      nickname:  user.displayName?.slice(0, 20) || "Сталкер",
+      photoURL:  user.photoURL || "",
+      role:      "user",
+      banned:    false,
+      email:     user.email || "",
+    };
+    await update(userRef, profile);
+    callback(profile);
+    return;
   }
-  });
+
+  /* Проверяем срок доступа */
+  if (data.accessExpiry && data.accessExpiry < Date.now() && (data.accessLevel ?? 0) > 0) {
+    await update(userRef, { accessLevel: 0 });
+    data.accessLevel = 0;
+  }
+
+  callback(data);
 }
 
 /* ── Обновить аватар в меню карты ── */
@@ -95,7 +96,7 @@ export function updateMenuProfile(profile) {
   if (nickEl)  nickEl.textContent = profile.nickname || "ЧВК";
   if (photoEl) {
     if (profile.photoURL) {
-      photoEl.src = profile.photoURL;
+      photoEl.src           = profile.photoURL;
       photoEl.style.display = "block";
     } else {
       photoEl.style.display = "none";
@@ -111,6 +112,9 @@ export function initAuthGuard(onReady) {
 
   onAuthStateChanged(auth, user => {
     if (!user) {
+      /* Сбрасываем уровень доступа при выходе */
+      state.userAccess = 0;
+      state.isAdmin    = false;
       showOverlay();
       initialized = false;
       return;
@@ -123,6 +127,9 @@ export function initAuthGuard(onReady) {
         return;
       }
 
+      /* Пишем уровень доступа в глобальный state */
+      state.userAccess = profile.accessLevel ?? 0;
+
       hideOverlay();
       updateMenuProfile(profile);
 
@@ -130,6 +137,9 @@ export function initAuthGuard(onReady) {
         initialized = true;
         onReady(user, profile);
       }
+    }).catch(err => {
+      console.error("Ошибка загрузки профиля:", err);
+      showOverlay();
     });
   });
 }

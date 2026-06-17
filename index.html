@@ -3,27 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tarkov Map</title>
+  <meta name="description" content="Интерактивная карта Escape from Tarkov">
+  <title>Тактик — Карта Таркова</title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="menu.css">
   <link rel="stylesheet" href="profile.css">
-
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
   <style>
+    /* ── Emoji picker ── */
     .emoji-picker { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
     .emoji-btn {
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:6px; padding:4px 6px;
-      font-size:18px; cursor:pointer;
-      transition:background .15s,border-color .15s; line-height:1;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 6px; padding: 4px 6px;
+      font-size: 18px; cursor: pointer;
+      transition: background .15s, border-color .15s; line-height: 1;
     }
-    .emoji-btn:hover  { background:rgba(255,255,255,.14); }
-    .emoji-btn.active { border-color:var(--accent,#e6872e); background:rgba(230,135,46,.18); }
+    .emoji-btn:hover  { background: rgba(255,255,255,.14); }
+    .emoji-btn.active { border-color: var(--accent,#e6872e); background: rgba(230,135,46,.18); }
 
+    /* ── Quill ── */
     .ql-toolbar.ql-snow {
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.15) !important;
@@ -35,11 +37,8 @@
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.15) !important;
       border-radius: 0 0 6px 6px;
-      min-height: 90px;
-      max-height: 180px;
-      overflow-y: auto;
-      font-size: 14px;
-      color: #e0d8cc;
+      min-height: 90px; max-height: 180px;
+      overflow-y: auto; font-size: 14px; color: #e0d8cc;
     }
     .ql-editor { min-height: 80px; padding: 8px 10px; }
     .ql-editor.ql-blank::before { color: rgba(255,255,255,.3); font-style: normal; }
@@ -50,102 +49,136 @@
     .ql-toolbar button.ql-active .ql-stroke { stroke: var(--accent,#e6872e) !important; }
     .ql-toolbar button:hover .ql-fill,
     .ql-toolbar button.ql-active .ql-fill   { fill: var(--accent,#e6872e) !important; }
-    .ql-toolbar .ql-picker-options { background:#1a1b1c; border-color:rgba(255,255,255,.15) !important; }
-    .ql-toolbar .ql-picker-item { color:#e0d8cc !important; }
+    .ql-toolbar .ql-picker-options { background: #1a1b1c; border-color: rgba(255,255,255,.15) !important; }
+    .ql-toolbar .ql-picker-item { color: #e0d8cc !important; }
 
-    .modal-desc-wrap { max-height:200px; overflow-y:auto; padding-right:4px; }
-    .modal-desc-wrap::-webkit-scrollbar { width:4px; }
-    .modal-desc-wrap::-webkit-scrollbar-thumb { background:rgba(255,255,255,.2); border-radius:4px; }
-    .modal-desc-wrap h1,.modal-desc-wrap h2 { font-size:1.1em; margin:.3em 0; }
-    .modal-desc-wrap ul,.modal-desc-wrap ol  { padding-left:1.4em; margin:.3em 0; }
-    .modal-desc-wrap strong { color:#fff; }
-    .modal-desc-wrap em     { font-style:italic; }
-    .modal-desc-wrap u      { text-decoration:underline; }
-    .modal-desc-wrap s      { text-decoration:line-through; }
+    /* ── Описание в модалке ── */
+    .modal-desc-wrap { max-height: 200px; overflow-y: auto; padding-right: 4px; }
+    .modal-desc-wrap::-webkit-scrollbar { width: 4px; }
+    .modal-desc-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 4px; }
+    .modal-desc-wrap h1,.modal-desc-wrap h2 { font-size: 1.1em; margin: .3em 0; }
+    .modal-desc-wrap ul,.modal-desc-wrap ol  { padding-left: 1.4em; margin: .3em 0; }
+    .modal-desc-wrap strong { color: #fff; }
+    .modal-desc-wrap em     { font-style: italic; }
+    .modal-desc-wrap u      { text-decoration: underline; }
+    .modal-desc-wrap s      { text-decoration: line-through; }
 
-    .modal-extras { display:flex; flex-direction:column; gap:6px; }
-    .modal-extra-row { display:flex; gap:8px; align-items:baseline; font-size:13px; }
-    .modal-extra-label { color:rgba(255,255,255,.5); white-space:nowrap; min-width:80px; }
-    .modal-extra-value { color:#e0d8cc; }
+    /* ── Extra fields в модалке ── */
+    .modal-extras { display: flex; flex-direction: column; gap: 6px; }
+    .modal-extra-row { display: flex; gap: 8px; align-items: baseline; font-size: 13px; }
+    .modal-extra-label { color: rgba(255,255,255,.5); white-space: nowrap; min-width: 80px; }
+    .modal-extra-value { color: #e0d8cc; }
 
-    .extra-field-row { display:flex; gap:6px; align-items:center; }
-    .extra-field-row input { flex:1; }
-    .extra-field-row .extra-field-remove { flex-shrink:0; }
+    /* ── Extra fields в формах ── */
+    .extra-field-row { display: flex; gap: 6px; align-items: center; }
+    .extra-field-row input { flex: 1; }
+    .extra-field-row .extra-field-remove { flex-shrink: 0; }
 
-    .icon-section { display:flex; flex-direction:column; gap:6px; }
-    .icon-section .form-label { margin-bottom:0; }
-
+    /* ── Иконка-картинка на маркере ── */
+    .icon-section { display: flex; flex-direction: column; gap: 6px; }
+    .icon-section .form-label { margin-bottom: 0; }
     .marker-icon.icon-img {
-      width:36px; height:36px; border-radius:50%; overflow:hidden;
-      border:2px solid var(--accent,#e6872e); background:#222;
-      display:flex; align-items:center; justify-content:center;
+      width: 36px; height: 36px; border-radius: 50%; overflow: hidden;
+      border: 2px solid var(--accent,#e6872e); background: #222;
+      display: flex; align-items: center; justify-content: center;
     }
-    .marker-icon.icon-img img { width:100%; height:100%; object-fit:cover; }
+    .marker-icon.icon-img img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* editForm управляется через класс .active */
-    #editForm { display:none; }
-    #editForm.active { display:flex; }
+    /* ── Бейдж уровня доступа на маркере ── */
+    .marker-access-badge {
+      position: absolute; bottom: -2px; right: -4px;
+      font-size: 10px; line-height: 1;
+      background: rgba(10,11,12,.85);
+      border-radius: 4px; padding: 1px 2px;
+      pointer-events: none;
+    }
+
+    /* ── Бейдж уровня доступа в модалке ── */
+    .modal-access-badge {
+      font-size: 12px;
+      color: var(--accent, #e6872e);
+      background: rgba(230,135,46,.1);
+      border: 1px solid rgba(230,135,46,.3);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 4px;
+    }
+
+    /* ── editForm управляется классом .active ── */
+    #editForm { display: none; }
+    #editForm.active { display: flex; }
   </style>
 </head>
 <body>
 
 <div class="map-container">
-  <button class="menu-toggle" id="menuToggle">☰</button>
+  <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-label="Меню">☰</button>
   <div class="menu-panel" id="menuPanel">
     <div id="ui">
+
+      <!-- Профиль / Auth -->
       <div class="hud-panel">
-  <a href="profile.html" class="menu-profile-btn" id="profileBtn" style="display:none">
-    <img id="menuAvatar" src="" alt="avatar">
-    <span id="menuNickname">ЧВК</span>
-  </a>
-  <button id="loginBtn"  class="btn btn-login">Войти</button>
-  <button id="logoutBtn" class="btn btn-logout" style="display:none">Выйти</button>
-  <span id="adminBadge">ADMIN</span>
-</div>
+        <a href="profile.html" class="menu-profile-btn" id="profileBtn" style="display:none">
+          <img id="menuAvatar" src="" alt="avatar">
+          <span id="menuNickname">ЧВК</span>
+        </a>
+        <button id="loginBtn"  class="btn btn-login">Войти</button>
+        <button id="logoutBtn" class="btn btn-logout" style="display:none">Выйти</button>
+        <span id="adminBadge">ADMIN</span>
+      </div>
+
+      <!-- Выбор карты -->
       <div class="hud-panel">
         <span class="hud-label">Карта</span>
         <select id="mapSelect">
           <option value="groundzero">🏙 Эпицентр</option>
-<option value="streetsoftarkov">🏚 Улицы Таркова</option>
-<option value="labs">🔬 Лаборатория</option>
-<option value="interchange">🏬 Развязка</option>
-<option value="customs">🏭 Таможня</option>
-<option value="factory">🏗 Завод</option>
-<option value="woods">🌲 Лес</option>
-<option value="reserve">⚙️ Резерв</option>
-<option value="lighthouse">🔦 Маяк</option>
-<option value="shoreline">🌊 Берег</option>
-<option value="labyrinth">🌀 Лабиринт</option>
-          
+          <option value="streetsoftarkov">🏚 Улицы Таркова</option>
+          <option value="labs">🔬 Лаборатория</option>
+          <option value="interchange">🏬 Развязка</option>
+          <option value="customs">🏭 Таможня</option>
+          <option value="factory">🏗 Завод</option>
+          <option value="woods">🌲 Лес</option>
+          <option value="reserve">⚙️ Резерв</option>
+          <option value="lighthouse">🔦 Маяк</option>
+          <option value="shoreline">🌊 Берег</option>
+          <option value="labyrinth">🌀 Лабиринт</option>
         </select>
       </div>
+
+      <!-- Фильтр -->
       <div class="hud-panel">
         <span class="hud-label">Фильтр</span>
         <select id="filter">
           <option value="all">Все</option>
-          <option value="loot">Лут</option>
-          <option value="bot">Снайпер</option>
-          <option value="boss">Босс</option>
-          <option value="quest">Квесты</option>
-          <option value="exit">Выходы</option>
-          <option value="structure">Точки интересов</option>
-          <option value="tain">Тайник</option>
+          <option value="loot">📦 Лут</option>
+          <option value="bot">🎯 Снайпер</option>
+          <option value="boss">💀 Босс</option>
+          <option value="quest">📋 Квесты</option>
+          <option value="exit">🚪 Выходы</option>
+          <option value="structure">🧩 Точки интересов</option>
+          <option value="tain">👁 Тайник</option>
         </select>
       </div>
+
+      <!-- Добавить маркер (только админ) -->
       <div>
         <button id="addModeBtn" class="btn btn-primary" style="display:none">+ Маркер</button>
       </div>
+
     </div>
   </div>
 </div>
 
+<!-- КАРТА -->
 <div id="mapWrapper">
   <div id="map">
-    <img id="mapImage" alt="Tarkov Map" draggable="false">
+    <img id="mapImage" alt="Карта Таркова" draggable="false">
   </div>
 </div>
 
-<!-- ADD FORM -->
+<!-- ═══════════════════════════════════════════
+     ФОРМА ДОБАВЛЕНИЯ МАРКЕРА
+     ═══════════════════════════════════════════ -->
 <div id="addForm" style="
   display:none;
   position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
@@ -162,24 +195,39 @@
   overflow-y:auto;
 ">
   <div class="hud-label" style="color:var(--accent)">НОВЫЙ МАРКЕР</div>
+
   <div class="form-group">
-    <label class="form-label">Название маркера <span style="color:var(--accent)">*</span></label>
+    <label class="form-label">Название <span style="color:var(--accent)">*</span></label>
     <input id="addName" type="text" placeholder="Например: ЛЕСОПИЛКА">
   </div>
+
   <div class="form-group">
     <label class="form-label">Тип</label>
     <select id="addType">
-      <option value="loot">📦 Loot</option>
+      <option value="loot">📦 Лут</option>
       <option value="bot">🎯 Снайпер</option>
-      <option value="boss">💀 Boss</option>
-      <option value="quest">📋 Quest</option>
-      <option value="exit">🚪 Выходы</option>
-      <option value="structure">🧩 Точки интересов</option>
+      <option value="boss">💀 Босс</option>
+      <option value="quest">📋 Квест</option>
+      <option value="exit">🚪 Выход</option>
+      <option value="structure">🧩 Точка интереса</option>
       <option value="tain">👁 Тайник</option>
     </select>
   </div>
+
+  <!-- Уровень доступа -->
   <div class="form-group">
-    <label class="form-label">Описание (видно в окне)</label>
+    <label class="form-label">Уровень доступа</label>
+    <select id="addMinAccess">
+      <option value="0">🌐 Всем</option>
+      <option value="1">🎯 Left Behind и выше</option>
+      <option value="2">⚔️ Prepare for Escape и выше</option>
+      <option value="3">💀 Edge of Darkness и выше</option>
+      <option value="4">👁 Только Unheard</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Описание</label>
     <div id="addQuillToolbar">
       <span class="ql-formats">
         <button class="ql-bold"></button>
@@ -200,19 +248,21 @@
       </span>
       <span class="ql-formats">
         <button class="ql-link"></button>
-        <button class="ql-clean"></button>
         <button class="ql-image"></button>
         <button class="ql-video"></button>
-        
+        <button class="ql-clean"></button>
       </span>
     </div>
     <div id="addQuillEditor"></div>
   </div>
+
   <div class="form-group">
     <label class="form-label">Дополнительные поля</label>
     <div id="addExtraFields" style="display:flex;flex-direction:column;gap:6px;"></div>
-    <button type="button" id="addExtraFieldBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить поле</button>
+    <button type="button" id="addExtraFieldBtn" class="btn btn-sm"
+            style="margin-top:6px;align-self:flex-start">+ Добавить поле</button>
   </div>
+
   <div class="icon-section">
     <label class="form-label">Иконка маркера</label>
     <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:2px;">Выбрать emoji:</div>
@@ -221,17 +271,21 @@
     <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:6px;margin-bottom:2px;">Или URL иконки (перекрывает emoji):</div>
     <input id="addIconUrl" type="url" placeholder="https://...icon.png">
   </div>
+
   <div class="form-group">
-    <label class="form-label">URL фото (превью + модальное окно)</label>
+    <label class="form-label">URL фото (превью + модалка)</label>
     <input id="addImgUrl" type="url" placeholder="https://...">
   </div>
+
   <div style="display:flex;gap:8px;justify-content:flex-end">
     <button id="addCancel"  class="btn btn-sm">Отмена</button>
     <button id="addConfirm" class="btn btn-sm btn-primary">Добавить</button>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- ═══════════════════════════════════════════
+     МОДАЛЬНОЕ ОКНО МАРКЕРА
+     ═══════════════════════════════════════════ -->
 <div id="modal">
   <div class="modal-box">
     <div class="modal-header">
@@ -239,35 +293,53 @@
         <span id="modalTitle">Маркер</span>
         <span id="modalBadge" class="modal-type-badge badge-loot">loot</span>
       </div>
-      <button class="modal-close" id="modalClose">✕</button>
+      <button class="modal-close" id="modalClose" aria-label="Закрыть">✕</button>
     </div>
 
     <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
       <img id="modalPhoto" class="modal-photo" src="" alt="" style="display:none">
+
+      <!-- Бейдж уровня доступа — вставляется динамически через modal.js -->
+
       <div class="modal-desc-wrap">
         <div id="modalDesc" class="modal-desc"></div>
       </div>
       <div id="modalExtras" class="modal-extras"></div>
       <p id="modalCoords" class="modal-coords"></p>
 
-      <!-- editForm скрыт через CSS класс, не inline style -->
+      <!-- Форма редактирования — управляется классом .active -->
       <div id="editForm" style="flex-direction:column;gap:10px">
+
         <div class="form-group">
-          <label class="form-label">Название маркера <span style="color:var(--accent)">*</span></label>
+          <label class="form-label">Название <span style="color:var(--accent)">*</span></label>
           <input id="editName" type="text" placeholder="Название на карте">
         </div>
+
         <div class="form-group">
           <label class="form-label">Тип</label>
           <select id="editType">
-            <option value="loot">📦 Loot</option>
+            <option value="loot">📦 Лут</option>
             <option value="bot">🎯 Снайпер</option>
-            <option value="boss">💀 Boss</option>
-            <option value="quest">📋 Quest</option>
-            <option value="exit">🚪 Выходы</option>
-            <option value="structure">🧩 Точки интересов</option>
+            <option value="boss">💀 Босс</option>
+            <option value="quest">📋 Квест</option>
+            <option value="exit">🚪 Выход</option>
+            <option value="structure">🧩 Точка интереса</option>
             <option value="tain">👁 Тайник</option>
           </select>
         </div>
+
+        <!-- Уровень доступа при редактировании -->
+        <div class="form-group">
+          <label class="form-label">Уровень доступа</label>
+          <select id="editMinAccess">
+            <option value="0">🌐 Всем</option>
+            <option value="1">🎯 Left Behind и выше</option>
+            <option value="2">⚔️ Prepare for Escape и выше</option>
+            <option value="3">💀 Edge of Darkness и выше</option>
+            <option value="4">👁 Только Unheard</option>
+          </select>
+        </div>
+
         <div class="form-group">
           <label class="form-label">Описание</label>
           <div id="editQuillToolbar">
@@ -290,19 +362,21 @@
             </span>
             <span class="ql-formats">
               <button class="ql-link"></button>
-              <button class="ql-clean"></button>
               <button class="ql-image"></button>
               <button class="ql-video"></button>
-              
+              <button class="ql-clean"></button>
             </span>
           </div>
           <div id="editQuillEditor"></div>
         </div>
+
         <div class="form-group">
           <label class="form-label">Дополнительные поля</label>
           <div id="editExtraFields" style="display:flex;flex-direction:column;gap:6px;"></div>
-          <button type="button" id="editExtraFieldBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить поле</button>
+          <button type="button" id="editExtraFieldBtn" class="btn btn-sm"
+                  style="margin-top:6px;align-self:flex-start">+ Добавить поле</button>
         </div>
+
         <div class="icon-section">
           <label class="form-label">Иконка маркера</label>
           <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:2px;">Выбрать emoji:</div>
@@ -311,32 +385,36 @@
           <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:6px;margin-bottom:2px;">Или URL иконки (перекрывает emoji):</div>
           <input id="editIconUrl" type="url" placeholder="https://...icon.png">
         </div>
+
         <div class="form-group">
-          <label class="form-label">URL фото (превью + модальное окно)</label>
+          <label class="form-label">URL фото (превью + модалка)</label>
           <input id="editImgUrl" type="url" placeholder="https://...">
         </div>
+
       </div><!-- /editForm -->
     </div><!-- /modal-body -->
 
     <div class="modal-footer">
       <button id="copyLinkBtn" class="btn btn-sm" title="Скопировать ссылку">🔗</button>
-      <button id="cancelEdit" class="btn btn-sm" style="display:none">Отмена</button>
-      <button id="saveBtn"    class="btn btn-sm btn-primary" style="display:none">Сохранить</button>
-      <button id="editBtn"    class="btn btn-sm">Редактировать</button>
-      <button id="delBtn"     class="btn btn-sm btn-danger">Удалить</button>
+      <button id="cancelEdit"  class="btn btn-sm"            style="display:none">Отмена</button>
+      <button id="saveBtn"     class="btn btn-sm btn-primary" style="display:none">Сохранить</button>
+      <button id="editBtn"     class="btn btn-sm">Редактировать</button>
+      <button id="delBtn"      class="btn btn-sm btn-danger">Удалить</button>
     </div>
   </div>
 </div>
-<!-- LEVEL CONTROLS -->
+
+<!-- УПРАВЛЕНИЕ УРОВНЯМИ -->
 <div id="levelControls">
   <button id="levelUp"   class="zoom-btn" title="Уровень выше">▲</button>
   <span   id="levelLabel">0</span>
   <button id="levelDown" class="zoom-btn" title="Уровень ниже">▼</button>
 </div>
-<!-- ZOOM -->
+
+<!-- ЗУМ -->
 <div id="zoomControls">
   <button class="zoom-btn" id="zoomIn"    title="Приблизить">＋</button>
-  <button class="zoom-btn" id="zoomReset" title="Сброс">⊙</button>
+  <button class="zoom-btn" id="zoomReset" title="Сброс вида">⊙</button>
   <button class="zoom-btn" id="zoomOut"   title="Отдалить">－</button>
 </div>
 
@@ -348,4 +426,5 @@
 <script src="menu.js"></script>
 <script src="marker-preview.js"></script>
 </body>
-</html>
+    </html>
+  
