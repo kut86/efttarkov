@@ -27,7 +27,7 @@ export const MAPS = {
       "0":  { label: "Б1", imgUrl: "images/labs/labs.svg" },
       "-1": { label: "Б2", imgUrl: "images/labs/labsB2.svg" },
     },
-    fallback: "https://raw.githubusercontent.com/kut86/amigos-wiki/3b703c6b42941e6fc08ebaaf27ea7ef54d328452/map/images/labs/labs.svg",
+    fallback: "https://raw.githubuserscontent.com/kut86/amigos-wiki/3b703c6b42941e6fc08ebaaf27ea7ef54d328452/map/images/labs/labs.svg",
   },
   interchange: {
     label: "Развязка",
