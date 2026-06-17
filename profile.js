@@ -293,8 +293,8 @@ onAuthStateChanged(auth, async user => {
   setAvatar(profile.photoURL);
   profileNickname.textContent = profile.nickname || "Сталкер";
   profileEmail.textContent    = user.email || "";
-  nicknameInput.value         = profile.nickname || "";
-  photoInput.value            = profile.photoURL || "";
+ /* nicknameInput.value         = profile.nickname || "";
+  photoInput.value            = profile.photoURL || ""; */
   renderRole(profile.role);
   renderAccessBanner(profile);
 
@@ -304,7 +304,7 @@ onAuthStateChanged(auth, async user => {
   }
 
   /* ── Кнопки ── */
-  saveProfileBtn.onclick = () => {
+  /*saveProfileBtn.onclick = () => {
     const nick = nicknameInput.value.trim();
     const err  = validateNickname(nick);
     if (err) { toast(err, true); return; }
@@ -326,7 +326,7 @@ onAuthStateChanged(auth, async user => {
   photoPreviewBtn.onclick = () => {
     const url = photoInput.value.trim();
     url ? setAvatar(url) : toast("Введите URL фото", true);
-  };
+  }; */
 
   logoutBtn.onclick = () => signOut(auth).then(() => location.href = "index.html");
 });
