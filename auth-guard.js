@@ -6,7 +6,7 @@ import { state }                  from "./state.js";
 
 const OVERLAY_ID = "authOverlay";
 
-/* ── Создаём оверлей входа ── */
+/* ── Создаём оверлей входа ──  */
 function createOverlay() {
   if (document.getElementById(OVERLAY_ID)) return;
   const el = document.createElement("div");
