@@ -68,7 +68,7 @@ function renderCard(u) {
   const status = getExpiryStatus(u.accessExpiry);
   const level  = u.accessLevel ?? 0;
 
-  let cls = "access-user-card";
+  let cls = "access-users-card";
   if (u.banned)            cls += " banned";
   else if (status === "expired") cls += " expired";
   else if (status === "soon")    cls += " expiring";
@@ -153,10 +153,10 @@ function openModal(u) {
   selectedLevel  = u.accessLevel  ?? 0;
   selectedExpiry = u.accessExpiry ?? null;
 
-  document.getElementById("modalUserNick").textContent  = u.nickname || "—";
-  document.getElementById("modalUserEmail").textContent = u.email    || "";
+  document.getElementById("modalUsersNick").textContent  = u.nickname || "—";
+  document.getElementById("modalUsersEmail").textContent = u.email    || "";
 
-  const av = document.getElementById("modalUserAvatar");
+  const av = document.getElementById("modalUsersAvatar");
   av.src           = u.photoURL || "";
   av.style.display = u.photoURL ? "" : "none";
 
@@ -244,8 +244,8 @@ function esc(s) {
 /* ──────────────────────────────────────────────
    AUTH — однократная проверка роли через get()
    ────────────────────────────────────────────── */
-onAuthStateChanged(auth, async user => {
-  if (!user) {
+onAuthStateChanged(auth, async users => {
+  if (!users) {
     authOverlay.innerHTML = `
       <div class="auth-box">
         <div class="auth-logo">ТАКТИК</div>
@@ -261,7 +261,7 @@ onAuthStateChanged(auth, async user => {
   /* Однократная проверка роли — без постоянной подписки */
   let profile;
   try {
-    const snap = await get(ref(db, `users/${user.uid}`));
+    const snap = await get(ref(db, `users/${users.uid}`));
     profile    = snap.val();
   } catch (e) {
     toast("Ошибка проверки доступа", true);
