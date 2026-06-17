@@ -47,7 +47,7 @@ html, body {
   background: var(--bg);
   font-family: 'Rajdhani', sans-serif;
   color: var(--text);
-  user-select: none;
+  users-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -87,7 +87,7 @@ body::before {
   width: 100%;
   pointer-events: none;
   image-rendering: crisp-edges;
-  -webkit-user-drag: none;
+  -webkit-users-drag: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -209,8 +209,8 @@ body::before {
 .marker img {
   -webkit-touch-callout: none;
   pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
+  users-select: none;
+  -webkit-users-drag: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -564,7 +564,7 @@ textarea { resize: vertical; min-height: 72px; }
   .marker-icon img {
     -webkit-touch-callout: none;
     pointer-events: none;
-    user-select: none;
+    users-select: none;
   }
 }
 
