@@ -302,18 +302,7 @@ onAuthStateChanged(auth, async user => {
     adminPanel.style.display = "block";
     loadUsers(user.uid);
   }
-function loadUsers(currentUid) {
-  const usersRef = ref(db, "users"); // 👈 ВАЖНО: НЕ user/${uid}
 
-  onValue(usersRef, snap => {
-    const all = [];
-    snap.forEach(child => {
-      all.push({ uid: child.key, ...child.val() });
-    });
-
-    renderUsers(all, currentUid);
-  });
-}
   /* ── Кнопки ── */
   saveProfileBtn.onclick = () => {
     const nick = nicknameInput.value.trim();
@@ -341,4 +330,3 @@ function loadUsers(currentUid) {
 
   logoutBtn.onclick = () => signOut(auth).then(() => location.href = "index.html");
 });
-             
