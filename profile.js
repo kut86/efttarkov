@@ -1,7 +1,7 @@
 // profile.js — Логика страницы профиля
 
 import { auth, db, provider,
-         ref, get, update,
+         ref, get, onValue, update,
          signInWithPopup, onAuthStateChanged,
          signOut }                              from "./config.js";
 import { LEVELS, THREE_DAYS_MS }               from "./constants.js";
@@ -37,7 +37,7 @@ function toast(msg, err = false) {
 
 /* ── Валидация никнейма ── */
 function validateNickname(val) {
-  if (!val)         return "Никнейм не может быть пустым";
+  if (!val)            return "Никнейм не может быть пустым";
   if (val.length > 20) return "Максимум 20 символов";
   if (!/^[a-zA-Zа-яёА-ЯЁ0-9_\- ]+$/.test(val))
     return "Только буквы, цифры, пробел, _ и -";
@@ -47,7 +47,7 @@ function validateNickname(val) {
 /* ── Аватар ── */
 function setAvatar(url) {
   if (url) {
-    profileAvatar.src         = url;
+    profileAvatar.src          = url;
     profileAvatar.style.display    = "block";
     profileAvatarPh.style.display  = "none";
   } else {
@@ -136,19 +136,17 @@ function renderAccessBanner(profile) {
 }
 
 /* ── Список пользователей (только для админа) ── */
-let usersUnsubscribe = null;   // храним отписку чтобы не дублировать подписку
+let usersUnsubscribe = null;
 
 function loadUsers(currentUid) {
-  /* Защита от повторного вызова */
-  if (usersUnsubscribe) return;
+  if (usersUnsubscribe) return;   // уже подписаны
 
-  import("./config.js").then(({ db, ref, onValue }) => {
-    const usersRef = ref(db, "users");
-    usersUnsubscribe = onValue(usersRef, snap => {
-      const all = [];
-      snap.forEach(child => all.push({ uid: child.key, ...child.val() }));
-      renderUsers(all, currentUid);
-    });
+  /* Используем уже импортированные db, ref, onValue — без динамического импорта */
+  const usersRef = ref(db, "users");
+  usersUnsubscribe = onValue(usersRef, snap => {
+    const all = [];
+    snap.forEach(child => all.push({ uid: child.key, ...child.val() }));
+    renderUsers(all, currentUid);
   });
 
   adminSearch.addEventListener("input", () => {
@@ -216,17 +214,17 @@ function handleUserAction(btn, u, isAdmin) {
     return;
   }
 
-  import("./config.js").then(({ db, ref, update }) => {
-    const uRef = ref(db, `users/${u.uid}`);
-    if (btn.dataset.action === "ban") {
-      update(uRef, { banned: !u.banned })
-        .then(() => toast(u.banned ? "Пользователь разбанен" : "Пользователь заблокирован"));
-    }
-    if (btn.dataset.action === "role") {
-      update(uRef, { role: isAdmin ? "user" : "admin" })
-        .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"));
-    }
-  });
+  const uRef = ref(db, `users/${u.uid}`);
+  if (btn.dataset.action === "ban") {
+    update(uRef, { banned: !u.banned })
+      .then(() => toast(u.banned ? "Пользователь разбанен" : "Пользователь заблокирован"))
+      .catch(e => toast(e.message, true));
+  }
+  if (btn.dataset.action === "role") {
+    update(uRef, { role: isAdmin ? "user" : "admin" })
+      .then(() => toast(isAdmin ? "Роль снята" : "Назначен администратором"))
+      .catch(e => toast(e.message, true));
+  }
 }
 
 function esc(s) {
@@ -254,7 +252,7 @@ onAuthStateChanged(auth, async user => {
 
   const userRef = ref(db, `users/${user.uid}`);
 
-  /* ── Однократное чтение профиля ── */
+  /* Однократное чтение профиля */
   let profile;
   try {
     const snap = await get(userRef);
@@ -332,3 +330,4 @@ onAuthStateChanged(auth, async user => {
 
   logoutBtn.onclick = () => signOut(auth).then(() => location.href = "index.html");
 });
+         
