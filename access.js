@@ -74,7 +74,7 @@ function updateStats(users) {
   statBanned.textContent = banned;
 }
 
-/* ── Рендер карточки ── */
+/* ── Рендер карточки пользователя ── */
 function renderCard(u) {
   const card = document.createElement("div");
   const status = getExpiryStatus(u.accessExpiry);
@@ -84,6 +84,7 @@ function renderCard(u) {
   if (u.banned) cls += " banned";
   else if (status === "expired") cls += " expired";
   else if (status === "soon") cls += " expiring";
+
   card.className = cls;
 
   let expiryHTML = "";
@@ -96,7 +97,7 @@ function renderCard(u) {
 
   card.innerHTML = `
     <div class="access-card-left">
-      <img src="${u.photoURL || ""}" style="${u.photoURL ? "" : "display:none"}" />
+      <img src="${u.photoURL || ""}" style="${u.photoURL ? "" : "display:none"}">
       <div>
         <div>${esc(u.nickname || "—")} ${u.banned ? "🔴" : ""}</div>
         <div>${esc(u.email || "")}</div>
@@ -178,7 +179,26 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeModal();
 });
 
-/* ── Save ── */
+/* ──────────────────────────────────────────────
+   🔥 FIX: ИНИЦИАЛИЗАЦИЯ КНОПОК УРОВНЕЙ
+────────────────────────────────────────────── */
+function initLevelButtons() {
+  if (!levelButtons) return;
+
+  levelButtons.querySelectorAll(".level-btn").forEach(btn => {
+    btn.onclick = () => {
+      selectedLevel = Number(btn.dataset.level);
+
+      levelButtons.querySelectorAll(".level-btn").forEach(b =>
+        b.classList.remove("active")
+      );
+
+      btn.classList.add("active");
+    };
+  });
+}
+
+/* ── SAVE ── */
 accessModalSave.onclick = () => {
   if (!currentEdit) return;
 
@@ -193,7 +213,7 @@ accessModalSave.onclick = () => {
 };
 
 /* ──────────────────────────────────────────────
-   AUTH (ИСПРАВЛЕНО: get() + onValue отдельно)
+   AUTH
 ────────────────────────────────────────────── */
 onAuthStateChanged(auth, async user => {
   if (!user) {
@@ -211,36 +231,30 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  /* ✅ ПРАВИЛЬНАЯ ПРОВЕРКА АДМИНА */
-  let profile = null;
+  const userRef = ref(db, `users/${user.uid}`);
 
-  try {
-    const snap = await get(ref(db, `users/${user.uid}`));
-    profile = snap.val();
-  } catch (e) {
-    toast("Ошибка доступа", true);
-    return;
-  }
+  const snap = await get(userRef);
+  const profile = snap.val();
 
   if (!profile || profile.role !== "admin") {
     authOverlay.innerHTML = `
       <div class="auth-box">
         <div class="auth-logo" style="color:#c0392b">⛔ НЕТ ДОСТУПА</div>
         <div class="auth-sub">Только для администраторов</div>
-        <a href="index.html" class="btn btn-sm">← Назад</a>
       </div>`;
     authOverlay.style.display = "flex";
     return;
   }
 
-  /* UI */
   authOverlay.style.display = "none";
   accessPage.style.display = "block";
 
-  /* ✅ ОТДЕЛЬНАЯ ПОДПИСКА НА USERS */
-  const usersRef = ref(db, "users");
+  /* 🔥 FIX: теперь точно после появления страницы */
+  setTimeout(() => {
+    initLevelButtons();
+  }, 0);
 
-  onValue(usersRef, snap => {
+  onValue(ref(db, "users"), snap => {
     allUsers = [];
     snap.forEach(child => {
       allUsers.push({ uid: child.key, ...child.val() });
