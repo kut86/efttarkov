@@ -42,7 +42,7 @@ function toast(msg, err = false) {
   setTimeout(() => t.remove(), 3200);
 }
 
-/* ── Статистика ── */
+/* ── Статистика ──  */
 function updateStats(users) {
   const now = Date.now();
   let active = 0, expiring = 0, banned = 0;
