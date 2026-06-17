@@ -8,7 +8,7 @@ export const state = {
   /* ── Авторизация ── */
   isAdmin:       false,
   /** Числовой уровень доступа текущего пользователя (0–4) */
-  userAccess:    0,
+  usersAccess:    0,
 
   /* ── Текущая карта и этаж ── */
   currentMap:    "groundzero",
