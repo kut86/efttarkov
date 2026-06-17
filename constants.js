@@ -1,8 +1,5 @@
-// constants.js — Статические данные: карты, типы, уровни доступа
+// constants.js — Статические данные: карты, типы, эмодзи
 
-/* ──────────────────────────────────────────────
-   КАРТЫ
-   ────────────────────────────────────────────── */
 export const MAPS = {
   groundzero: {
     label: "Эпицентр",
@@ -11,7 +8,7 @@ export const MAPS = {
       "1":  { label: "1 этаж", imgUrl: "images/groundzero/level1.png" },
       "2":  { label: "2 этаж", imgUrl: "images/groundzero/level2.png" },
     },
-    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/groundzero/groundzero.png?raw=true",
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/groundzero/groundzero.png?raw=true"
   },
   streetsoftarkov: {
     label: "Улицы Таркова",
@@ -19,7 +16,7 @@ export const MAPS = {
       "0": { label: "Улица",  imgUrl: "images/streetsoftarkov/streetsoftarkov.svg" },
       "1": { label: "1 этаж", imgUrl: "images/streetsoftarkov/level1.svg" },
     },
-    fallback: "",
+    fallback: ""
   },
   labs: {
     label: "Лаборатория",
@@ -27,7 +24,7 @@ export const MAPS = {
       "0":  { label: "Б1", imgUrl: "images/labs/labs.svg" },
       "-1": { label: "Б2", imgUrl: "images/labs/labsB2.svg" },
     },
-    fallback: "https://raw.githubusercontent.com/kut86/amigos-wiki/3b703c6b42941e6fc08ebaaf27ea7ef54d328452/map/images/labs/labs.svg",
+    fallback: "https://raw.githubusercontent.com/kut86/amigos-wiki/3b703c6b42941e6fc08ebaaf27ea7ef54d328452/map/images/labs/labs.svg"
   },
   interchange: {
     label: "Развязка",
@@ -36,14 +33,14 @@ export const MAPS = {
       "1": { label: "1 этаж", imgUrl: "images/interchange/level1.avif" },
       "2": { label: "2 этаж", imgUrl: "images/interchange/level2.avif" },
     },
-    fallback: "",
+    fallback: ""
   },
   customs: {
     label: "Таможня",
     levels: {
       "0": { label: "Основной", imgUrl: "images/customs/customs.jpg" },
     },
-    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/customs/customs.jpg?raw=true",
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/customs/customs.jpg?raw=true"
   },
   factory: {
     label: "Завод",
@@ -53,14 +50,14 @@ export const MAPS = {
       "2":  { label: "2",      imgUrl: "images/factory/level2.svg" },
       "-1": { label: "Подвал", imgUrl: "images/factory/level-1.svg" },
     },
-    fallback: "",
+    fallback: ""
   },
   woods: {
     label: "Лес",
     levels: {
       "0": { label: "Основной", imgUrl: "images/woods/woods.jpg" },
     },
-    fallback: "",
+    fallback: ""
   },
   reserve: {
     label: "Резерв",
@@ -68,34 +65,31 @@ export const MAPS = {
       "0":  { label: "Поверхность", imgUrl: "images/reserve/reserve.svg" },
       "-1": { label: "Подземный",   imgUrl: "images/reserve/underground.svg" },
     },
-    fallback: "",
+    fallback: ""
   },
   lighthouse: {
     label: "Маяк",
     levels: {
       "0": { label: "Основной", imgUrl: "images/lighthouse/lighthouse.svg" },
     },
-    fallback: "",
+    fallback: ""
   },
   shoreline: {
     label: "Берег",
     levels: {
       "0": { label: "Основной", imgUrl: "images/shoreline/shoreline.svg" },
     },
-    fallback: "",
+    fallback: ""
   },
   labyrinth: {
     label: "Лабиринт",
     levels: {
       "0": { label: "Основной", imgUrl: "images/labyrinth/labyrinth.svg" },
     },
-    fallback: "",
-  },
+    fallback: ""
+  }
 };
 
-/* ──────────────────────────────────────────────
-   ТИПЫ МАРКЕРОВ
-   ────────────────────────────────────────────── */
 export const TYPE_EMOJI = {
   loot:      "📦",
   boss:      "💀",
@@ -104,7 +98,7 @@ export const TYPE_EMOJI = {
   bot:       "🎯",
   exit:      "🚪",
   structure: "🧩",
-  tain:      "👁",
+  tain:      "👁"
 };
 
 export const TYPE_LABEL = {
@@ -115,33 +109,12 @@ export const TYPE_LABEL = {
   bot:       "Бот",
   exit:      "Выход",
   structure: "Точка интереса",
-  tain:      "Тайник",
+  tain:      "Тайник"
 };
 
 export const QUICK_EMOJI = [
   "📍","⭐","🔥","💎","⚔️","🧨","💊","🗺","🏴","🔑",
-  "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡",
+  "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡"
 ];
 
-/* ──────────────────────────────────────────────
-   УРОВНИ ДОСТУПА
-   Единственный источник правды — импортируется в
-   access.js, profile.js
-   ────────────────────────────────────────────── */
-export const LEVELS = {
-  0: { name: "Standard",           icon: "🪖" },
-  1: { name: "Left Behind",        icon: "🎯" },
-  2: { name: "Prepare for Escape", icon: "⚔️" },
-  3: { name: "Edge of Darkness",   icon: "💀" },
-  4: { name: "Unheard",            icon: "👁" },
-};
-
-/* ──────────────────────────────────────────────
-   ПРОЧЕЕ
-   ────────────────────────────────────────────── */
-/** UID главного администратора — защита от случайного разжалования */
 export const ADMIN_UID = "7AvuSzEGvwQYPLowdsI5mKUZEFG2";
-
-/** Порог «скоро истекает» — 3 суток в мс */
-export const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-      

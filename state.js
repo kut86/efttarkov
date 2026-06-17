@@ -1,39 +1,33 @@
 // state.js — Глобальное изменяемое состояние приложения
 
-/**
- * Единственный объект состояния. Мутируется напрямую — модули
- * читают и пишут в него через именованный импорт { state }.
- */
 export const state = {
-  /* ── Авторизация ── */
-  isAdmin:       false,
-  /** Числовой уровень доступа текущего пользователя (0–4) */
-  userAccess:    0,
+  // Авторизация
+  isAdmin:      false,
 
-  /* ── Текущая карта и этаж ── */
-  currentMap:    "groundzero",
-  currentLevel:  0,
-  /** Этаж, на который нужно переключиться после инициализации карты (URL-хэш) */
-  _pendingLevel: null,
+  // Текущая карта и уровень
+  currentMap:   "groundzero",
+  currentLevel: 0,
 
-  /* ── Открытый маркер ── */
-  current:       null,   // { id, ...markerData }
+  // Открытый маркер в модальном окне
+  current:      null,
 
-  /* ── Режим добавления ── */
-  addMode:       false,
-  pendingPos:    null,   // { x, y } в процентах
+  // Режим добавления маркера
+  addMode:      false,
+  pendingPos:   null,
 
-  /* ── Маркеры текущей карты ── */
-  allMarkers:    {},     // { [firebaseKey]: markerData }
+  // Все маркеры текущей карты { id: data }
+  allMarkers:   {},
 
-  /* ── Firebase ── */
-  currentRef:    null,   // DatabaseReference текущей карты
-  offFn:         null,   // функция отписки от onValue маркеров
+  // Firebase ref текущей карты
+  currentRef:   null,
 
-  /* ── Panzoom ── */
-  pz:            null,
+  // Функция отписки от Firebase onValue
+  offFn:        null,
 
-  /* ── Quill-редакторы ── */
-  addQuill:      null,
-  editQuill:     null,
+  // Экземпляр Panzoom
+  pz:           null,
+
+  // Экземпляры Quill-редакторов
+  addQuill:     null,
+  editQuill:    null,
 };
