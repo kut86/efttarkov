@@ -383,6 +383,15 @@
   <div id="authGuestView">
     <div class="auth-panel-title">Вход для администраторов</div>
     <button id="authGoogleBtn" class="btn btn-login" type="button">Войти через Google</button>
+    <div class="auth-sep"><span>или почта и пароль</span></div>
+    <form id="authEmailForm" class="auth-email-form" autocomplete="on">
+      <input id="authEmail" class="auth-input" type="email" name="email" autocomplete="username"
+             placeholder="Email" inputmode="email" required>
+      <input id="authPassword" class="auth-input" type="password" name="password" autocomplete="current-password"
+             placeholder="Пароль" required>
+      <button id="authEmailBtn" class="btn btn-login" type="submit">Войти</button>
+      <button id="authResetBtn" class="auth-link" type="button">Забыли пароль?</button>
+    </form>
   </div>
   <div id="authUserView" hidden>
     <a href="profile.html" class="menu-profile-btn" id="profileBtn">

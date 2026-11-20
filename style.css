@@ -791,3 +791,22 @@ body.modal-open #zoomControls { display: none !important; }
 }
 body.offline #offlineBadge { display: block; }
 body.offline #addModeBtn   { display: none !important; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ВХОД ПО ПОЧТЕ И ПАРОЛЮ
+═══════════════════════════════════════════════════════════════ */
+.auth-sep { display: flex; align-items: center; gap: 8px; color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.auth-sep::before, .auth-sep::after { content: ""; flex: 1; height: 1px; background: var(--border2); }
+.auth-email-form { display: flex; flex-direction: column; gap: 8px; }
+.auth-input {
+  width: 100%;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text-bright);
+  padding: 8px 10px; font-size: 16px;
+}
+.auth-input:focus { outline: none; border-color: var(--accent); }
+.auth-link { background: none; border: none; color: var(--text-dim); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; padding: 2px; align-self: flex-start; }
+.auth-link:hover { color: var(--accent); }

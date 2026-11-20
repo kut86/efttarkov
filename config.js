@@ -6,7 +6,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import {
   getAuth, GoogleAuthProvider,
-  signInWithPopup, onAuthStateChanged, signOut
+  signInWithPopup, onAuthStateChanged, signOut,
+  signInWithEmailAndPassword, sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -27,5 +28,6 @@ const provider = new GoogleAuthProvider();
 export {
   db, auth, provider,
   ref, get, push, onValue, update, remove,
-  signInWithPopup, onAuthStateChanged, signOut
+  signInWithPopup, onAuthStateChanged, signOut,
+  signInWithEmailAndPassword, sendPasswordResetEmail
 };
