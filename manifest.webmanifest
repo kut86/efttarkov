@@ -4,7 +4,7 @@
   "description": "Интерактивная карта Escape from Tarkov с метками. Работает без интернета (просмотр).",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#0a0b0c",
   "theme_color": "#0a0b0c",
   "lang": "ru",
