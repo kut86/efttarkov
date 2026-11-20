@@ -9,6 +9,13 @@
   <meta property="og:description" content="Метки лута, боссов, квестов, выходов и тайников на всех картах.">
   <meta property="og:type" content="website">
   <link rel="icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0a0b0c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tarkov Map">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="menu.css">
   <link rel="stylesheet" href="profile.css">
@@ -132,8 +139,16 @@
         </select>
       </div>
       <div class="hud-panel">
+        <span class="hud-label">Торговец</span>
+        <select id="traderFilter"></select>
+      </div>
+      <div class="hud-panel">
         <span class="hud-label">Поиск</span>
         <input id="markerSearch" type="search" placeholder="Название метки…" autocomplete="off">
+      </div>
+      <div class="hud-panel">
+        <button id="offlineBtn" class="btn btn-sm" type="button">📥 Сохранить для офлайна</button>
+        <button id="installBtn" class="btn btn-sm" type="button" style="display:none">📲 Установить приложение</button>
       </div>
       <div>
         <button id="addModeBtn" class="btn btn-primary" style="display:none">+ Маркер</button>
@@ -180,6 +195,10 @@
       <option value="structure">🧩 Точки интересов</option>
       <option value="tain">👁 Тайник</option>
     </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Торговец <span style="color:var(--text-dim)">(необязательно — для квестов)</span></label>
+    <select id="addTrader"></select>
   </div>
   <div class="form-group">
     <label class="form-label">Маркеры-ссылки (над описанием)</label>
@@ -246,6 +265,7 @@
       <div class="modal-title">
         <span id="modalTitle">Маркер</span>
         <span id="modalBadge" class="modal-type-badge badge-loot">loot</span>
+        <span id="modalTrader" class="modal-trader-badge" style="display:none"></span>
       </div>
       <button class="modal-close" id="modalClose">✕</button>
     </div>
@@ -275,6 +295,10 @@
             <option value="structure">🧩 Точки интересов</option>
             <option value="tain">👁 Тайник</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Торговец <span style="color:var(--text-dim)">(необязательно — для квестов)</span></label>
+          <select id="editTrader"></select>
         </div>
         <div class="form-group">
           <label class="form-label">Маркеры-ссылки (над описанием)</label>
@@ -370,6 +394,7 @@
   </div>
 </div>
 
+<div id="offlineBadge">📴 Офлайн · только просмотр</div>
 <div id="toastContainer"></div>
 
 <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>

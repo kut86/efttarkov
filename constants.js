@@ -125,3 +125,18 @@ export const ACCESS_LEVELS = {
   3: { name: "Edge of Darkness",   icon: "💀" },
   4: { name: "Unheard",            icon: "👁" },
 };
+
+/* Торговцы (для квестовых маркеров). Порядок = порядок в списках.
+   Чтобы добавить нового торговца — допишите строку: ключ (латиницей, не менять после!) и русское имя. */
+export const TRADERS = {
+  prapor:      { label: "Прапор" },
+  therapist:   { label: "Терапевт" },
+  skier:       { label: "Лыжник" },
+  peacekeeper: { label: "Миротворец" },
+  mechanic:    { label: "Механик" },
+  ragman:      { label: "Барахольщик" },
+  jaeger:      { label: "Егерь" },
+  lightkeeper: { label: "Смотритель" },
+  ref:         { label: "Реф" },
+  fence:       { label: "Скупщик" },
+};

@@ -1,9 +1,10 @@
 // markers.js — Маркеры: подписка, рендер, добавление, extra fields
 
 import { db, ref, push, onValue }         from "./config.js";
-import { QUICK_EMOJI, TYPE_EMOJI }        from "./constants.js";
+import { QUICK_EMOJI, TYPE_EMOJI, TRADERS } from "./constants.js";
 import { state }                          from "./state.js";
 import { mapEl, mapWrapper, filterSel, searchInput,
+         traderFilter, addTrader, editTrader,
          addForm, addName, addType,
          addImgUrl, addIconUrl,
          addEmojiInput, addEmojiPicker,
@@ -14,6 +15,8 @@ import { mapEl, mapWrapper, filterSel, searchInput,
 import { openModal }                      from "./modal.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
+import { readCache, writeCache,
+         requireOnline }                  from "./offline.js";
 
 const ICON_FALLBACK = "data:image/svg+xml," +
   "%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect width='36' height='36' fill='%23444'/%3E" +
@@ -32,9 +35,21 @@ export function subscribe() {
   state.dataLoaded = false;
   state.currentRef = ref(db, `maps/${state.currentMap}/markers`);
 
+  /* Сохранённые метки показываем сразу (быстрый старт и работа без интернета) */
+  const cached = readCache(state.currentMap);
+  if (cached) {
+    state.allMarkers = cached;
+    render();
+    if (state.pending && cached[state.pending.id]) {
+      state.dataLoaded = true;
+      if (state.onData) state.onData();
+    }
+  }
+
   state.offFn = onValue(state.currentRef, snap => {
     state.allMarkers = {};
     snap.forEach(i => { state.allMarkers[i.key] = i.val(); });
+    writeCache(state.currentMap, state.allMarkers);
     state.dataLoaded = true;
     render();
     if (state.onData) state.onData();
@@ -50,13 +65,18 @@ export function subscribe() {
 export function render() {
   document.querySelectorAll(".marker").forEach(m => m.remove());
   const f = filterSel.value;
+  const tr = traderFilter.value;
   const q = (searchInput?.value || "").trim().toLowerCase();
   const frag = document.createDocumentFragment();
 
   Object.entries(state.allMarkers).forEach(([id, m]) => {
     if (f !== "all" && m.type !== f) return;
+    if (tr !== "all" && m.trader !== tr) return;
     if ((m.level ?? 0) !== state.currentLevel) return;
-    if (q && !(m.name || "").toLowerCase().includes(q)) return;
+    if (q) {
+      const hay = ((m.name || "") + " " + (TRADERS[m.trader]?.label || "")).toLowerCase();
+      if (!hay.includes(q)) return;
+    }
     frag.appendChild(createMarker(id, m));
   });
   mapEl.appendChild(frag);
@@ -66,6 +86,23 @@ filterSel.value = localStorage.getItem("markerFilter") || "all";
 if (filterSel.value === "") filterSel.value = "all";
 filterSel.addEventListener("change", () => {
   localStorage.setItem("markerFilter", filterSel.value);
+  render();
+});
+
+/* ── Списки торговцев: фильтр + формы (необязательное поле) ── */
+export function fillTraderSelect(sel, firstValue, firstLabel) {
+  sel.innerHTML = "";
+  sel.add(new Option(firstLabel, firstValue));
+  Object.entries(TRADERS).forEach(([key, t]) => sel.add(new Option(t.label, key)));
+}
+fillTraderSelect(traderFilter, "all", "Все торговцы");
+fillTraderSelect(addTrader,    "",    "— не указан —");
+fillTraderSelect(editTrader,   "",    "— не указан —");
+
+traderFilter.value = localStorage.getItem("traderFilter") || "all";
+if (traderFilter.value === "") traderFilter.value = "all";
+traderFilter.addEventListener("change", () => {
+  localStorage.setItem("traderFilter", traderFilter.value);
   render();
 });
 
@@ -98,7 +135,9 @@ export function createMarker(id, m) {
     ? `<div class="marker-preview"><img src="${esc(m.imgUrl)}" alt="" draggable="false" loading="lazy"></div>`
     : "";
 
-  div.innerHTML = `${iconHTML}${previewHTML}<div class="marker-tooltip">${esc(m.name || "")}</div>`;
+  const traderLabel = TRADERS[m.trader]?.label;
+  const sub = traderLabel ? `<small class="marker-tooltip-sub">${esc(traderLabel)}</small>` : "";
+  div.innerHTML = `${iconHTML}${previewHTML}<div class="marker-tooltip">${esc(m.name || "")}${sub}</div>`;
 
   const iconImg = div.querySelector(".icon-img img");
   if (iconImg) iconImg.addEventListener("error", () => { iconImg.src = ICON_FALLBACK; }, { once: true });
@@ -114,7 +153,7 @@ export function createMarker(id, m) {
 
 /* ── Режим добавления (только админ) ── */
 export function enterAddMode() {
-  if (!state.isAdmin) return;
+  if (!state.isAdmin || !requireOnline()) return;
   state.addMode = true;
   addModeBtn.textContent = "✕ Отмена";
   addModeBtn.classList.add("btn-danger");
@@ -144,6 +183,7 @@ mapEl.addEventListener("click", e => {
   addForm.style.display = "flex";
   addName.value = addImgUrl.value = addIconUrl.value = addEmojiInput.value = "";
   addType.value = "loot";
+  addTrader.value = "";
   if (state.addQuill) state.addQuill.setContents([]);
   addEmojiPicker.querySelectorAll(".emoji-btn").forEach(b => b.classList.remove("active"));
   addExtraFields.innerHTML = "";
@@ -152,7 +192,7 @@ mapEl.addEventListener("click", e => {
 });
 
 addConfirm.onclick = () => {
-  if (!state.isAdmin || !state.pendingPos) return;
+  if (!state.isAdmin || !state.pendingPos || !requireOnline()) return;
   const name = addName.value.trim();
   if (!name) { toast("Введите название маркера", true); return; }
   const textVal = (state.addQuill && state.addQuill.getText().trim())
@@ -165,6 +205,7 @@ addConfirm.onclick = () => {
     name,
     text:        textVal,
     type:        addType.value,
+    trader:      addTrader.value || null,
     emoji:       addEmojiInput.value.trim()  || null,
     imgUrl:      addImgUrl.value.trim()      || null,
     iconUrl:     addIconUrl.value.trim()     || null,

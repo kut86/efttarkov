@@ -10,6 +10,7 @@ import { switchMap, resolveLegacyMarker }  from "./map.js";
 import { exitAddMode, buildEmojiPicker }   from "./markers.js";
 import { refreshModalControls }            from "./modal.js";
 import { initAuth }                        from "./auth.js";
+import { downloadForOffline }              from "./offline.js";
 
 /* ── Emoji pickers ── */
 buildEmojiPicker(addEmojiPicker, addEmojiInput);
@@ -60,3 +61,54 @@ async function start() {
   switchMap(startMap, { pending });
 }
 start();
+
+/* ═══════════ Приложение (PWA) и офлайн-режим ═══════════ */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err => console.warn("SW:", err));
+  });
+}
+
+function updateNet() {
+  document.body.classList.toggle("offline", navigator.onLine === false);
+}
+updateNet();
+window.addEventListener("offline", () => { updateNet(); toast("Нет интернета: показаны сохранённые карты и метки"); });
+window.addEventListener("online",  () => { updateNet(); toast("Интернет снова доступен"); });
+
+/* Кнопка установки (если браузер её поддерживает) */
+const installBtn = document.getElementById("installBtn");
+let installEvent = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  installEvent = e;
+  installBtn.style.display = "";
+});
+installBtn.onclick = async () => {
+  if (!installEvent) return;
+  installEvent.prompt();
+  await installEvent.userChoice;
+  installEvent = null;
+  installBtn.style.display = "none";
+};
+window.addEventListener("appinstalled", () => { installBtn.style.display = "none"; });
+
+/* Скачать все карты и метки для работы без интернета */
+const offlineBtn  = document.getElementById("offlineBtn");
+const OFFLINE_IDLE = "📥 Сохранить для офлайна";
+offlineBtn.onclick = async () => {
+  if (navigator.onLine === false) { toast("Для загрузки нужен интернет", true); return; }
+  if (!confirm("Скачать все карты и метки для работы без интернета? Это около 10–20 МБ.")) return;
+  offlineBtn.disabled = true;
+  try {
+    const r = await downloadForOffline((d, t) => { offlineBtn.textContent = `Сохранение ${d}/${t}…`; });
+    toast(r.failed ? `Сохранено, не загрузилось файлов: ${r.failed}` : "Готово: карты и метки доступны без интернета");
+    offlineBtn.textContent = "✅ Сохранено · обновить";
+  } catch (e) {
+    console.error(e);
+    toast("Не удалось сохранить данные", true);
+    offlineBtn.textContent = OFFLINE_IDLE;
+  } finally {
+    offlineBtn.disabled = false;
+  }
+};

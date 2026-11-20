@@ -1,7 +1,7 @@
 // modal.js — Модальное окно: просмотр, редактирование, удаление маркера
 
 import { db, ref, update, remove }        from "./config.js";
-import { TYPE_LABEL, MAPS }                from "./constants.js";
+import { TYPE_LABEL, MAPS, TRADERS }       from "./constants.js";
 import { state }                           from "./state.js";
 import { modal, modalTitle, modalBadge,
          modalPhoto, modalDesc, modalExtras,
@@ -12,11 +12,13 @@ import { modal, modalTitle, modalBadge,
          cancelEdit, editBtn, delBtn,
          modalClose, toast, esc,
          modalLinks, editMarkerLinks,
+         modalTrader, editTrader,
          buildHash, sanitizeHTML, mapEl }  from "./ui.js";
 import { addExtraFieldRow,
          collectExtraFields }              from "./markers.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
+import { requireOnline }                  from "./offline.js";
 
 /* ── Показ/скрытие формы редактирования ── */
 function showEditForm() {
@@ -56,6 +58,10 @@ export function openModal(id, m) {
   modalTitle.textContent = m.name || "Маркер";
   modalBadge.textContent = TYPE_LABEL[m.type] || m.type || "";
   modalBadge.className   = `modal-type-badge badge-${TYPE_LABEL[m.type] ? m.type : "loot"}`;
+
+  const tr = TRADERS[m.trader];
+  modalTrader.textContent   = tr ? "🛒 " + tr.label : "";
+  modalTrader.style.display = tr ? "" : "none";
 
   if (m.text) {
     modalDesc.innerHTML     = sanitizeHTML(m.text);
@@ -171,9 +177,10 @@ document.getElementById("copyLinkBtn").onclick = () => {
 
 /* ── Редактирование (только админ) ── */
 editBtn.onclick = () => {
-  if (!state.current || !state.isAdmin) return;
+  if (!state.current || !state.isAdmin || !requireOnline()) return;
   editName.value       = state.current.name    || "";
   editType.value       = state.current.type    || "loot";
+  editTrader.value     = state.current.trader  || "";
   editImgUrl.value     = state.current.imgUrl  || "";
   editIconUrl.value    = state.current.iconUrl || "";
   editEmojiInput.value = state.current.emoji   || "";
@@ -195,7 +202,7 @@ editBtn.onclick = () => {
 cancelEdit.onclick = hideEditForm;
 
 saveBtn.onclick = () => {
-  if (!state.current || !state.isAdmin) return;
+  if (!state.current || !state.isAdmin || !requireOnline()) return;
   const name = editName.value.trim();
   if (!name) { toast("Введите название маркера", true); return; }
   const textVal = (state.editQuill && state.editQuill.getText().trim())
@@ -207,6 +214,7 @@ saveBtn.onclick = () => {
     name,
     text:        textVal,
     type:        editType.value,
+    trader:      editTrader.value || null,
     emoji:       editEmojiInput.value.trim()  || null,
     imgUrl:      editImgUrl.value.trim()      || null,
     iconUrl:     editIconUrl.value.trim()     || null,
@@ -226,7 +234,7 @@ document.getElementById("editMarkerLinkBtn").addEventListener("click", () => {
 
 /* ── Удаление (только админ) ── */
 delBtn.onclick = () => {
-  if (!state.current || !state.isAdmin) return;
+  if (!state.current || !state.isAdmin || !requireOnline()) return;
   if (!confirm("Удалить маркер?")) return;
   remove(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`))
     .then(() => { toast("Удалено"); invalidateCatalog(); closeModal(); })

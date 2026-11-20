@@ -761,3 +761,33 @@ body.modal-open #zoomControls { display: none !important; }
   box-shadow: 0 0 12px var(--accent-glow);
 }
 .marker-link-map { color: var(--text-dim); font-weight: 400; font-size: .8em; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ТОРГОВЕЦ + ОФЛАЙН-РЕЖИМ
+═══════════════════════════════════════════════════════════════ */
+.modal-trader-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 10px;
+  border: 1px solid var(--border2);
+  border-radius: 999px;
+  color: var(--text-bright);
+  background: rgba(255,255,255,.06);
+  font-size: 12px; white-space: nowrap;
+}
+.marker-tooltip-sub { display: block; color: var(--accent); font-size: .85em; }
+
+#offlineBadge {
+  display: none;
+  position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%);
+  z-index: 9400;
+  padding: 4px 12px;
+  background: rgba(10,11,12,.9);
+  border: 1px solid var(--border2);
+  border-radius: 999px;
+  color: var(--text-dim); font-size: 12px;
+  pointer-events: none;
+}
+body.offline #offlineBadge { display: block; }
+body.offline #addModeBtn   { display: none !important; }
