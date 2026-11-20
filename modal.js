@@ -68,6 +68,7 @@ export function openModal(id, m) {
   renderModalExtras(m.extraFields);
   hideEditForm();
   modal.classList.add("open");
+  document.body.classList.add("modal-open");
   markSelected(id);
 }
 
@@ -75,6 +76,7 @@ export function openModal(id, m) {
 export function closeModal() {
   history.replaceState(null, "", location.pathname + location.search);
   modal.classList.remove("open");
+  document.body.classList.remove("modal-open");
   state.current = null;
   markSelected(null);
   hideEditForm();
