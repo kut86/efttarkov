@@ -724,5 +724,40 @@ textarea { resize: vertical; min-height: 72px; }
   50%      { box-shadow: 0 0 0 6px rgba(255,102,0,.35), 0 0 22px 8px var(--accent-glow); }
 }
 
+/* Пока открыто окно метки — прячем кнопки этажей и зума, чтобы не перекрывали кнопки окна */
 body.modal-open #levelControls,
 body.modal-open #zoomControls { display: none !important; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   МАРКЕРЫ-ССЫЛКИ (редактор + окно метки)
+═══════════════════════════════════════════════════════════════ */
+.ml-list { display: flex; flex-direction: column; gap: 8px; }
+.ml-row  { display: flex; flex-direction: column; gap: 6px;
+           padding: 8px; border: 1px dashed var(--border2); border-radius: 8px; }
+.ml-row .ml-text { width: 100%; }
+.ml-pick { display: flex; gap: 6px; align-items: center; }
+.ml-pick .ml-select { flex: 1; min-width: 0; }
+.ml-pick .ml-remove { flex-shrink: 0; }
+
+.modal-links     { display: flex; flex-direction: column; gap: 8px; }
+.modal-link-row  { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.modal-link-text { color: var(--text-bright); line-height: 1.4; }
+.marker-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  max-width: 100%;
+  background: rgba(255,102,0,.08);
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font: inherit; font-weight: 600;
+  padding: 5px 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background .15s, box-shadow .15s;
+}
+.marker-link:hover, .marker-link:active {
+  background: rgba(255,102,0,.2);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.marker-link-map { color: var(--text-dim); font-weight: 400; font-size: .8em; }

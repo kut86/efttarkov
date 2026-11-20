@@ -9,8 +9,11 @@ import { mapEl, mapWrapper, filterSel, searchInput,
          addEmojiInput, addEmojiPicker,
          addExtraFields, addConfirm,
          addCancel, addModeBtn, toast,
+         addMarkerLinks,
          esc, isMobile }                  from "./ui.js";
 import { openModal }                      from "./modal.js";
+import { addMarkerLinkRow, collectMarkerLinks,
+         invalidateCatalog }              from "./links.js";
 
 const ICON_FALLBACK = "data:image/svg+xml," +
   "%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect width='36' height='36' fill='%23444'/%3E" +
@@ -144,6 +147,8 @@ mapEl.addEventListener("click", e => {
   if (state.addQuill) state.addQuill.setContents([]);
   addEmojiPicker.querySelectorAll(".emoji-btn").forEach(b => b.classList.remove("active"));
   addExtraFields.innerHTML = "";
+  addMarkerLinks.innerHTML = "";
+  invalidateCatalog();
 });
 
 addConfirm.onclick = () => {
@@ -153,6 +158,7 @@ addConfirm.onclick = () => {
   const textVal = (state.addQuill && state.addQuill.getText().trim())
     ? state.addQuill.root.innerHTML : null;
   const extraFields = collectExtraFields(addExtraFields);
+  const markerLinks = collectMarkerLinks(addMarkerLinks);
   push(state.currentRef, {
     x: state.pendingPos.x, y: state.pendingPos.y,
     level:       state.currentLevel,
@@ -163,7 +169,8 @@ addConfirm.onclick = () => {
     imgUrl:      addImgUrl.value.trim()      || null,
     iconUrl:     addIconUrl.value.trim()     || null,
     extraFields: extraFields.length ? extraFields : null,
-  }).then(() => { toast("Маркер добавлен"); exitAddMode(); })
+    markerLinks: markerLinks.length ? markerLinks : null,
+  }).then(() => { toast("Маркер добавлен"); invalidateCatalog(); exitAddMode(); })
     .catch(e => toast(e.message, true));
 };
 
@@ -171,6 +178,10 @@ addCancel.onclick = exitAddMode;
 
 document.getElementById("addExtraFieldBtn").addEventListener("click", () => {
   addExtraFieldRow(addExtraFields);
+});
+
+document.getElementById("addMarkerLinkBtn").addEventListener("click", () => {
+  addMarkerLinkRow(addMarkerLinks);
 });
 
 /* ── Emoji picker ── */

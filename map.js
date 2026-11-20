@@ -6,7 +6,7 @@ import { mapEl, mapImg, mapSelect,
          levelUp, levelDown, levelLabel,
          levelControls, toast, parseHash } from "./ui.js";
 import { subscribe, render }             from "./markers.js";
-import { openModal }                     from "./modal.js";
+import { openModal, closeModal }         from "./modal.js";
 
 const FIT = 1;                       // единый коэффициент вписывания карты в экран
 const missingLevels = new Set();     // "map:level" — картинки, которых нет на сервере
@@ -247,6 +247,20 @@ export function tryOpenPending() {
   else open();
 }
 state.onData = tryOpenPending;
+
+/* Переход по маркеру-ссылке: другая карта, другой этаж или та же карта */
+state.goToMarker = ({ map, id, level }) => {
+  if (!MAPS[map]) { toast("Карта не найдена", true); return; }
+  closeModal();
+  const pending = { id, level: Number(level) || 0 };
+  if (map !== state.currentMap) {
+    mapSelect.value = map;
+    switchMap(map, { pending });
+  } else {
+    state.pending = pending;
+    tryOpenPending();
+  }
+};
 
 /* Старые ссылки вида #marker=ID (без карты): ищем маркер по всем картам */
 export async function resolveLegacyMarker(id) {

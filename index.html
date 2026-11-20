@@ -182,6 +182,11 @@
     </select>
   </div>
   <div class="form-group">
+    <label class="form-label">Маркеры-ссылки (над описанием)</label>
+    <div id="addMarkerLinks" class="ml-list"></div>
+    <button type="button" id="addMarkerLinkBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить маркер</button>
+  </div>
+  <div class="form-group">
     <label class="form-label">Описание (видно в окне)</label>
     <div id="addQuillToolbar">
       <span class="ql-formats">
@@ -247,6 +252,7 @@
 
     <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
       <img id="modalPhoto" class="modal-photo" src="" alt="" style="display:none">
+      <div id="modalLinks" class="modal-links" style="display:none"></div>
       <div class="modal-desc-wrap">
         <div id="modalDesc" class="modal-desc"></div>
       </div>
@@ -269,6 +275,11 @@
             <option value="structure">🧩 Точки интересов</option>
             <option value="tain">👁 Тайник</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Маркеры-ссылки (над описанием)</label>
+          <div id="editMarkerLinks" class="ml-list"></div>
+          <button type="button" id="editMarkerLinkBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить маркер</button>
         </div>
         <div class="form-group">
           <label class="form-label">Описание</label>

@@ -1,7 +1,7 @@
 // modal.js — Модальное окно: просмотр, редактирование, удаление маркера
 
 import { db, ref, update, remove }        from "./config.js";
-import { TYPE_LABEL }                      from "./constants.js";
+import { TYPE_LABEL, MAPS }                from "./constants.js";
 import { state }                           from "./state.js";
 import { modal, modalTitle, modalBadge,
          modalPhoto, modalDesc, modalExtras,
@@ -11,9 +11,12 @@ import { modal, modalTitle, modalBadge,
          editExtraFields, saveBtn,
          cancelEdit, editBtn, delBtn,
          modalClose, toast, esc,
+         modalLinks, editMarkerLinks,
          buildHash, sanitizeHTML, mapEl }  from "./ui.js";
 import { addExtraFieldRow,
          collectExtraFields }              from "./markers.js";
+import { addMarkerLinkRow, collectMarkerLinks,
+         invalidateCatalog }              from "./links.js";
 
 /* ── Показ/скрытие формы редактирования ── */
 function showEditForm() {
@@ -65,6 +68,7 @@ export function openModal(id, m) {
   modalPhoto.style.display = m.imgUrl ? "" : "none";
   if (m.imgUrl) modalPhoto.src = m.imgUrl;
 
+  renderModalLinks(m.markerLinks);
   renderModalExtras(m.extraFields);
   hideEditForm();
   modal.classList.add("open");
@@ -80,6 +84,41 @@ export function closeModal() {
   state.current = null;
   markSelected(null);
   hideEditForm();
+}
+
+/* ── Маркеры-ссылки в модалке: текст + кнопка с названием маркера ── */
+function renderModalLinks(links) {
+  modalLinks.innerHTML = "";
+  const valid = (links || []).filter(l => l && l.id && MAPS[l.map]);
+  modalLinks.style.display = valid.length ? "" : "none";
+  valid.forEach(l => {
+    const live = l.map === state.currentMap ? state.allMarkers[l.id] : null;
+    const row  = document.createElement("div");
+    row.className = "modal-link-row";
+
+    if (l.text) {
+      const t = document.createElement("span");
+      t.className   = "modal-link-text";
+      t.textContent = l.text;
+      row.appendChild(t);
+    }
+
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "marker-link";
+    const nm = document.createElement("span");
+    nm.textContent = "📍 " + (live?.name || l.name || "Метка");
+    b.appendChild(nm);
+    if (l.map !== state.currentMap) {
+      const mp = document.createElement("small");
+      mp.className   = "marker-link-map";
+      mp.textContent = MAPS[l.map].label;
+      b.appendChild(mp);
+    }
+    b.onclick = () => state.goToMarker && state.goToMarker(l);
+    row.appendChild(b);
+    modalLinks.appendChild(row);
+  });
 }
 
 /* ── Extra fields в модалке ── */
@@ -147,6 +186,9 @@ editBtn.onclick = () => {
   });
   editExtraFields.innerHTML = "";
   (state.current.extraFields || []).forEach(f => addExtraFieldRow(editExtraFields, f.label, f.value));
+  editMarkerLinks.innerHTML = "";
+  invalidateCatalog();
+  (state.current.markerLinks || []).forEach(l => addMarkerLinkRow(editMarkerLinks, l, state.current.id));
   showEditForm();
 };
 
@@ -159,6 +201,7 @@ saveBtn.onclick = () => {
   const textVal = (state.editQuill && state.editQuill.getText().trim())
     ? state.editQuill.root.innerHTML : null;
   const extraFields = collectExtraFields(editExtraFields);
+  const markerLinks = collectMarkerLinks(editMarkerLinks);
   /* x, y и level не трогаем — обновляем только редактируемые поля */
   update(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`), {
     name,
@@ -168,7 +211,8 @@ saveBtn.onclick = () => {
     imgUrl:      editImgUrl.value.trim()      || null,
     iconUrl:     editIconUrl.value.trim()     || null,
     extraFields: extraFields.length ? extraFields : null,
-  }).then(() => { toast("Сохранено"); closeModal(); })
+    markerLinks: markerLinks.length ? markerLinks : null,
+  }).then(() => { toast("Сохранено"); invalidateCatalog(); closeModal(); })
     .catch(e => toast(e.message, true));
 };
 
@@ -176,11 +220,15 @@ document.getElementById("editExtraFieldBtn").addEventListener("click", () => {
   addExtraFieldRow(editExtraFields);
 });
 
+document.getElementById("editMarkerLinkBtn").addEventListener("click", () => {
+  addMarkerLinkRow(editMarkerLinks, null, state.current?.id);
+});
+
 /* ── Удаление (только админ) ── */
 delBtn.onclick = () => {
   if (!state.current || !state.isAdmin) return;
   if (!confirm("Удалить маркер?")) return;
   remove(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`))
-    .then(() => { toast("Удалено"); closeModal(); })
+    .then(() => { toast("Удалено"); invalidateCatalog(); closeModal(); })
     .catch(e => toast(e.message, true));
 };
