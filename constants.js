@@ -4,11 +4,11 @@ export const MAPS = {
   groundzero: {
     label: "Эпицентр",
     levels: {
-      "0":  { label: "Улица",  imgUrl: "images/groundzero/groundzero.png" },
+      "0":  { label: "Улица",  imgUrl: "images/groundzero/groundzero.webp" },
       "1":  { label: "1 этаж", imgUrl: "images/groundzero/level1.png" },
       "2":  { label: "2 этаж", imgUrl: "images/groundzero/level2.png" },
     },
-    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/groundzero/groundzero.png?raw=true"
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/groundzero/groundzero.webp?raw=true"
   },
   streetsoftarkov: {
     label: "Улицы Таркова",
@@ -38,9 +38,9 @@ export const MAPS = {
   customs: {
     label: "Таможня",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/customs/customs.jpg" },
+      "0": { label: "Основной", imgUrl: "images/customs/customs.webp" },
     },
-    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/customs/customs.jpg?raw=true"
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/customs/customs.webp?raw=true"
   },
   factory: {
     label: "Завод",
@@ -55,7 +55,7 @@ export const MAPS = {
   woods: {
     label: "Лес",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/woods/woods.jpg" },
+      "0": { label: "Основной", imgUrl: "images/woods/woods.webp" },
     },
     fallback: ""
   },
@@ -117,4 +117,11 @@ export const QUICK_EMOJI = [
   "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡"
 ];
 
-export const ADMIN_UID = "7AvuSzEGvwQYPLowdsI5mKUZEFG2";
+/* Уровни доступа пользователей (используются в profile.js и access.js) */
+export const ACCESS_LEVELS = {
+  0: { name: "Standard",           icon: "🪖" },
+  1: { name: "Left Behind",        icon: "🎯" },
+  2: { name: "Prepare for Escape", icon: "⚔️" },
+  3: { name: "Edge of Darkness",   icon: "💀" },
+  4: { name: "Unheard",            icon: "👁" },
+};

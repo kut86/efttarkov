@@ -4,6 +4,7 @@ import { auth, db, provider,
          ref, onValue, update,
          signInWithPopup, onAuthStateChanged,
          signOut }                         from "./config.js";
+import { ACCESS_LEVELS } from "./constants.js";
 
 /* ── DOM ── */
 const profilePage      = document.getElementById("profilePage");
@@ -61,13 +62,7 @@ function renderRole(role) {
 }
 
 /* ── Уровни доступа ── */
-const LEVELS = {
-  0: { name: "Standard",           icon: "🪖" },
-  1: { name: "Left Behind",        icon: "🎯" },
-  2: { name: "Prepare for Escape", icon: "⚔️" },
-  3: { name: "Edge of Darkness",   icon: "💀" },
-  4: { name: "Unheard",            icon: "👁" },
-};
+const LEVELS = ACCESS_LEVELS;
 
 /* ── Баннер уровня доступа ── */
 function renderAccessBanner(profile) {

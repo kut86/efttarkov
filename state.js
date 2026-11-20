@@ -1,7 +1,8 @@
 // state.js — Глобальное изменяемое состояние приложения
 
 export const state = {
-  // Авторизация
+  // Авторизация (по умолчанию — гость, только просмотр)
+  user:         null,
   isAdmin:      false,
 
   // Текущая карта и уровень
@@ -15,19 +16,26 @@ export const state = {
   addMode:      false,
   pendingPos:   null,
 
-  // Все маркеры текущей карты { id: data }
+  // Маркеры текущей карты { id: data }
   allMarkers:   {},
+  dataLoaded:   false,
 
-  // Firebase ref текущей карты
+  // Firebase
   currentRef:   null,
-
-  // Функция отписки от Firebase onValue
   offFn:        null,
 
-  // Экземпляр Panzoom
+  // Panzoom и состояние вида
   pz:           null,
+  fitScale:     1,
+  fitted:       false,   // первичное вписывание карты выполнено
+  touched:      false,   // пользователь двигал/масштабировал карту
+  loadToken:    0,       // защита от гонок при смене карты/этажа
 
-  // Экземпляры Quill-редакторов
+  // Маркер из ссылки, который нужно открыть { id, level }
+  pending:      null,
+  onData:       null,    // колбэк «маркеры загружены» (ставится в map.js)
+
+  // Quill-редакторы
   addQuill:     null,
   editQuill:    null,
 };

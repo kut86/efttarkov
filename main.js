@@ -1,62 +1,62 @@
-// main.js — Точка входа: инициализация приложения
+// main.js — Точка входа: карта открывается сразу, вход необязателен
 
-import { auth, provider, signInWithPopup,
-         onAuthStateChanged, signOut }     from "./config.js";
-import { MAPS }                           from "./constants.js";
-import { state }                          from "./state.js";
-import { toast, loginBtn, logoutBtn, adminBadge,
-         addModeBtn, mapSelect,
+import { MAPS }                            from "./constants.js";
+import { state }                           from "./state.js";
+import { toast, adminBadge, addModeBtn, mapSelect,
          addEmojiPicker, addEmojiInput,
-         editEmojiPicker, editEmojiInput } from "./ui.js";
-import { switchMap, setLevel }            from "./map.js";
-import { exitAddMode, buildEmojiPicker,
-         checkUrlHash }                    from "./markers.js";
-import { initAuthGuard, updateMenuProfile } from "./auth-guard.js";
+         editEmojiPicker, editEmojiInput,
+         parseHash }                       from "./ui.js";
+import { switchMap, resolveLegacyMarker }  from "./map.js";
+import { exitAddMode, buildEmojiPicker }   from "./markers.js";
+import { refreshModalControls }            from "./modal.js";
+import { initAuth }                        from "./auth.js";
 
 /* ── Emoji pickers ── */
 buildEmojiPicker(addEmojiPicker, addEmojiInput);
 buildEmojiPicker(editEmojiPicker, editEmojiInput);
 
-/* ── Auth + запуск карты ── */
-loginBtn.onclick  = () => signInWithPopup(auth, provider)
-  .catch(e => toast(e.message, true));
-logoutBtn.onclick = () => signOut(auth).then(() => location.reload());
-
-initAuthGuard((user, profile) => {
-  state.isAdmin = profile.role === "admin";
-
-  const profileBtn = document.getElementById("profileBtn");
-  if (profileBtn) profileBtn.style.display = "flex";
-
-  loginBtn.style.display   = "none";
-  logoutBtn.style.display  = "";
-  adminBadge.style.display = state.isAdmin ? "" : "none";
-  addModeBtn.style.display = state.isAdmin ? "" : "none";
-
-  updateMenuProfile(profile);
-  if (!state.isAdmin) exitAddMode();
-
-  /* ── Старт карты ── */
-  const savedMap = localStorage.getItem("lastMap");
-  const startMap = (savedMap && MAPS[savedMap]) ? savedMap : "groundzero";
-  mapSelect.value = startMap;
-  switchMap(startMap);
-  checkUrlHash();
-
-  if (state._pendingLevel !== null && state._pendingLevel !== undefined) {
-    setLevel(state._pendingLevel);
-    state._pendingLevel = null;
-  }
-
-  /* ── Quill — последними ── */
+/* ── Quill (если CDN недоступен — карта всё равно работает) ── */
+if (window.Quill) {
   state.addQuill = new Quill("#addQuillEditor", {
-    theme: "snow",
-    placeholder: "Подробное описание...",
+    theme: "snow", placeholder: "Подробное описание...",
     modules: { toolbar: "#addQuillToolbar" }
   });
   state.editQuill = new Quill("#editQuillEditor", {
-    theme: "snow",
-    placeholder: "Описание...",
+    theme: "snow", placeholder: "Описание...",
     modules: { toolbar: "#editQuillToolbar" }
   });
-});
+}
+
+/* ── Права: гость по умолчанию, админ — после входа ── */
+function applyAuth(user, profile) {
+  state.user    = user;
+  state.isAdmin = !!profile && profile.role === "admin" && !profile.banned;
+
+  adminBadge.style.display = state.isAdmin ? "" : "none";
+  addModeBtn.style.display = state.isAdmin ? "" : "none";
+  if (!state.isAdmin) exitAddMode();
+  refreshModalControls();
+
+  if (profile?.banned) toast("Аккаунт заблокирован — доступен только просмотр", true);
+}
+initAuth(applyAuth);
+
+/* ── Старт карты (не ждёт авторизации) ── */
+async function start() {
+  const h     = parseHash();
+  const saved = localStorage.getItem("lastMap");
+  let startMap = MAPS[h.map] ? h.map : (MAPS[saved] ? saved : "groundzero");
+  let pending  = h.marker ? { id: h.marker, level: Number(h.level) || 0 } : null;
+
+  /* Старый формат ссылки #marker=ID — выясняем, на какой он карте */
+  if (h.marker && !MAPS[h.map]) {
+    try {
+      const found = await resolveLegacyMarker(h.marker);
+      if (found) { startMap = found.map; pending = { id: h.marker, level: found.level }; }
+    } catch (e) { console.warn(e); }
+  }
+
+  mapSelect.value = startMap;
+  switchMap(startMap, { pending });
+}
+start();

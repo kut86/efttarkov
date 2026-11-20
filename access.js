@@ -3,14 +3,9 @@
 import { auth, db, provider,
          ref, onValue, update,
          signInWithPopup, onAuthStateChanged } from "./config.js";
+import { ACCESS_LEVELS } from "./constants.js";
 
-const LEVELS = {
-  0: { name: "Standard",           icon: "🪖" },
-  1: { name: "Left Behind",        icon: "🎯" },
-  2: { name: "Prepare for Escape", icon: "⚔️" },
-  3: { name: "Edge of Darkness",   icon: "💀" },
-  4: { name: "Unheard",            icon: "👁" },
-};
+const LEVELS = ACCESS_LEVELS;
 
 const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
 
