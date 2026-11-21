@@ -75,7 +75,7 @@ export function esc(s) {
 export function parseMarkerSize(v) {
   const n = Math.round(Number(String(v ?? "").replace(",", ".")));
   if (!String(v ?? "").trim() || !Number.isFinite(n) || n <= 0) return null;
-  return Math.min(500, Math.max(30, n));
+  return Math.min(1000, Math.max(1, n));
 }
 
 /* Ссылки GitHub вида github.com/…/blob/…?raw=true превращаем в raw.githubusercontent.com:
