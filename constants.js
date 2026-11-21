@@ -4,16 +4,16 @@ export const MAPS = {
   groundzero: {
     label: "Эпицентр",
     levels: {
-      "0":  { label: "Улица",  imgUrl: "images/groundzero/groundzero.png" },
+      "0":  { label: "Улица",  imgUrl: "images/groundzero/groundzero.webp" },
       "1":  { label: "1 этаж", imgUrl: "images/groundzero/level1.png" },
       "2":  { label: "2 этаж", imgUrl: "images/groundzero/level2.png" },
     },
-    fallback: ""
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/groundzero/groundzero.webp?raw=true"
   },
   streetsoftarkov: {
     label: "Улицы Таркова",
     levels: {
-      "0": { label: "Улица",  imgUrl: "images/streetsoftarkov/streetsoftarkov.png" },
+      "0": { label: "Улица",  imgUrl: "images/streetsoftarkov/streetsoftarkov.svg" },
       "1": { label: "1 этаж", imgUrl: "images/streetsoftarkov/level1.svg" },
     },
     fallback: ""
@@ -21,15 +21,15 @@ export const MAPS = {
   labs: {
     label: "Лаборатория",
     levels: {
-      "0":  { label: "Б1", imgUrl: "images/labs/labs.png" },
+      "0":  { label: "Б1", imgUrl: "images/labs/labs.svg" },
       "-1": { label: "Б2", imgUrl: "images/labs/labsB2.svg" },
     },
-    fallback: ""
+    fallback: "https://raw.githubusercontent.com/kut86/amigos-wiki/3b703c6b42941e6fc08ebaaf27ea7ef54d328452/map/images/labs/labs.svg"
   },
   interchange: {
     label: "Развязка",
     levels: {
-      "0": { label: "Улица",  imgUrl: "images/interchange/interchange.png" },
+      "0": { label: "Улица",  imgUrl: "images/interchange/interchange.avif" },
       "1": { label: "1 этаж", imgUrl: "images/interchange/level1.avif" },
       "2": { label: "2 этаж", imgUrl: "images/interchange/level2.avif" },
     },
@@ -38,9 +38,9 @@ export const MAPS = {
   customs: {
     label: "Таможня",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/customs/customs.png" },
+      "0": { label: "Основной", imgUrl: "images/customs/customs.webp" },
     },
-    fallback: ""
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/customs/customs.webp?raw=true"
   },
   factory: {
     label: "Завод",
@@ -55,14 +55,14 @@ export const MAPS = {
   woods: {
     label: "Лес",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/woods/woods.png" },
+      "0": { label: "Основной", imgUrl: "images/woods/woods.webp" },
     },
     fallback: ""
   },
   reserve: {
     label: "Резерв",
     levels: {
-      "0":  { label: "Поверхность", imgUrl: "images/reserve/reserve.png" },
+      "0":  { label: "Поверхность", imgUrl: "images/reserve/reserve.svg" },
       "-1": { label: "Подземный",   imgUrl: "images/reserve/underground.svg" },
     },
     fallback: ""
@@ -70,21 +70,21 @@ export const MAPS = {
   lighthouse: {
     label: "Маяк",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/lighthouse/lighthouse.png" },
+      "0": { label: "Основной", imgUrl: "images/lighthouse/lighthouse.svg" },
     },
     fallback: ""
   },
   shoreline: {
     label: "Берег",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/shoreline/shoreline.png" },
+      "0": { label: "Основной", imgUrl: "images/shoreline/shoreline.svg" },
     },
     fallback: ""
   },
   labyrinth: {
     label: "Лабиринт",
     levels: {
-      "0": { label: "Основной", imgUrl: "images/labyrinth/labyrinth.png" },
+      "0": { label: "Основной", imgUrl: "images/labyrinth/labyrinth.svg" },
     },
     fallback: ""
   }
@@ -114,7 +114,7 @@ export const TYPE_LABEL = {
 
 export const QUICK_EMOJI = [
   "📍","⭐","🔥","💎","⚔️","🧨","💊","🗺","🏴","🔑",
-  "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡","🎥","🪬"
+  "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡"
 ];
 
 /* Уровни доступа пользователей (используются в profile.js и access.js) */
