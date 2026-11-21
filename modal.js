@@ -13,6 +13,7 @@ import { modal, modalTitle, modalBadge,
          modalClose, toast, esc,
          modalLinks, editMarkerLinks,
          modalTrader, editTrader,
+         editNoBg, editSize, parseMarkerSize,
          modalVideos, editVideos,
          buildHash, sanitizeHTML, mapEl,
          normalizeImageUrl }              from "./ui.js";
@@ -187,6 +188,8 @@ editBtn.onclick = () => {
   editName.value       = state.current.name    || "";
   editType.value       = state.current.type    || "loot";
   editTrader.value     = state.current.trader  || "";
+  editNoBg.checked     = !!state.current.noBg;
+  editSize.value       = state.current.size || "";
   editImgUrl.value     = state.current.imgUrl  || "";
   editIconUrl.value    = state.current.iconUrl || "";
   editEmojiInput.value = state.current.emoji   || "";
@@ -225,6 +228,8 @@ saveBtn.onclick = () => {
     text:        textVal,
     type:        editType.value,
     trader:      editTrader.value || null,
+    noBg:        editNoBg.checked ? true : null,
+    size:        parseMarkerSize(editSize.value),
     emoji:       editEmojiInput.value.trim()  || null,
     imgUrl:      editImgUrl.value.trim()      || null,
     iconUrl:     editIconUrl.value.trim()     || null,

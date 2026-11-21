@@ -13,6 +13,10 @@ export const addForm        = document.getElementById("addForm");
 export const addName        = document.getElementById("addName");
 export const addType        = document.getElementById("addType");
 export const addTrader      = document.getElementById("addTrader");
+export const addNoBg        = document.getElementById("addNoBg");
+export const addSize        = document.getElementById("addSize");
+export const editNoBg       = document.getElementById("editNoBg");
+export const editSize       = document.getElementById("editSize");
 export const editTrader     = document.getElementById("editTrader");
 export const traderFilter   = document.getElementById("traderFilter");
 export const modalTrader    = document.getElementById("modalTrader");
@@ -65,6 +69,13 @@ export function esc(s) {
     .replace(/>/g,  "&gt;")
     .replace(/"/g,  "&quot;")
     .replace(/'/g,  "&#39;");
+}
+
+/* Размер маркера в процентах: пусто/некорректно → null (значит «как сейчас») */
+export function parseMarkerSize(v) {
+  const n = Math.round(Number(String(v ?? "").replace(",", ".")));
+  if (!String(v ?? "").trim() || !Number.isFinite(n) || n <= 0) return null;
+  return Math.min(500, Math.max(30, n));
 }
 
 /* Ссылки GitHub вида github.com/…/blob/…?raw=true превращаем в raw.githubusercontent.com:

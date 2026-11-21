@@ -254,6 +254,14 @@
     <input id="addIconUrl" type="url" placeholder="https://...icon.png">
   </div>
   <div class="form-group">
+    <label class="form-label">Вид маркера <span style="color:var(--text-dim)">(необязательно)</span></label>
+    <label class="check-row"><input type="checkbox" id="addNoBg"> Без подложки — только значок (эмодзи или иконка)</label>
+    <div class="size-row">
+      <input type="number" id="addSize" class="mk-num" min="30" max="500" step="5" inputmode="numeric" placeholder="Авто">
+      <span class="size-hint">% размера. Пусто — как сейчас (100%). Например: 150 — крупнее, 70 — мельче</span>
+    </div>
+  </div>
+  <div class="form-group">
     <label class="form-label">URL фото (превью + модальное окно)</label>
     <input id="addImgUrl" type="url" placeholder="https://...">
   </div>
@@ -358,6 +366,14 @@
           <input id="editEmojiInput" type="text" placeholder="Или введи свой emoji" style="margin-top:4px;">
           <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:6px;margin-bottom:2px;">Или URL иконки (перекрывает emoji):</div>
           <input id="editIconUrl" type="url" placeholder="https://...icon.png">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Вид маркера <span style="color:var(--text-dim)">(необязательно)</span></label>
+          <label class="check-row"><input type="checkbox" id="editNoBg"> Без подложки — только значок (эмодзи или иконка)</label>
+          <div class="size-row">
+            <input type="number" id="editSize" class="mk-num" min="30" max="500" step="5" inputmode="numeric" placeholder="Авто">
+            <span class="size-hint">% размера. Пусто — как сейчас (100%). Например: 150 — крупнее, 70 — мельче</span>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">URL фото (превью + модальное окно)</label>

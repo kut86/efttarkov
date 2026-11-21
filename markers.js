@@ -5,6 +5,7 @@ import { QUICK_EMOJI, TYPE_EMOJI, TRADERS } from "./constants.js";
 import { state }                          from "./state.js";
 import { mapEl, mapWrapper, filterSel, searchInput,
          traderFilter, addTrader, editTrader,
+         addNoBg, addSize, parseMarkerSize,
          addForm, addName, addType,
          addImgUrl, addIconUrl,
          addEmojiInput, addEmojiPicker,
@@ -122,6 +123,9 @@ export function createMarker(id, m) {
   div.style.top  = m.y + "%";
   if (isMobile()) div.classList.add("no-hover");
   if (state.current?.id === id) div.classList.add("selected");
+  if (m.noBg) div.classList.add("no-bg");
+  const size = parseMarkerSize(m.size);
+  if (size) div.style.setProperty("--ms", String(size / 100));
 
   const typeClass = TYPE_EMOJI[m.type] ? m.type : "custom";
   let iconHTML;
@@ -185,6 +189,8 @@ mapEl.addEventListener("click", e => {
   addName.value = addImgUrl.value = addIconUrl.value = addEmojiInput.value = "";
   addType.value = "loot";
   addTrader.value = "";
+  addNoBg.checked = false;
+  addSize.value = "";
   if (state.addQuill) state.addQuill.setContents([]);
   addEmojiPicker.querySelectorAll(".emoji-btn").forEach(b => b.classList.remove("active"));
   addExtraFields.innerHTML = "";
@@ -210,6 +216,8 @@ addConfirm.onclick = () => {
     text:        textVal,
     type:        addType.value,
     trader:      addTrader.value || null,
+    noBg:        addNoBg.checked ? true : null,
+    size:        parseMarkerSize(addSize.value),
     emoji:       addEmojiInput.value.trim()  || null,
     imgUrl:      addImgUrl.value.trim()      || null,
     iconUrl:     addIconUrl.value.trim()     || null,
