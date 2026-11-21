@@ -106,7 +106,7 @@ async function staleWhileRevalidate(req, cacheName) {
 }
 
 async function cachedImageOnly(req) {
-  const hit = await caches.match(req);
+  const hit = await caches.match(req, { ignoreVary: true });
   if (hit) return hit;
   try { return await fetch(req); } catch { return Response.error(); }
 }

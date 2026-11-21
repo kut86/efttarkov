@@ -11,7 +11,7 @@ import { mapEl, mapWrapper, filterSel, searchInput,
          addExtraFields, addConfirm,
          addCancel, addModeBtn, toast,
          addMarkerLinks, addVideos,
-         esc, isMobile }                  from "./ui.js";
+         esc, isMobile, normalizeImageUrl } from "./ui.js";
 import { openModal }                      from "./modal.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
@@ -126,14 +126,14 @@ export function createMarker(id, m) {
   const typeClass = TYPE_EMOJI[m.type] ? m.type : "custom";
   let iconHTML;
   if (m.iconUrl) {
-    iconHTML = `<div class="marker-icon icon-img"><img src="${esc(m.iconUrl)}" alt="" draggable="false"></div>`;
+    iconHTML = `<div class="marker-icon icon-img"><img src="${esc(normalizeImageUrl(m.iconUrl))}" alt="" draggable="false"></div>`;
   } else {
     const displayEmoji = m.emoji || TYPE_EMOJI[m.type] || "📍";
     iconHTML = `<div class="marker-icon ${typeClass}"><span>${esc(displayEmoji)}</span></div>`;
   }
 
   const previewHTML = (!isMobile() && m.imgUrl)
-    ? `<div class="marker-preview"><img src="${esc(m.imgUrl)}" alt="" draggable="false" loading="lazy"></div>`
+    ? `<div class="marker-preview"><img src="${esc(normalizeImageUrl(m.imgUrl))}" alt="" draggable="false" loading="lazy"></div>`
     : "";
 
   const traderLabel = TRADERS[m.trader]?.label;

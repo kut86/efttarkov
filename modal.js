@@ -14,7 +14,8 @@ import { modal, modalTitle, modalBadge,
          modalLinks, editMarkerLinks,
          modalTrader, editTrader,
          modalVideos, editVideos,
-         buildHash, sanitizeHTML, mapEl }  from "./ui.js";
+         buildHash, sanitizeHTML, mapEl,
+         normalizeImageUrl }              from "./ui.js";
 import { addExtraFieldRow,
          collectExtraFields }              from "./markers.js";
 import { addMarkerLinkRow, collectMarkerLinks,
@@ -75,7 +76,7 @@ export function openModal(id, m) {
   }
 
   modalPhoto.style.display = m.imgUrl ? "" : "none";
-  if (m.imgUrl) modalPhoto.src = m.imgUrl;
+  if (m.imgUrl) modalPhoto.src = normalizeImageUrl(m.imgUrl);
 
   renderModalLinks(m.markerLinks);
   renderVideos(modalVideos, m.videos);

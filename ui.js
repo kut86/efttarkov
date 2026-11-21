@@ -67,6 +67,20 @@ export function esc(s) {
     .replace(/'/g,  "&#39;");
 }
 
+/* Ссылки GitHub вида github.com/…/blob/…?raw=true превращаем в raw.githubusercontent.com:
+   только там сервер разрешает сохранять картинку для офлайна (CORS) */
+export function normalizeImageUrl(url) {
+  if (!url) return url;
+  try {
+    const u = new URL(url, location.href);
+    if (u.hostname === "github.com") {
+      const m = u.pathname.match(/^\/([^/]+)\/([^/]+)\/(?:blob|raw)\/(?:refs\/heads\/)?(.+)$/);
+      if (m) return `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`;
+    }
+  } catch { /* оставляем как есть */ }
+  return url;
+}
+
 export function toast(msg, err = false) {
   const tc = document.getElementById("toastContainer");
   const t  = document.createElement("div");

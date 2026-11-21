@@ -2,7 +2,7 @@
 
 import { db, ref, get } from "./config.js";
 import { MAPS }         from "./constants.js";
-import { toast }        from "./ui.js";
+import { toast, normalizeImageUrl } from "./ui.js";
 
 const PREFIX    = "tm:markers:";
 const IMG_CACHE = "tm-img";             // то же имя, что в sw.js
@@ -42,8 +42,8 @@ export async function downloadForOffline(onProgress) {
     Object.values(m.levels || {}).forEach(l => l.imgUrl && urls.add(l.imgUrl)));
   Object.values(all).forEach(map =>
     Object.values(map.markers || {}).forEach(m => {
-      if (m.imgUrl)  urls.add(m.imgUrl);
-      if (m.iconUrl) urls.add(m.iconUrl);
+      if (m.imgUrl)  urls.add(normalizeImageUrl(m.imgUrl));
+      if (m.iconUrl) urls.add(normalizeImageUrl(m.iconUrl));
     }));
 
   const list  = [...urls].map(u => new URL(u, location.href).href);
