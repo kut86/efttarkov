@@ -71,6 +71,10 @@ export function esc(s) {
    только там сервер разрешает сохранять картинку для офлайна (CORS) */
 export function normalizeImageUrl(url) {
   if (!url) return url;
+  url = String(url).trim();
+  /* Ссылка без https:// (например, "raw.githubusercontent.com/…") — иначе браузер ищет её внутри сайта */
+  if (url.startsWith("//")) url = "https:" + url;
+  else if (/^(?:[a-z0-9-]+\.)+[a-z]{2,}\//i.test(url)) url = "https://" + url;
   try {
     const u = new URL(url, location.href);
     if (u.hostname === "github.com") {
