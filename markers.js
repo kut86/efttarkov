@@ -10,11 +10,12 @@ import { mapEl, mapWrapper, filterSel, searchInput,
          addEmojiInput, addEmojiPicker,
          addExtraFields, addConfirm,
          addCancel, addModeBtn, toast,
-         addMarkerLinks,
+         addMarkerLinks, addVideos,
          esc, isMobile }                  from "./ui.js";
 import { openModal }                      from "./modal.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
+import { addVideoRow, collectVideos }    from "./videos.js";
 import { readCache, writeCache,
          requireOnline }                  from "./offline.js";
 
@@ -188,6 +189,7 @@ mapEl.addEventListener("click", e => {
   addEmojiPicker.querySelectorAll(".emoji-btn").forEach(b => b.classList.remove("active"));
   addExtraFields.innerHTML = "";
   addMarkerLinks.innerHTML = "";
+  addVideos.innerHTML = "";
   invalidateCatalog();
 });
 
@@ -199,6 +201,8 @@ addConfirm.onclick = () => {
     ? state.addQuill.root.innerHTML : null;
   const extraFields = collectExtraFields(addExtraFields);
   const markerLinks = collectMarkerLinks(addMarkerLinks);
+  const videos = collectVideos(addVideos);
+  if (videos.invalid) { toast("Не удалось распознать ссылку на видео", true); return; }
   push(state.currentRef, {
     x: state.pendingPos.x, y: state.pendingPos.y,
     level:       state.currentLevel,
@@ -211,6 +215,7 @@ addConfirm.onclick = () => {
     iconUrl:     addIconUrl.value.trim()     || null,
     extraFields: extraFields.length ? extraFields : null,
     markerLinks: markerLinks.length ? markerLinks : null,
+    videos:      videos.length ? videos : null,
   }).then(() => { toast("Маркер добавлен"); invalidateCatalog(); exitAddMode(); })
     .catch(e => toast(e.message, true));
 };
@@ -220,6 +225,8 @@ addCancel.onclick = exitAddMode;
 document.getElementById("addExtraFieldBtn").addEventListener("click", () => {
   addExtraFieldRow(addExtraFields);
 });
+
+document.getElementById("addVideoBtn").addEventListener("click", () => addVideoRow(addVideos));
 
 document.getElementById("addMarkerLinkBtn").addEventListener("click", () => {
   addMarkerLinkRow(addMarkerLinks);

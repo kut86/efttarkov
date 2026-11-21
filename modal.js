@@ -13,12 +13,15 @@ import { modal, modalTitle, modalBadge,
          modalClose, toast, esc,
          modalLinks, editMarkerLinks,
          modalTrader, editTrader,
+         modalVideos, editVideos,
          buildHash, sanitizeHTML, mapEl }  from "./ui.js";
 import { addExtraFieldRow,
          collectExtraFields }              from "./markers.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
 import { requireOnline }                  from "./offline.js";
+import { addVideoRow, collectVideos,
+         renderVideos, stopVideos }       from "./videos.js";
 
 /* ── Показ/скрытие формы редактирования ── */
 function showEditForm() {
@@ -75,6 +78,7 @@ export function openModal(id, m) {
   if (m.imgUrl) modalPhoto.src = m.imgUrl;
 
   renderModalLinks(m.markerLinks);
+  renderVideos(modalVideos, m.videos);
   renderModalExtras(m.extraFields);
   hideEditForm();
   modal.classList.add("open");
@@ -86,6 +90,7 @@ export function openModal(id, m) {
 export function closeModal() {
   history.replaceState(null, "", location.pathname + location.search);
   modal.classList.remove("open");
+  stopVideos(modalVideos);
   document.body.classList.remove("modal-open");
   state.current = null;
   markSelected(null);
@@ -196,6 +201,8 @@ editBtn.onclick = () => {
   editMarkerLinks.innerHTML = "";
   invalidateCatalog();
   (state.current.markerLinks || []).forEach(l => addMarkerLinkRow(editMarkerLinks, l, state.current.id));
+  editVideos.innerHTML = "";
+  (state.current.videos || []).forEach(v => addVideoRow(editVideos, v));
   showEditForm();
 };
 
@@ -209,6 +216,8 @@ saveBtn.onclick = () => {
     ? state.editQuill.root.innerHTML : null;
   const extraFields = collectExtraFields(editExtraFields);
   const markerLinks = collectMarkerLinks(editMarkerLinks);
+  const videos = collectVideos(editVideos);
+  if (videos.invalid) { toast("Не удалось распознать ссылку на видео", true); return; }
   /* x, y и level не трогаем — обновляем только редактируемые поля */
   update(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`), {
     name,
@@ -220,6 +229,7 @@ saveBtn.onclick = () => {
     iconUrl:     editIconUrl.value.trim()     || null,
     extraFields: extraFields.length ? extraFields : null,
     markerLinks: markerLinks.length ? markerLinks : null,
+    videos:      videos.length ? videos : null,
   }).then(() => { toast("Сохранено"); invalidateCatalog(); closeModal(); })
     .catch(e => toast(e.message, true));
 };
@@ -227,6 +237,8 @@ saveBtn.onclick = () => {
 document.getElementById("editExtraFieldBtn").addEventListener("click", () => {
   addExtraFieldRow(editExtraFields);
 });
+
+document.getElementById("editVideoBtn").addEventListener("click", () => addVideoRow(editVideos));
 
 document.getElementById("editMarkerLinkBtn").addEventListener("click", () => {
   addMarkerLinkRow(editMarkerLinks, null, state.current?.id);
