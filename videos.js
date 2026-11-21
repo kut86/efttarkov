@@ -50,6 +50,29 @@ export function parseVideo(raw) {
     };
   }
 
+  /* Twitch: записи эфиров и клипы (Twitch требует указать домен сайта в parent) */
+  if (host === "twitch.tv" || host === "clips.twitch.tv") {
+    const parent = (globalThis.location && location.hostname) || "localhost";
+    const time = u.searchParams.get("t");
+    const vod = host === "twitch.tv" ? path.match(/(?:^|\/)(?:videos|video|v)\/(\d+)/) : null;
+    if (vod) {
+      const t = time ? `&time=${encodeURIComponent(time)}` : "";
+      return {
+        kind: "twitch", site: "Twitch", vertical: false, thumb: "",
+        embed: `https://player.twitch.tv/?video=v${vod[1]}&parent=${parent}&autoplay=true${t}`,
+        watch: `https://www.twitch.tv/videos/${vod[1]}${time ? `?t=${encodeURIComponent(time)}` : ""}`,
+      };
+    }
+    let slug = null;
+    if (host === "clips.twitch.tv") slug = path === "/embed" ? u.searchParams.get("clip") : path.slice(1).split("/")[0];
+    else { const m = path.match(/\/clip\/([A-Za-z0-9_-]+)/); if (m) slug = m[1]; }
+    if (slug && /^[A-Za-z0-9_-]{3,}$/.test(slug)) return {
+      kind: "twitch", site: "Twitch", vertical: false, thumb: "",
+      embed: `https://clips.twitch.tv/embed?clip=${slug}&parent=${parent}&autoplay=true`,
+      watch: `https://clips.twitch.tv/${slug}`,
+    };
+  }
+
   /* Прямой файл */
   if (/\.(mp4|webm|ogv|mov|m4v)$/i.test(path)) {
     return { kind: "file", site: "Видео", vertical: false, src: u.href, watch: u.href };
@@ -63,7 +86,7 @@ export function addVideoRow(container, v = null) {
   row.className = "vd-row";
   row.innerHTML = `
     <input type="url" class="vd-url" inputmode="url" autocomplete="off"
-           placeholder="Ссылка: YouTube, Shorts, Vimeo или .mp4">
+           placeholder="Ссылка: YouTube, Twitch, Vimeo или .mp4">
     <div class="vd-pick">
       <input type="text" class="vd-title" maxlength="120" placeholder="Подпись (необязательно)">
       <button type="button" class="vd-remove btn btn-sm btn-danger" aria-label="Удалить">✕</button>
