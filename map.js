@@ -118,7 +118,7 @@ export function initPanzoom() {
   if (state.pz) { state.pz.destroy(); state.pz = null; }
   state.fitted  = false;
   state.touched = false;
-  state.pz = Panzoom(mapEl, { maxScale: 8, minScale: 0.5, contain: "outside" });
+  state.pz = Panzoom(mapEl, { maxScale: 20, minScale: 0.5, contain: "outside" });
   requestAnimationFrame(() => requestAnimationFrame(() => fitView(false)));
 }
 
