@@ -20,6 +20,10 @@
         }
       }
     },
+    "houses": {
+      ".read": true,
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    },
     "users": {
       ".read":  "root.child('users').child(auth.uid).child('role').val() === 'admin'",
       ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
@@ -27,7 +31,8 @@
         ".read": "auth.uid === $uid",
         ".write": "auth.uid === $uid && !data.exists() && newData.child('role').val() === 'user' && newData.child('banned').val() === false",
         "nickname": { ".write": "auth.uid === $uid" },
-        "photoURL": { ".write": "auth.uid === $uid" }
+        "photoURL": { ".write": "auth.uid === $uid" },
+        "accessLevel": { ".write": "auth.uid === $uid && newData.val() === 0" }
       }
     }
   }
