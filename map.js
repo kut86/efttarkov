@@ -124,6 +124,19 @@ export function initPanzoom() {
 
 mapEl.addEventListener("panzoomstart", () => { state.touched = true; });
 
+/* ── Единый размер маркеров на любом устройстве ──
+   Ширина карты на экране зависит от устройства (телефон ≈ 400px, ПК ≈ 1900px),
+   а маркер раньше был в пикселях — поэтому на ПК он казался мельче.
+   Теперь размер маркера = доля от ширины карты: на всех экранах пропорции одинаковые. */
+const MARKER_REF_WIDTH = 1800;   // при ширине карты 1800px маркер 25px (как раньше на ПК)
+function updateMarkerScale() {
+  const w = mapEl.offsetWidth;
+  if (w) mapEl.style.setProperty("--mk", (w / MARKER_REF_WIDTH).toFixed(4));
+}
+if (window.ResizeObserver) new ResizeObserver(updateMarkerScale).observe(mapEl);
+window.addEventListener("resize", updateMarkerScale);
+updateMarkerScale();
+
 export function fitView(animate = false) {
   if (!state.pz) return;
   const iw = mapImg.naturalWidth, ih = mapImg.naturalHeight;

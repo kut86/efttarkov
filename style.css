@@ -103,11 +103,11 @@ body::before {
 }
 
 .marker-icon {
-  width: calc(25px * var(--ms, 1)); height: calc(25px * var(--ms, 1));
+  width: calc(25px * var(--mk, 1) * var(--ms, 1)); height: calc(25px * var(--mk, 1) * var(--ms, 1));
   border-radius: 50% 50% 50% 0;
   rotate: -45deg;
   display: flex; align-items: center; justify-content: center;
-  font-size: calc(12px * var(--ms, 1));
+  font-size: calc(14px * var(--mk, 1) * var(--ms, 1));
   box-shadow: 0 2px 9px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08);
   transition: box-shadow .15s;
 }
@@ -141,7 +141,7 @@ body::before {
 
 /* URL-иконки */
 .marker-icon.icon-img {
-  width: calc(36px * var(--ms, 1)); height: calc(36px * var(--ms, 1));
+  width: calc(36px * var(--mk, 1) * var(--ms, 1)); height: calc(36px * var(--mk, 1) * var(--ms, 1));
   border-radius: 50%;
   rotate: 0deg;
   overflow: hidden;
@@ -590,12 +590,6 @@ textarea { resize: vertical; min-height: 72px; }
   .modal-photo { max-height: 200px; }
   .modal-body  { padding: 12px 14px; }
   
-  .marker-icon,
-  .marker-photo {
-    width: 6px;
-    height: 6px;
-    font-size: 4px;
-  }
 
   #addForm {
     bottom: 0;
@@ -621,12 +615,6 @@ textarea { resize: vertical; min-height: 72px; }
   .modal-footer { gap: 5px; padding: 5px 8px; }
   .modal-footer .btn { font-size: 12px; padding: 5px 8px; }
   
-  .marker-icon,
-  .marker-photo {
-    width: 6px;
-    height: 6px;
-    font-size: 4px;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -716,12 +704,12 @@ textarea { resize: vertical; min-height: 72px; }
 
 .marker.selected { z-index: 300; }
 .marker.selected .marker-icon {
-  box-shadow: 0 0 0 3px var(--accent), 0 0 18px 4px var(--accent-glow);
+  box-shadow: 0 0 0 calc(3px * var(--mk, 1)) var(--accent), 0 0 calc(18px * var(--mk, 1)) calc(4px * var(--mk, 1)) var(--accent-glow);
   animation: markerPulse 1.4s ease-in-out infinite;
 }
 @keyframes markerPulse {
-  0%, 100% { box-shadow: 0 0 0 3px var(--accent), 0 0 10px 2px var(--accent-glow); }
-  50%      { box-shadow: 0 0 0 6px rgba(255,102,0,.35), 0 0 22px 8px var(--accent-glow); }
+  0%, 100% { box-shadow: 0 0 0 calc(3px * var(--mk, 1)) var(--accent), 0 0 calc(10px * var(--mk, 1)) calc(2px * var(--mk, 1)) var(--accent-glow); }
+  50%      { box-shadow: 0 0 0 calc(6px * var(--mk, 1)) rgba(255,102,0,.35), 0 0 calc(22px * var(--mk, 1)) calc(8px * var(--mk, 1)) var(--accent-glow); }
 }
 
 /* Пока открыто окно метки — прячем кнопки этажей и зума, чтобы не перекрывали кнопки окна */
@@ -877,13 +865,13 @@ body.offline #addModeBtn   { display: none !important; }
   width: auto; height: auto;
   background: none !important;
   border: none; border-radius: 0; box-shadow: none; rotate: 0deg; overflow: visible;
-  font-size: calc(26px * var(--ms, 1));
+  font-size: calc(26px * var(--mk, 1) * var(--ms, 1));
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.85)) drop-shadow(0 0 3px rgba(0,0,0,.45));
   transition: transform .15s;
 }
 .marker.no-bg .marker-icon span { rotate: 0deg; }
 .marker.no-bg .marker-icon.icon-img img {
-  width: calc(36px * var(--ms, 1)); height: calc(36px * var(--ms, 1)); object-fit: contain;
+  width: calc(36px * var(--mk, 1) * var(--ms, 1)); height: calc(36px * var(--mk, 1) * var(--ms, 1)); object-fit: contain;
 }
 .marker.no-bg:hover .marker-icon { box-shadow: none; transform: scale(1.18); }
 .marker.no-bg.selected .marker-icon {
