@@ -1,9 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="svg176" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:svg="http://www.w3.org/2000/svg" viewBox="0 0 130.82 141.23">
+<svg width="6000" height="6000" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="6002" width="6002" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <defs>
+   <style>.cls-1{fill:#dff2ff;}.cls-12,.cls-2{fill:#ffffa9;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6{stroke:#000;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6,.cls-7,.cls-8,.cls-9{stroke-miterlimit:10;}.cls-11,.cls-3{fill:none;}.cls-14,.cls-3,.cls-5{stroke-width:4px;}.cls-4{fill:#0c0c0b;stroke-width:0.5px;}.cls-11,.cls-12,.cls-13,.cls-6,.cls-7,.cls-8,.cls-9{stroke-width:2px;}.cls-7{fill:#fff;}.cls-7,.cls-8,.cls-9{stroke:#888;}.cls-8{fill:#d1e3e8;}.cls-9{fill:#e9f7ff;}.cls-10{fill:#d3d190;}.cls-13{fill:#020201;}.cls-14{fill:#050502;}</style>
+  </defs>
   <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
   <defs>
-    <style>
-      .st0 {
+   <style>.st0 {
         fill: none;
         stroke: #000;
         stroke-width: .2px;
@@ -16,30 +28,246 @@
       .st2 {
         fill: gold;
       }
-    </style>
+
+      .st3 {
+        fill: #1a2632;
+      }
+
+      .st4 {
+        fill: #c6c2c2;
+      }</style>
   </defs>
-  <g id="Third_Floor">
-    <g id="Floor-3">
-      <path class="st1" d="M25.29,10.24v.91h5.1v12.04h-5.1v.88h59.67v-.88h-50.65v-12.04h62.53v-.91H25.29ZM94.82,24.55v.23H25.29s0,.9,0,.9h25.15v12.21h-13.16s0,.9,0,.9h3.21l-.06,1.71h-7.04v-1.03h-4.61v.14s-.02.14-.02.14h-4.18v3.23h6.51v3.63h-.17v-3.38h-4.93v6.1h4.93v-1.83h.17v4.01h-.17v-1.83h-4.93v4.62l4.93-.19v-1.83h.17v4.06h-.17v-2l-4.93.21v11.01h4.93v-3.51h.17v3.76h-3.25s-3.25,0-3.25,0v3.23h6.91v.3H3.9v48.05s14.41,0,14.41,0v-2.02h-.3v-43.87h15.95v27.96s.9,0,.9,0v-10.1h14.74v10.1s.9,0,.9,0v-54.12h.65v54.12s16.55,0,16.55,0v-56.07h1.48v56.07s16.55,0,16.55,0v-47.9h.56v47.9s.9,0,.9,0v-15.07h14.74v15.07s.9,0,.9,0v-47.9h.52v-11.86h-19.31v.81h-16.35v-.5h-.31l.13-.2-.59-.4.33-.5-.17-.12h29.84s0-14.25,0-14.25h-2.12ZM54.33,25.68h40.49v12.21h-40.49v-12.21ZM41.46,38.79h24.88s-.2.3-.2.3l.27.18-.37.55.35.23.05-.07.36.24v.29h-24.57s-.84,0-.84,0l.06-1.71ZM33.38,43.38h.58v25.96h-.58v-25.96ZM34.87,43.38h13.7v.26h-1.85v1.7h2.9v39.45h-14.75v-41.41ZM49.83,43.39h1.33v.26h-1.33v-.26ZM52.06,43.39h14.74v9.68h-14.74v-9.68ZM70.09,43.39h13.97v8.17h.78v20.53h-14.74v-28.7ZM87.2,51.56h14.74v28.25h-14.74v-28.25ZM52.73,55.2h13.38v.5h-13.38v-.5ZM30.91,57.13h.17v4.12h-.17v-4.12ZM52.06,57.82h14.74v39.67h-14.74v-39.67ZM13.81,71.5h3.3v3.04h-.3v2.07h.3v22.37H4.8v-25.48h9.01v-2.01ZM70.09,76.66h14.74v20.68h-14.75v-.08h.19v-1.89h-.19v-18.7ZM4.8,102.84h12.3v12.53H4.8v-12.53Z"/>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <defs>
+   <style>.cls-1{fill:#dff2ff;}.cls-12,.cls-2{fill:#ffffa9;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6{stroke:#000;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6,.cls-7,.cls-8,.cls-9{stroke-miterlimit:10;}.cls-11,.cls-3{fill:none;}.cls-14,.cls-3,.cls-5{stroke-width:4px;}.cls-4{fill:#0c0c0b;stroke-width:0.5px;}.cls-11,.cls-12,.cls-13,.cls-6,.cls-7,.cls-8,.cls-9{stroke-width:2px;}.cls-7{fill:#fff;}.cls-7,.cls-8,.cls-9{stroke:#888;}.cls-8{fill:#d1e3e8;}.cls-9{fill:#e9f7ff;}.cls-10{fill:#d3d190;}.cls-13{fill:#020201;}.cls-14{fill:#050502;}</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }
+
+      .st4 {
+        fill: #c6c2c2;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: #70777f;
+      }
+
+      .st1 {
+        fill: gold;
+      }
+
+      .st2 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: #70777f;
+      }
+
+      .st1 {
+        fill: gold;
+      }
+
+      .st2 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }
+
+      .st4 {
+        fill: #c6c2c2;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: #70777f;
+      }
+
+      .st1 {
+        fill: gold;
+      }
+
+      .st2 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }</style>
+  </defs>
+  <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+  <g stroke="null" id="svg_2284">
+   <g stroke="null" transform="matrix(53.99362068360069,0,0,51.42468959640591,-27824.667607587875,-26362.521951076655) " id="svg_2264">
+    <g stroke="null" id="svg_2276">
+     <path stroke="null" id="svg_2278" d="m542.12746,516.88746l0,0.91l5.1,0l0,12.04l-5.1,0l0,0.88l59.67,0l0,-0.88l-50.65,0l0,-12.04l62.53,0l0,-0.91l-71.55,0zm69.53,14.31l0,0.23l-69.53,0s0,0.9 0,0.9l25.15,0l0,12.21l-13.16,0s0,0.9 0,0.9l3.21,0l-0.06,1.71l-7.04,0l0,-1.03l-4.61,0l0,0.14s-0.02,0.14 -0.02,0.14l-4.18,0l0,3.23l6.51,0l0,3.63l-0.17,0l0,-3.38l-4.93,0l0,6.1l4.93,0l0,-1.83l0.17,0l0,4.01l-0.17,0l0,-1.83l-4.93,0l0,4.62l4.93,-0.19l0,-1.83l0.17,0l0,4.06l-0.17,0l0,-2l-4.93,0.21l0,11.01l4.93,0l0,-3.51l0.17,0l0,3.76l-3.25,0s-3.25,0 -3.25,0l0,3.23l6.91,0l0,0.3l-27.6,0l0,48.05s14.41,0 14.41,0l0,-2.02l-0.3,0l0,-43.87l15.95,0l0,27.96s0.9,0 0.9,0l0,-10.1l14.74,0l0,10.1s0.9,0 0.9,0l0,-54.12l0.65,0l0,54.12s16.55,0 16.55,0l0,-56.07l1.48,0l0,56.07s16.55,0 16.55,0l0,-47.9l0.56,0l0,47.9s0.9,0 0.9,0l0,-15.07l14.74,0l0,15.07s0.9,0 0.9,0l0,-47.9l0.52,0l0,-11.86l-19.31,0l0,0.81l-16.35,0l0,-0.5l-0.31,0l0.13,-0.2l-0.59,-0.4l0.33,-0.5l-0.17,-0.12l29.84,0s0,-14.25 0,-14.25l-2.12,0l0.02,0.01zm-40.49,1.13l40.49,0l0,12.21l-40.49,0l0,-12.21zm-12.87,13.11l24.88,0s-0.2,0.3 -0.2,0.3l0.27,0.18l-0.37,0.55l0.35,0.23l0.05,-0.07l0.36,0.24l0,0.29l-24.57,0s-0.84,0 -0.84,0l0.06,-1.71l0.01,-0.01zm-8.08,4.59l0.58,0l0,25.96l-0.58,0l0,-25.96zm1.49,0l13.7,0l0,0.26l-1.85,0l0,1.7l2.9,0l0,39.45l-14.75,0l0,-41.41zm14.96,0.01l1.33,0l0,0.26l-1.33,0l0,-0.26zm2.23,0l14.74,0l0,9.68l-14.74,0l0,-9.68zm18.03,0l13.97,0l0,8.17l0.78,0l0,20.53l-14.74,0l0,-28.7l-0.01,0zm17.11,8.17l14.74,0l0,28.25l-14.74,0l0,-28.25zm-34.47,3.64l13.38,0l0,0.5l-13.38,0l0,-0.5zm-21.82,1.93l0.17,0l0,4.12l-0.17,0l0,-4.12zm21.15,0.69l14.74,0l0,39.67l-14.74,0l0,-39.67zm-38.25,13.68l3.3,0l0,3.04l-0.3,0l0,2.07l0.3,0l0,22.37l-12.31,0l0,-25.48l9.01,0l0,-2.01l0,0.01zm56.28,5.16l14.74,0l0,20.68l-14.75,0l0,-0.08l0.19,0l0,-1.89l-0.19,0l0,-18.7l0.01,-0.01zm-65.29,26.18l12.3,0l0,12.53l-12.3,0l0,-12.53z" class="st1"/>
     </g>
-    <g id="Wall-3">
-      <path class="st0" d="M33.46,43.39v-.51"/>
-      <path class="st0" d="M33.46,41.18v-.68"/>
-      <path class="st0" d="M11.09,72.04h.93v-2.69"/>
-      <path class="st0" d="M9.54,72.04h-4.98v-2.69"/>
-      <path class="st0" d="M30.91,60.5h-2.19"/>
+    <g stroke="null" id="svg_2275">
+     <path stroke="null" id="svg_2279" d="m550.29746,550.03746l0,-0.51" class="st0"/>
+     <path stroke="null" id="svg_2280" d="m550.29746,547.82746l0,-0.68" class="st0"/>
+     <path stroke="null" id="svg_2281" d="m527.92746,578.68746l0.93,0l0,-2.69" class="st0"/>
+     <path stroke="null" id="svg_2282" d="m526.37746,578.68746l-4.98,0l0,-2.69" class="st0"/>
+     <path stroke="null" id="svg_2283" d="m547.74746,567.14746l-2.19,0" class="st0"/>
     </g>
-    <g id="Stairs-3">
-      <g id="Stairs-3-down">
-        <path id="stair-127" class="st2" d="M30.34,39.71h-6.36v3.2h6.36v-3.2ZM28.77,41.23v.15h-3.31v-.15h3.31Z"/>
-        <path id="stair-128" class="st2" d="M30.34,65.87h-6.36v3.2h6.36v-3.2ZM28.77,67.39v.15h-3.31v-.15h3.31Z"/>
-        <path id="stair-69" class="st2" d="M18.21,111.32v6.07h2.74v-6.07h-2.74ZM19.52,112.48h.13v3.74h-.13v-3.74Z"/>
-        <path id="stair-96" class="st2" d="M14.18,69.46v5.85h2.74v-5.85h-2.74ZM15.48,70.59h.13v3.6h-.13v-3.6Z"/>
-        <path id="stair-97" class="st2" d="M52.09,93.47v6.05h2.74v-6.05h-2.74ZM53.39,94.63h.13v3.72h-.13v-3.72Z"/>
-        <path id="stair-100" class="st2" d="M70.33,93.47v6.05h2.74v-6.05h-2.74ZM71.64,94.63h.13v3.72h-.13v-3.72Z"/>
-        <path id="stair-101" class="st2" d="M96.73,21.85h-5.85v2.74h5.85v-2.74ZM95.6,23.16v.13h-3.6v-.13h3.6Z"/>
-        <path id="stair-129" class="st2" d="M46.68,43.54v6.05h2.74v-6.05h-2.74ZM47.99,44.7h.13v3.73h-.13v-3.73Z"/>
-      </g>
+    <g stroke="null" id="svg_2265">
+     <g stroke="null" id="svg_2266">
+      <path stroke="null" d="m547.17746,546.35746l-6.36,0l0,3.2l6.36,0l0,-3.2zm-1.57,1.52l0,0.15l-3.31,0l0,-0.15l3.31,0z" class="st2" id="svg_2274"/>
+      <path stroke="null" d="m547.17746,572.51746l-6.36,0l0,3.2l6.36,0l0,-3.2zm-1.57,1.52l0,0.15l-3.31,0l0,-0.15l3.31,0z" class="st2" id="svg_2273"/>
+      <path stroke="null" d="m535.04746,617.96746l0,6.07l2.74,0l0,-6.07l-2.74,0zm1.31,1.16l0.13,0l0,3.74l-0.13,0l0,-3.74z" class="st2" id="svg_2272"/>
+      <path stroke="null" d="m531.01746,576.10746l0,5.85l2.74,0l0,-5.85l-2.74,0zm1.3,1.13l0.13,0l0,3.6l-0.13,0l0,-3.6z" class="st2" id="svg_2271"/>
+      <path stroke="null" d="m568.92746,600.11746l0,6.05l2.74,0l0,-6.05l-2.74,0zm1.3,1.16l0.13,0l0,3.72l-0.13,0l0,-3.72z" class="st2" id="svg_2270"/>
+      <path stroke="null" d="m587.16746,600.11746l0,6.05l2.74,0l0,-6.05l-2.74,0zm1.31,1.16l0.13,0l0,3.72l-0.13,0l0,-3.72z" class="st2" id="svg_2269"/>
+      <path stroke="null" d="m613.56746,528.49746l-5.85,0l0,2.74l5.85,0l0,-2.74zm-1.13,1.31l0,0.13l-3.6,0l0,-0.13l3.6,0z" class="st2" id="svg_2268"/>
+      <path stroke="null" d="m563.51746,550.18746l0,6.05l2.74,0l0,-6.05l-2.74,0zm1.31,1.16l0.13,0l0,3.73l-0.13,0l0,-3.73z" class="st2" id="svg_2267"/>
+     </g>
     </g>
+   </g>
   </g>
+ </g>
 </svg>
