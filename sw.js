@@ -10,7 +10,7 @@ const CDN   = `tm-cdn-${VERSION}`;     // внешние библиотеки и
 const SHELL_FILES = [
   "./", "index.html", "style.css", "menu.css", "profile.css",
   "main.js", "state.js", "ui.js", "auth.js", "config.js", "constants.js",
-  "map.js", "markers.js", "modal.js", "links.js", "videos.js", "offline.js",
+  "map.js", "markers.js", "modal.js", "links.js", "videos.js", "houses.js", "offline.js",
   "menu.js", "marker-preview.js",
   "favicon.ico", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png"

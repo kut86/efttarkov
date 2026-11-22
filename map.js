@@ -4,7 +4,8 @@ import { MAPS }                          from "./constants.js";
 import { state }                         from "./state.js";
 import { mapEl, mapImg, mapSelect,
          levelUp, levelDown, levelLabel,
-         levelControls, toast, parseHash } from "./ui.js";
+         levelControls, toast, parseHash,
+         houseBar, houseBack, houseTitle } from "./ui.js";
 import { subscribe, render }             from "./markers.js";
 import { openModal, closeModal }         from "./modal.js";
 
@@ -118,7 +119,7 @@ export function initPanzoom() {
   if (state.pz) { state.pz.destroy(); state.pz = null; }
   state.fitted  = false;
   state.touched = false;
-  state.pz = Panzoom(mapEl, { maxScale: 20, minScale: 0.5, contain: "outside" });
+  state.pz = Panzoom(mapEl, { maxScale: 8, minScale: 0.5, contain: "outside" });
   requestAnimationFrame(() => requestAnimationFrame(() => fitView(false)));
 }
 
@@ -176,18 +177,23 @@ window.addEventListener("resize", () => {
 });
 
 /* ── Переключение карты ── */
-export async function switchMap(id, { pending = null } = {}) {
+export async function switchMap(id, { pending = null, startLevel = null } = {}) {
   if (!MAPS[id]) id = "groundzero";
-  localStorage.setItem("lastMap", id);
+  if (!MAPS[id].isHouse) {            // дом не запоминаем как «последнюю карту»
+    localStorage.setItem("lastMap", id);
+    state.houseStack = [];
+  }
 
   const token = ++state.loadToken;
   state.currentMap = id;
   state.pending    = pending;
   state.dataLoaded = false;
+  updateHouseBar();
 
   /* стартовый этаж: из ссылки, если он существует на этой карте */
   const levels = getLevels();
   state.currentLevel = (pending && levels[String(pending.level)]) ? Number(pending.level) : 0;
+  if (startLevel !== null && levels[String(startLevel)]) state.currentLevel = Number(startLevel);
   if (!levels[String(state.currentLevel)]) state.currentLevel = Number(Object.keys(levels)[0]);
 
   if (state.offFn) { state.offFn(); state.offFn = null; }
@@ -248,6 +254,7 @@ export function tryOpenPending() {
   state.pending = null;
 
   const m = state.allMarkers[p.id];
+  if (!m && p.focusOnly) return;
   if (!m) {
     history.replaceState(null, "", location.pathname + location.search);
     toast("Метка не найдена — возможно, она удалена", true);
@@ -255,11 +262,37 @@ export function tryOpenPending() {
   }
 
   const lvl  = m.level ?? 0;
-  const open = () => { openModal(p.id, m); focusMarker(p.id); };
+  const open = () => { if (!p.focusOnly) openModal(p.id, m); focusMarker(p.id); };
   if (lvl !== state.currentLevel) setLevel(lvl).then(open);
   else open();
 }
 state.onData = tryOpenPending;
+
+/* ── Дома: вход / выход ── */
+function updateHouseBar() {
+  const m = MAPS[state.currentMap];
+  houseBar.hidden = !m?.isHouse;
+  if (m?.isHouse) houseTitle.textContent = "🏠 " + String(m.label || "").replace(/^Дом:\s*/, "");
+}
+
+function enterHouse(houseId, fromMarkerId) {
+  const key = "house_" + houseId;
+  const m = MAPS[key];
+  if (!m || !Object.keys(m.levels).length) { toast("Дом ещё загружается или у него нет этажей", true); return; }
+  state.houseStack.push({ map: state.currentMap, level: state.currentLevel, marker: fromMarkerId || null });
+  switchMap(key, { startLevel: m.start });
+}
+
+function leaveHouse() {
+  const back = state.houseStack.pop();
+  if (!back) return;
+  const pending = back.marker ? { id: back.marker, level: back.level, focusOnly: true } : null;
+  if (!MAPS[back.map]?.isHouse && mapSelect.querySelector(`option[value="${back.map}"]`)) mapSelect.value = back.map;
+  switchMap(back.map, { pending, startLevel: back.level });
+}
+
+houseBack.onclick = leaveHouse;
+state.enterHouse  = enterHouse;
 
 /* Переход по маркеру-ссылке: другая карта, другой этаж или та же карта */
 state.goToMarker = ({ map, id, level }) => {

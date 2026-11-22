@@ -10,6 +10,7 @@ import { switchMap, resolveLegacyMarker }  from "./map.js";
 import { exitAddMode, buildEmojiPicker }   from "./markers.js";
 import { refreshModalControls }            from "./modal.js";
 import { initAuth }                        from "./auth.js";
+import { loadHouses }                      from "./houses.js";
 import { downloadForOffline }              from "./offline.js";
 
 /* ── Emoji pickers ── */
@@ -42,10 +43,17 @@ function applyAuth(user, profile) {
 }
 initAuth(applyAuth);
 
+/* ── Дома загружаются в фоне (из кеша и с сервера) ── */
+const housesReady = loadHouses().catch(e => console.warn("Дома не загружены:", e));
+
 /* ── Старт карты (не ждёт авторизации) ── */
 async function start() {
   const h     = parseHash();
   const saved = localStorage.getItem("lastMap");
+  /* Ссылка внутрь дома: ждём, пока дома зарегистрируются (но не дольше 3 секунд) */
+  if (h.map && h.map.startsWith("house_")) {
+    await Promise.race([housesReady, new Promise(r => setTimeout(r, 3000))]);
+  }
   let startMap = MAPS[h.map] ? h.map : (MAPS[saved] ? saved : "groundzero");
   let pending  = h.marker ? { id: h.marker, level: Number(h.level) || 0 } : null;
 

@@ -34,7 +34,9 @@ export const state = {
   // Маркер из ссылки, который нужно открыть { id, level }
   pending:      null,
   onData:       null,    // колбэк «маркеры загружены» (ставится в map.js)
-  goToMarker:   null,    // переход по маркеру-ссылке (ставится в map.js)
+  goToMarker:   null,
+  enterHouse:   null,    // вход в дом (ставится в map.js)
+  houseStack:   [],      // откуда вошли в дом: [{ map, level, marker }]    // переход по маркеру-ссылке (ставится в map.js)
 
   // Quill-редакторы
   addQuill:     null,

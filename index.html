@@ -136,6 +136,7 @@
           <option value="exit">Выходы</option>
           <option value="structure">Точки интересов</option>
           <option value="tain">Тайник</option>
+          <option value="house">🏠 Вход в дом</option>
         </select>
       </div>
       <div class="hud-panel">
@@ -194,7 +195,14 @@
       <option value="exit">🚪 Выходы</option>
       <option value="structure">🧩 Точки интересов</option>
       <option value="tain">👁 Тайник</option>
+      <option value="house">🏠 Вход в дом</option>
     </select>
+  </div>
+  <div class="form-group" id="addHouseBox" style="display:none">
+    <label class="form-label">Дом: название и этажи <span style="color:var(--text-dim)">(первая строка — самый нижний этаж)</span></label>
+    <input type="text" id="addHouseName" maxlength="60" placeholder="Название дома (если пусто — название метки)">
+    <div id="addFloors" class="fl-list"></div>
+    <button type="button" id="addFloorBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить этаж</button>
   </div>
   <div class="form-group">
     <label class="form-label">Торговец <span style="color:var(--text-dim)">(необязательно — для квестов)</span></label>
@@ -285,6 +293,7 @@
 
     <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
       <img id="modalPhoto" class="modal-photo" src="" alt="" style="display:none">
+      <div id="modalHouse" class="modal-house" style="display:none"></div>
       <div id="modalLinks" class="modal-links" style="display:none"></div>
       <div class="modal-desc-wrap">
         <div id="modalDesc" class="modal-desc"></div>
@@ -308,7 +317,14 @@
             <option value="exit">🚪 Выходы</option>
             <option value="structure">🧩 Точки интересов</option>
             <option value="tain">👁 Тайник</option>
+            <option value="house">🏠 Вход в дом</option>
           </select>
+        </div>
+        <div class="form-group" id="editHouseBox" style="display:none">
+          <label class="form-label">Дом: название и этажи <span style="color:var(--text-dim)">(первая строка — самый нижний этаж)</span></label>
+          <input type="text" id="editHouseName" maxlength="60" placeholder="Название дома (если пусто — название метки)">
+          <div id="editFloors" class="fl-list"></div>
+          <button type="button" id="editFloorBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить этаж</button>
         </div>
         <div class="form-group">
           <label class="form-label">Торговец <span style="color:var(--text-dim)">(необязательно — для квестов)</span></label>
@@ -390,6 +406,11 @@
       <button id="delBtn"     class="btn btn-sm btn-danger" style="display:none">Удалить</button>
     </div>
   </div>
+</div>
+<!-- ПАНЕЛЬ ДОМА (видна, пока открыт план дома) -->
+<div id="houseBar" hidden>
+  <button id="houseBack" type="button">← К карте</button>
+  <span id="houseTitle"></span>
 </div>
 <!-- LEVEL CONTROLS -->
 <div id="levelControls">

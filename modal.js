@@ -15,10 +15,15 @@ import { modal, modalTitle, modalBadge,
          modalTrader, editTrader,
          editNoBg, editSize, parseMarkerSize,
          modalVideos, editVideos,
+         modalHouse, editHouseBox, editHouseName, editFloors,
          buildHash, sanitizeHTML, mapEl,
          normalizeImageUrl }              from "./ui.js";
 import { addExtraFieldRow,
-         collectExtraFields }              from "./markers.js";
+         collectExtraFields,
+         syncHouseBox }                    from "./markers.js";
+import { HOUSES, addFloorRow, collectFloors,
+         fillFloors, saveHouse,
+         deleteHouse }                    from "./houses.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
 import { requireOnline }                  from "./offline.js";
@@ -81,11 +86,26 @@ export function openModal(id, m) {
 
   renderModalLinks(m.markerLinks);
   renderVideos(modalVideos, m.videos);
+  renderHouseButton(m, id);
   renderModalExtras(m.extraFields);
   hideEditForm();
   modal.classList.add("open");
   document.body.classList.add("modal-open");
   markSelected(id);
+}
+
+/* Кнопка «Войти в дом» (в окне метки; игроки попадают в дом сразу по нажатию на значок) */
+function renderHouseButton(m, id) {
+  modalHouse.innerHTML = "";
+  const h = m.type === "house" && m.houseId ? HOUSES[m.houseId] : null;
+  modalHouse.style.display = h ? "" : "none";
+  if (!h) return;
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "house-enter";
+  b.textContent = `🏠 Войти в дом · этажей: ${h.floors.length}`;
+  b.onclick = () => { closeModal(); if (state.enterHouse) state.enterHouse(m.houseId, id); };
+  modalHouse.appendChild(b);
 }
 
 /* ── Закрытие модалки ── */
@@ -207,12 +227,16 @@ editBtn.onclick = () => {
   (state.current.markerLinks || []).forEach(l => addMarkerLinkRow(editMarkerLinks, l, state.current.id));
   editVideos.innerHTML = "";
   (state.current.videos || []).forEach(v => addVideoRow(editVideos, v));
+  const house = state.current.houseId ? HOUSES[state.current.houseId] : null;
+  editHouseName.value = house?.name || "";
+  fillFloors(editFloors, house);
+  syncHouseBox(editType, editHouseBox, editFloors);
   showEditForm();
 };
 
 cancelEdit.onclick = hideEditForm;
 
-saveBtn.onclick = () => {
+saveBtn.onclick = async () => {
   if (!state.current || !state.isAdmin || !requireOnline()) return;
   const name = editName.value.trim();
   if (!name) { toast("Введите название маркера", true); return; }
@@ -222,12 +246,21 @@ saveBtn.onclick = () => {
   const markerLinks = collectMarkerLinks(editMarkerLinks);
   const videos = collectVideos(editVideos);
   if (videos.invalid) { toast("Не удалось распознать ссылку на видео", true); return; }
+  let houseId = state.current.houseId || null;
+  if (editType.value === "house") {
+    const fl = collectFloors(editFloors);
+    if (!fl.floors.length) { toast("Добавьте хотя бы один этаж с картинкой", true); return; }
+    try {
+      houseId = await saveHouse({ houseId, name: editHouseName.value.trim() || name, map: state.currentMap, ...fl });
+    } catch (e) { toast(e.message, true); return; }
+  }
   /* x, y и level не трогаем — обновляем только редактируемые поля */
   update(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`), {
     name,
     text:        textVal,
     type:        editType.value,
     trader:      editTrader.value || null,
+    houseId:     editType.value === "house" ? houseId : null,
     noBg:        editNoBg.checked ? true : null,
     size:        parseMarkerSize(editSize.value),
     emoji:       editEmojiInput.value.trim()  || null,
@@ -244,6 +277,9 @@ document.getElementById("editExtraFieldBtn").addEventListener("click", () => {
   addExtraFieldRow(editExtraFields);
 });
 
+editType.addEventListener("change", () => syncHouseBox(editType, editHouseBox, editFloors));
+document.getElementById("editFloorBtn").addEventListener("click", () => addFloorRow(editFloors));
+
 document.getElementById("editVideoBtn").addEventListener("click", () => addVideoRow(editVideos));
 
 document.getElementById("editMarkerLinkBtn").addEventListener("click", () => {
@@ -251,10 +287,15 @@ document.getElementById("editMarkerLinkBtn").addEventListener("click", () => {
 });
 
 /* ── Удаление (только админ) ── */
-delBtn.onclick = () => {
+delBtn.onclick = async () => {
   if (!state.current || !state.isAdmin || !requireOnline()) return;
-  if (!confirm("Удалить маркер?")) return;
-  remove(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`))
-    .then(() => { toast("Удалено"); invalidateCatalog(); closeModal(); })
-    .catch(e => toast(e.message, true));
+  const hid = state.current.type === "house" ? state.current.houseId : null;
+  if (!confirm(hid ? "Удалить маркер и сам дом (все этажи и метки внутри)?" : "Удалить маркер?")) return;
+  try {
+    await remove(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`));
+    if (hid) await deleteHouse(hid);
+    toast("Удалено");
+    invalidateCatalog();
+    closeModal();
+  } catch (e) { toast(e.message, true); }
 };

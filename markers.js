@@ -12,11 +12,14 @@ import { mapEl, mapWrapper, filterSel, searchInput,
          addExtraFields, addConfirm,
          addCancel, addModeBtn, toast,
          addMarkerLinks, addVideos,
+         addHouseBox, addHouseName, addFloors,
          esc, isMobile, normalizeImageUrl } from "./ui.js";
 import { openModal }                      from "./modal.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
 import { addVideoRow, collectVideos }    from "./videos.js";
+import { addFloorRow, collectFloors,
+         saveHouse }                      from "./houses.js";
 import { readCache, writeCache,
          requireOnline }                  from "./offline.js";
 
@@ -108,6 +111,15 @@ traderFilter.addEventListener("change", () => {
   render();
 });
 
+/* Поле «Дом: этажи» показываем только для типа «Вход в дом» */
+export function syncHouseBox(typeSel, box, container) {
+  const on = typeSel.value === "house";
+  box.style.display = on ? "" : "none";
+  if (on && !container.querySelector(".fl-row")) addFloorRow(container, { label: "1 этаж", imgUrl: "" }, true);
+}
+addType.addEventListener("change", () => syncHouseBox(addType, addHouseBox, addFloors));
+document.getElementById("addFloorBtn").addEventListener("click", () => addFloorRow(addFloors));
+
 let searchTimer = null;
 searchInput?.addEventListener("input", () => {
   clearTimeout(searchTimer);
@@ -151,7 +163,13 @@ export function createMarker(id, m) {
   div.addEventListener("click", e => {
     e.stopPropagation();
     if (state.addMode || wasDrag(e)) return;
-    openModal(id, state.allMarkers[id] || m);
+    const cur = state.allMarkers[id] || m;
+    /* Игрок: значок дома сразу открывает план дома. Админ: окно метки (там же кнопка «Войти в дом») */
+    if (cur.type === "house" && cur.houseId && !state.isAdmin && state.enterHouse) {
+      state.enterHouse(cur.houseId, id);
+      return;
+    }
+    openModal(id, cur);
   });
   return div;
 }
@@ -191,6 +209,9 @@ mapEl.addEventListener("click", e => {
   addTrader.value = "";
   addNoBg.checked = false;
   addSize.value = "";
+  addFloors.innerHTML = "";
+  addHouseName.value = "";
+  syncHouseBox(addType, addHouseBox, addFloors);
   if (state.addQuill) state.addQuill.setContents([]);
   addEmojiPicker.querySelectorAll(".emoji-btn").forEach(b => b.classList.remove("active"));
   addExtraFields.innerHTML = "";
@@ -199,7 +220,7 @@ mapEl.addEventListener("click", e => {
   invalidateCatalog();
 });
 
-addConfirm.onclick = () => {
+addConfirm.onclick = async () => {
   if (!state.isAdmin || !state.pendingPos || !requireOnline()) return;
   const name = addName.value.trim();
   if (!name) { toast("Введите название маркера", true); return; }
@@ -209,6 +230,14 @@ addConfirm.onclick = () => {
   const markerLinks = collectMarkerLinks(addMarkerLinks);
   const videos = collectVideos(addVideos);
   if (videos.invalid) { toast("Не удалось распознать ссылку на видео", true); return; }
+  let houseId = null;
+  if (addType.value === "house") {
+    const fl = collectFloors(addFloors);
+    if (!fl.floors.length) { toast("Добавьте хотя бы один этаж с картинкой", true); return; }
+    try {
+      houseId = await saveHouse({ name: addHouseName.value.trim() || name, map: state.currentMap, ...fl });
+    } catch (e) { toast(e.message, true); return; }
+  }
   push(state.currentRef, {
     x: state.pendingPos.x, y: state.pendingPos.y,
     level:       state.currentLevel,
@@ -216,6 +245,7 @@ addConfirm.onclick = () => {
     text:        textVal,
     type:        addType.value,
     trader:      addTrader.value || null,
+    houseId:     houseId || null,
     noBg:        addNoBg.checked ? true : null,
     size:        parseMarkerSize(addSize.value),
     emoji:       addEmojiInput.value.trim()  || null,
