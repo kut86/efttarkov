@@ -48,7 +48,8 @@ export function subscribe() {
   if (cached) {
     state.allMarkers = cached;
     render();
-    if (state.pending && cached[state.pending.id]) {
+    const pend = state.pending;
+    if (pend && (cached[pend.id] || (pend.houseId && Object.values(cached).some(x => x.houseId === pend.houseId)))) {
       state.dataLoaded = true;
       if (state.onData) state.onData();
     }
@@ -166,7 +167,7 @@ export function createMarker(id, m) {
   div.style.left = m.x + "%";
   div.style.top  = m.y + "%";
   if (isMobile()) div.classList.add("no-hover");
-  if (state.current?.id === id) div.classList.add("selected");
+  if (state.current?.id === id || state.highlightId === id) div.classList.add("selected");
   if (m.noBg) div.classList.add("no-bg");
   const size = parseMarkerSize(m.size);
   if (size) div.style.setProperty("--ms", String(size / 100));

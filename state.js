@@ -36,6 +36,7 @@ export const state = {
   onData:       null,    // колбэк «маркеры загружены» (ставится в map.js)
   goToMarker:   null,
   enterHouse:   null,    // вход в дом (ставится в map.js)
+  highlightId:  null,    // метка, которая ещё подсвечена после закрытия окна
   houseStack:   [],      // откуда вошли в дом: [{ map, level, marker }]    // переход по маркеру-ссылке (ставится в map.js)
 
   // Quill-редакторы

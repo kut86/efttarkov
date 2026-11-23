@@ -7,7 +7,9 @@ import { mapEl, mapImg, mapSelect,
          levelControls, toast, parseHash,
          houseBar, houseBack, houseTitle } from "./ui.js";
 import { subscribe, render }             from "./markers.js";
-import { openModal, closeModal }         from "./modal.js";
+import { openModal, closeModal,
+         flashMarker }                    from "./modal.js";
+import { HOUSES }                         from "./houses.js";
 
 const FIT = 1;                       // единый коэффициент вписывания карты в экран
 const missingLevels = new Set();     // "map:level" — картинки, которых нет на сервере
@@ -119,7 +121,7 @@ export function initPanzoom() {
   if (state.pz) { state.pz.destroy(); state.pz = null; }
   state.fitted  = false;
   state.touched = false;
-  state.pz = Panzoom(mapEl, { maxScale: 8, minScale: 0.5, contain: "outside" });
+  state.pz = Panzoom(mapEl, { maxScale: 20, minScale: 0.5, contain: "outside" });
   requestAnimationFrame(() => requestAnimationFrame(() => fitView(false)));
 }
 
@@ -231,18 +233,52 @@ export async function switchMap(id, { pending = null, startLevel = null } = {}) 
 mapSelect.addEventListener("change", e => switchMap(e.target.value));
 
 /* ── Ссылки на маркеры ── */
-function focusMarker(id) {
+/* Свободная от окна метки зона экрана: туда ставим метку, чтобы окно её не закрывало */
+function freeSpot() {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const box = document.querySelector("#modal.open .modal-box");
+  if (!box) return { x: vw / 2, y: vh / 2 };
+  const r = box.getBoundingClientRect();
+  const TOP = 64;                                   // ниже кнопок меню / панели дома
+  const zones = [
+    { x0: 0,       x1: vw, y0: TOP,      y1: r.top },
+    { x0: 0,       x1: vw, y0: r.bottom, y1: vh    },
+    { x0: 0,       x1: r.left,  y0: TOP, y1: vh    },
+    { x0: r.right, x1: vw,      y0: TOP, y1: vh    },
+  ].map(z => ({ ...z, w: z.x1 - z.x0, h: z.y1 - z.y0 })).filter(z => z.w >= 90 && z.h >= 90);
+  if (!zones.length) return { x: vw / 2, y: vh / 2 };
+  const best = zones.reduce((a, b) => (b.w * b.h > a.w * a.h ? b : a));
+  return { x: (best.x0 + best.x1) / 2, y: (best.y0 + best.y1) / 2 };
+}
+
+/* Приближает метку (значок не мельче ~56px) и ставит её на видное место */
+const MIN_ICON_PX = 56;
+const nextFrames = (n = 2) => new Promise(res => {
+  const step = k => requestAnimationFrame(() => (k <= 1 ? res() : step(k - 1)));
+  step(n);
+});
+
+async function focusMarker(id) {
   const el = mapEl.querySelector(`.marker[data-id="${CSS.escape(id)}"]`);
   if (!el || !state.pz) return;
+  const icon = el.querySelector(".marker-icon") || el;
 
-  const wanted = Math.max(state.pz.getScale(), state.fitScale * 2);
-  if (wanted > state.pz.getScale()) state.pz.zoom(wanted, { animate: false });
+  const s0   = state.pz.getScale();
+  const iw   = icon.getBoundingClientRect().width || 1;
+  const maxS = (state.pz.getOptions && state.pz.getOptions().maxScale) || 8;
+  const wanted = Math.min(maxS, Math.max(s0, state.fitScale * 2, s0 * (MIN_ICON_PX / iw)));
+  if (wanted > s0 + 0.01) state.pz.zoom(wanted, { animate: false });
 
-  const r   = el.getBoundingClientRect();
+  /* Panzoom применяет масштаб/сдвиг в следующем кадре — ждём, иначе измерим старое положение */
+  await nextFrames(2);
+  if (!state.pz) return;
+
+  const target = freeSpot();
+  const r   = icon.getBoundingClientRect();
   const s   = state.pz.getScale();
   const pan = state.pz.getPan();
-  const dx  = window.innerWidth  / 2 - (r.left + r.width  / 2);
-  const dy  = window.innerHeight / 2 - (r.top  + r.height / 2);
+  const dx  = target.x - (r.left + r.width  / 2);
+  const dy  = target.y - (r.top  + r.height / 2);
   state.pz.pan(pan.x + dx / s, pan.y + dy / s, { animate: true });
   state.touched = true;
 }
@@ -251,6 +287,13 @@ function focusMarker(id) {
 export function tryOpenPending() {
   const p = state.pending;
   if (!p || !state.pz || !state.fitted || !state.dataLoaded) return;
+  /* Возврат из дома без известной метки-входа: ищем на карте метку с этим домом */
+  if (p.houseId && !p.id) {
+    const hit = Object.entries(state.allMarkers).find(([, mk]) => mk.houseId === p.houseId);
+    if (!hit) { state.pending = null; return; }
+    p.id = hit[0];
+    p.level = hit[1].level ?? 0;
+  }
   state.pending = null;
 
   const m = state.allMarkers[p.id];
@@ -262,7 +305,11 @@ export function tryOpenPending() {
   }
 
   const lvl  = m.level ?? 0;
-  const open = () => { if (!p.focusOnly) openModal(p.id, m); focusMarker(p.id); };
+  const open = () => {
+    if (p.focusOnly) { focusMarker(p.id); flashMarker(p.id); return; }
+    openModal(p.id, m);
+    setTimeout(() => focusMarker(p.id), 320);          // после появления окна — ставим метку в свободную зону
+  };
   if (lvl !== state.currentLevel) setLevel(lvl).then(open);
   else open();
 }
@@ -284,9 +331,16 @@ function enterHouse(houseId, fromMarkerId) {
 }
 
 function leaveHouse() {
-  const back = state.houseStack.pop();
-  if (!back) return;
-  const pending = back.marker ? { id: back.marker, level: back.level, focusOnly: true } : null;
+  const cur = MAPS[state.currentMap];
+  let back = state.houseStack.pop();
+  if (!back) {
+    /* Дом открыли напрямую (по ссылке): возвращаемся на карту, где стоит вход в этот дом */
+    const h = cur && cur.houseId ? HOUSES[cur.houseId] : null;
+    back = { map: (h && MAPS[h.map]) ? h.map : "groundzero", level: 0, marker: null, houseId: cur && cur.houseId };
+  }
+  const pending = back.marker
+    ? { id: back.marker, level: back.level, focusOnly: !back.reopen }
+    : (back.houseId ? { houseId: back.houseId, focusOnly: true } : null);
   if (!MAPS[back.map]?.isHouse && mapSelect.querySelector(`option[value="${back.map}"]`)) mapSelect.value = back.map;
   switchMap(back.map, { pending, startLevel: back.level });
 }
@@ -297,9 +351,14 @@ state.enterHouse  = enterHouse;
 /* Переход по маркеру-ссылке: другая карта, другой этаж или та же карта */
 state.goToMarker = ({ map, id, level }) => {
   if (!MAPS[map]) { toast("Карта не найдена", true); return; }
+  const originId = state.current ? state.current.id : null;
   closeModal();
   const pending = { id, level: Number(level) || 0 };
   if (map !== state.currentMap) {
+    /* Переход в дом по ссылке: запоминаем исходную метку — «← К карте» вернёт к ней */
+    if (MAPS[map].isHouse) {
+      state.houseStack.push({ map: state.currentMap, level: state.currentLevel, marker: originId, reopen: !!originId });
+    }
     mapSelect.value = map;
     switchMap(map, { pending });
   } else {

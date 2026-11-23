@@ -57,6 +57,18 @@ export function refreshModalControls() {
   else if (!editForm.classList.contains("active")) hideEditForm();
 }
 
+/* Подсветка метки: остаётся ещё несколько секунд после закрытия окна — видно, где она на карте */
+let flashTimer = null;
+export function flashMarker(id, ms = 6000) {
+  clearTimeout(flashTimer);
+  state.highlightId = id;
+  mapEl.querySelector(`.marker[data-id="${CSS.escape(id)}"]`)?.classList.add("selected");
+  flashTimer = setTimeout(() => {
+    state.highlightId = null;
+    markSelected(state.current ? state.current.id : null);
+  }, ms);
+}
+
 function markSelected(id) {
   mapEl.querySelectorAll(".marker.selected").forEach(el => el.classList.remove("selected"));
   if (id) mapEl.querySelector(`.marker[data-id="${CSS.escape(id)}"]`)?.classList.add("selected");
@@ -106,6 +118,7 @@ export function openModal(id, m) {
   hideEditForm();
   modal.classList.add("open");
   document.body.classList.add("modal-open");
+  state.highlightId = null;
   markSelected(id);
 }
 
@@ -129,8 +142,9 @@ export function closeModal() {
   modal.classList.remove("open");
   stopVideos(modalVideos);
   document.body.classList.remove("modal-open");
+  const closedId = state.current ? state.current.id : null;
   state.current = null;
-  markSelected(null);
+  if (closedId) flashMarker(closedId); else markSelected(null);
   hideEditForm();
 }
 
