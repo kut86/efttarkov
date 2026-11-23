@@ -136,8 +136,7 @@
           <option value="exit">Выходы</option>
           <option value="structure">Точки интересов</option>
           <option value="tain">Тайник</option>
-          <option value="house">🏠 Вход в дом</option>
-        </select>
+            </select>
       </div>
       <div class="hud-panel">
         <span class="hud-label">Торговец</span>
@@ -195,18 +194,24 @@
       <option value="exit">🚪 Выходы</option>
       <option value="structure">🧩 Точки интересов</option>
       <option value="tain">👁 Тайник</option>
-      <option value="house">🏠 Вход в дом</option>
     </select>
   </div>
-  <div class="form-group" id="addHouseBox" style="display:none">
-    <label class="form-label">Дом: название и этажи <span style="color:var(--text-dim)">(первая строка — самый нижний этаж)</span></label>
-    <input type="text" id="addHouseName" maxlength="60" placeholder="Название дома (если пусто — название метки)">
-    <div id="addFloors" class="fl-list"></div>
-    <button type="button" id="addFloorBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить этаж</button>
+  <div class="form-group">
+    <label class="form-label">Дополнительные типы <span style="color:var(--text-dim)">(для фильтра; необязательно)</span></label>
+    <div id="addTypes" class="chip-list"></div>
   </div>
   <div class="form-group">
     <label class="form-label">Торговец <span style="color:var(--text-dim)">(необязательно — для квестов)</span></label>
     <select id="addTrader"></select>
+  </div>
+  <div class="form-group">
+    <label class="check-row"><input type="checkbox" id="addIsHouse"> 🏠 Вход в дом (внутри свои этажи и метки)</label>
+    <div id="addHouseBox" style="display:none">
+      <input type="text" id="addHouseName" maxlength="60" placeholder="Название дома (если пусто — название метки)">
+      <div class="size-hint">Этажи перечисляйте снизу вверх: первая строка — самый нижний.</div>
+      <div id="addFloors" class="fl-list"></div>
+      <button type="button" id="addFloorBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить этаж</button>
+    </div>
   </div>
   <div class="form-group">
     <label class="form-label">Маркеры-ссылки (над описанием)</label>
@@ -270,6 +275,14 @@
     </div>
   </div>
   <div class="form-group">
+    <label class="form-label">Подсказка при наведении <span style="color:var(--text-dim)">(только ПК; необязательно)</span></label>
+    <label class="check-row"><input type="checkbox" id="addPvImg" checked> Показывать картинку</label>
+    <label class="check-row"><input type="checkbox" id="addPvText" checked> Показывать текст (название, торговец)</label>
+    <div class="size-row"><input type="number" id="addPvSize" class="mk-num" min="1" max="1000" step="1" inputmode="numeric" placeholder="Авто"><span class="size-hint">% размера картинки (пусто — 100%)</span></div>
+    <div class="size-row"><input type="number" id="addPvTextSize" class="mk-num" min="1" max="1000" step="1" inputmode="numeric" placeholder="Авто"><span class="size-hint">% размера текста (пусто — 100%)</span></div>
+    <div class="size-hint">В окне метки картинка показывается всегда, если она указана.</div>
+  </div>
+  <div class="form-group">
     <label class="form-label">URL фото (превью + модальное окно)</label>
     <input id="addImgUrl" type="url" placeholder="https://...">
   </div>
@@ -317,18 +330,24 @@
             <option value="exit">🚪 Выходы</option>
             <option value="structure">🧩 Точки интересов</option>
             <option value="tain">👁 Тайник</option>
-            <option value="house">🏠 Вход в дом</option>
-          </select>
+                </select>
         </div>
-        <div class="form-group" id="editHouseBox" style="display:none">
-          <label class="form-label">Дом: название и этажи <span style="color:var(--text-dim)">(первая строка — самый нижний этаж)</span></label>
-          <input type="text" id="editHouseName" maxlength="60" placeholder="Название дома (если пусто — название метки)">
-          <div id="editFloors" class="fl-list"></div>
-          <button type="button" id="editFloorBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить этаж</button>
+        <div class="form-group">
+          <label class="form-label">Дополнительные типы <span style="color:var(--text-dim)">(для фильтра; необязательно)</span></label>
+          <div id="editTypes" class="chip-list"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Торговец <span style="color:var(--text-dim)">(необязательно — для квестов)</span></label>
           <select id="editTrader"></select>
+        </div>
+        <div class="form-group">
+          <label class="check-row"><input type="checkbox" id="editIsHouse"> 🏠 Вход в дом (внутри свои этажи и метки)</label>
+          <div id="editHouseBox" style="display:none">
+            <input type="text" id="editHouseName" maxlength="60" placeholder="Название дома (если пусто — название метки)">
+            <div class="size-hint">Этажи перечисляйте снизу вверх: первая строка — самый нижний.</div>
+            <div id="editFloors" class="fl-list"></div>
+            <button type="button" id="editFloorBtn" class="btn btn-sm" style="margin-top:6px;align-self:flex-start">+ Добавить этаж</button>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Маркеры-ссылки (над описанием)</label>
@@ -390,6 +409,14 @@
             <input type="number" id="editSize" class="mk-num" min="1" max="1000" step="1" inputmode="numeric" placeholder="Авто">
             <span class="size-hint">% размера. Пусто — как сейчас (100%). Например: 150 — крупнее, 70 — мельче</span>
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Подсказка при наведении <span style="color:var(--text-dim)">(только ПК; необязательно)</span></label>
+          <label class="check-row"><input type="checkbox" id="editPvImg" checked> Показывать картинку</label>
+          <label class="check-row"><input type="checkbox" id="editPvText" checked> Показывать текст (название, торговец)</label>
+          <div class="size-row"><input type="number" id="editPvSize" class="mk-num" min="1" max="1000" step="1" inputmode="numeric" placeholder="Авто"><span class="size-hint">% размера картинки (пусто — 100%)</span></div>
+          <div class="size-row"><input type="number" id="editPvTextSize" class="mk-num" min="1" max="1000" step="1" inputmode="numeric" placeholder="Авто"><span class="size-hint">% размера текста (пусто — 100%)</span></div>
+          <div class="size-hint">В окне метки картинка показывается всегда, если она указана.</div>
         </div>
         <div class="form-group">
           <label class="form-label">URL фото (превью + модальное окно)</label>
@@ -457,6 +484,5 @@
 <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
 <script type="module" src="main.js"></script>
 <script src="menu.js"></script>
-<script src="marker-preview.js"></script>
 </body>
 </html>

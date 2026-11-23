@@ -151,59 +151,8 @@ body::before {
 .marker-icon.icon-img img { width: 100%; height: 100%; object-fit: cover; }
 
 /* tooltip — только десктоп (hover) */
-.marker-tooltip {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(8,10,8,.96);
-  border: 1px solid var(--border2);
-  border-top: 2px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 5px 11px;
-  font-size: 11px;
-  font-family: 'Share Tech Mono', monospace;
-  letter-spacing: .04em;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .15s, transform .15s;
-  max-width: 180px;
-  text-align: center;
-  white-space: nowrap;
-  z-index: 300;
-}
-.marker:hover .marker-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(2px);
-}
 
 /* photo preview — только десктоп */
-.marker-preview {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%) translateY(6px);
-  width: 300px; height: 180px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--accent);
-  box-shadow: 0 4px 24px rgba(0,0,0,.85);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .2s, transform .2s;
-  z-index: 500;
-  background: var(--surface);
-  padding: 3px;
-}
-.marker-preview img {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  border-radius: calc(var(--radius) - 3px);
-}
-.marker:hover .marker-preview {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
 
 /* блокировка системного меню на изображениях маркеров */
 .marker img {
@@ -555,8 +504,6 @@ textarea { resize: vertical; min-height: 72px; }
 ═══════════════════════════════════════════════════════════════ */
 @media (hover: none) and (pointer: coarse) {
   /* скрываем tooltip и preview на всех тач-устройствах */
-  .marker-tooltip { display: none !important; }
-  .marker-preview { display: none !important; }
 
   /* блокируем системное меню при долгом нажатии */
   .marker img,
@@ -764,7 +711,6 @@ body.modal-open #zoomControls { display: none !important; }
   background: rgba(255,255,255,.06);
   font-size: 12px; white-space: nowrap;
 }
-.marker-tooltip-sub { display: block; color: var(--accent); font-size: .85em; }
 
 #offlineBadge {
   display: none;
@@ -933,3 +879,36 @@ body.offline #addModeBtn   { display: none !important; }
 .fl-start { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-bright); cursor: pointer; }
 .fl-start input { accent-color: var(--accent); width: 16px; height: 16px; }
 .fl-btns { display: flex; gap: 6px; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ПОДСКАЗКА ПРИ НАВЕДЕНИИ (ПК) — размер в пикселях экрана
+═══════════════════════════════════════════════════════════════ */
+#hoverCard {
+  position: fixed; left: 0; top: 0; z-index: 9200;
+  display: none; pointer-events: none;
+  max-width: calc(100vw - 16px);
+  background: rgba(8,10,8,.96);
+  border: 1px solid var(--accent); border-radius: var(--radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,.85);
+  padding: 3px;
+}
+#hoverCard.show { display: block; }
+.hc-img { overflow: hidden; border-radius: calc(var(--radius) - 3px); background: var(--surface); max-width: calc(100vw - 24px); max-height: 70vh; }
+.hc-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.hc-text { padding: 5px 11px; text-align: center; color: var(--text-bright); font-family: 'Share Tech Mono', monospace; letter-spacing: .04em; }
+.hc-img + .hc-text { border-top: 1px solid var(--border2); margin-top: 3px; }
+.hc-text small { display: block; color: var(--accent); font-size: .85em; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ЧИПЫ ДОПОЛНИТЕЛЬНЫХ ТИПОВ
+═══════════════════════════════════════════════════════════════ */
+.chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border: 1px solid var(--border2); border-radius: 999px;
+  font-size: 13px; color: var(--text-bright); cursor: pointer; user-select: none;
+}
+.chip input { accent-color: var(--accent); width: 15px; height: 15px; }
+.chip:has(input:checked) { border-color: var(--accent); background: rgba(255,102,0,.12); }
+.extra-badge { opacity: .85; font-size: .85em; }

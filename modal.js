@@ -14,13 +14,17 @@ import { modal, modalTitle, modalBadge,
          modalLinks, editMarkerLinks,
          modalTrader, editTrader,
          editNoBg, editSize, parseMarkerSize,
+         markerType, editTypes, editIsHouse,
+         editPvImg, editPvText, editPvSize, editPvTextSize,
          modalVideos, editVideos,
          modalHouse, editHouseBox, editHouseName, editFloors,
          buildHash, sanitizeHTML, mapEl,
          normalizeImageUrl }              from "./ui.js";
 import { addExtraFieldRow,
          collectExtraFields,
-         syncHouseBox }                    from "./markers.js";
+         syncHouseBox, buildTypeChips,
+         setTypeChips, collectTypeChips,
+         syncTypeChips }                   from "./markers.js";
 import { HOUSES, addFloorRow, collectFloors,
          fillFloors, saveHouse,
          deleteHouse }                    from "./houses.js";
@@ -66,8 +70,19 @@ export function openModal(id, m) {
   state.current = { id, ...m };
 
   modalTitle.textContent = m.name || "Маркер";
-  modalBadge.textContent = TYPE_LABEL[m.type] || m.type || "";
-  modalBadge.className   = `modal-type-badge badge-${TYPE_LABEL[m.type] ? m.type : "loot"}`;
+  const mt = markerType(m);
+  modalBadge.textContent = TYPE_LABEL[mt] || mt;
+  modalBadge.className   = `modal-type-badge badge-${TYPE_LABEL[mt] ? mt : "loot"}`;
+  /* дополнительные типы — рядом маленькими бейджами */
+  modalBadge.parentElement.querySelectorAll(".extra-badge").forEach(b => b.remove());
+  let anchor = modalBadge;
+  (Array.isArray(m.types) ? m.types : []).filter(t => TYPE_LABEL[t] && t !== mt).forEach(t => {
+    const b = document.createElement("span");
+    b.className = `modal-type-badge extra-badge badge-${t}`;
+    b.textContent = TYPE_LABEL[t];
+    anchor.after(b);
+    anchor = b;
+  });
 
   const tr = TRADERS[m.trader];
   modalTrader.textContent   = tr ? "🛒 " + tr.label : "";
@@ -97,7 +112,7 @@ export function openModal(id, m) {
 /* Кнопка «Войти в дом» (в окне метки; игроки попадают в дом сразу по нажатию на значок) */
 function renderHouseButton(m, id) {
   modalHouse.innerHTML = "";
-  const h = m.type === "house" && m.houseId ? HOUSES[m.houseId] : null;
+  const h = m.houseId ? HOUSES[m.houseId] : null;
   modalHouse.style.display = h ? "" : "none";
   if (!h) return;
   const b = document.createElement("button");
@@ -206,7 +221,7 @@ document.getElementById("copyLinkBtn").onclick = () => {
 editBtn.onclick = () => {
   if (!state.current || !state.isAdmin || !requireOnline()) return;
   editName.value       = state.current.name    || "";
-  editType.value       = state.current.type    || "loot";
+  editType.value       = markerType(state.current);
   editTrader.value     = state.current.trader  || "";
   editNoBg.checked     = !!state.current.noBg;
   editSize.value       = state.current.size || "";
@@ -230,7 +245,13 @@ editBtn.onclick = () => {
   const house = state.current.houseId ? HOUSES[state.current.houseId] : null;
   editHouseName.value = house?.name || "";
   fillFloors(editFloors, house);
-  syncHouseBox(editType, editHouseBox, editFloors);
+  editIsHouse.checked = !!state.current.houseId;
+  syncHouseBox(editIsHouse, editHouseBox, editFloors);
+  setTypeChips(editTypes, editType.value, state.current.types || []);
+  editPvImg.checked     = !state.current.noPvImg;
+  editPvText.checked    = !state.current.noPvText;
+  editPvSize.value      = state.current.pvSize || "";
+  editPvTextSize.value  = state.current.pvTextSize || "";
   showEditForm();
 };
 
@@ -247,7 +268,12 @@ saveBtn.onclick = async () => {
   const videos = collectVideos(editVideos);
   if (videos.invalid) { toast("Не удалось распознать ссылку на видео", true); return; }
   let houseId = state.current.houseId || null;
-  if (editType.value === "house") {
+  if (!editIsHouse.checked && houseId) {
+    if (!confirm("Убрать вход в дом? Сам дом со всеми этажами и метками внутри будет удалён.")) return;
+    try { await deleteHouse(houseId); } catch (e) { toast(e.message, true); return; }
+    houseId = null;
+  }
+  if (editIsHouse.checked) {
     const fl = collectFloors(editFloors);
     if (!fl.floors.length) { toast("Добавьте хотя бы один этаж с картинкой", true); return; }
     try {
@@ -260,7 +286,12 @@ saveBtn.onclick = async () => {
     text:        textVal,
     type:        editType.value,
     trader:      editTrader.value || null,
-    houseId:     editType.value === "house" ? houseId : null,
+    houseId:     editIsHouse.checked ? houseId : null,
+    types:       collectTypeChips(editTypes, editType.value).length ? collectTypeChips(editTypes, editType.value) : null,
+    noPvImg:     editPvImg.checked ? null : true,
+    noPvText:    editPvText.checked ? null : true,
+    pvSize:      parseMarkerSize(editPvSize.value),
+    pvTextSize:  parseMarkerSize(editPvTextSize.value),
     noBg:        editNoBg.checked ? true : null,
     size:        parseMarkerSize(editSize.value),
     emoji:       editEmojiInput.value.trim()  || null,
@@ -277,7 +308,9 @@ document.getElementById("editExtraFieldBtn").addEventListener("click", () => {
   addExtraFieldRow(editExtraFields);
 });
 
-editType.addEventListener("change", () => syncHouseBox(editType, editHouseBox, editFloors));
+buildTypeChips(editTypes);
+editType.addEventListener("change", () => syncTypeChips(editType, editTypes));
+editIsHouse.addEventListener("change", () => syncHouseBox(editIsHouse, editHouseBox, editFloors));
 document.getElementById("editFloorBtn").addEventListener("click", () => addFloorRow(editFloors));
 
 document.getElementById("editVideoBtn").addEventListener("click", () => addVideoRow(editVideos));
@@ -289,7 +322,7 @@ document.getElementById("editMarkerLinkBtn").addEventListener("click", () => {
 /* ── Удаление (только админ) ── */
 delBtn.onclick = async () => {
   if (!state.current || !state.isAdmin || !requireOnline()) return;
-  const hid = state.current.type === "house" ? state.current.houseId : null;
+  const hid = state.current.houseId || null;
   if (!confirm(hid ? "Удалить маркер и сам дом (все этажи и метки внутри)?" : "Удалить маркер?")) return;
   try {
     await remove(ref(db, `maps/${state.currentMap}/markers/${state.current.id}`));

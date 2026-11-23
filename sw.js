@@ -11,7 +11,7 @@ const SHELL_FILES = [
   "./", "index.html", "style.css", "menu.css", "profile.css",
   "main.js", "state.js", "ui.js", "auth.js", "config.js", "constants.js",
   "map.js", "markers.js", "modal.js", "links.js", "videos.js", "houses.js", "offline.js",
-  "menu.js", "marker-preview.js",
+  "menu.js", "hover.js",
   "favicon.ico", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png"
 ];

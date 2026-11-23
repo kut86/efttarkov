@@ -98,8 +98,7 @@ export const TYPE_EMOJI = {
   bot:       "🎯",
   exit:      "🚪",
   structure: "🧩",
-  tain:      "👁",
-  house:     "🏠"
+  tain:      "👁"
 };
 
 export const TYPE_LABEL = {
@@ -110,8 +109,7 @@ export const TYPE_LABEL = {
   bot:       "Бот",
   exit:      "Выход",
   structure: "Точка интереса",
-  tain:      "Тайник",
-  house:     "Вход в дом"
+  tain:      "Тайник"
 };
 
 export const QUICK_EMOJI = [

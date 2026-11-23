@@ -1,7 +1,7 @@
 // markers.js — Маркеры: подписка, рендер, добавление, extra fields
 
 import { db, ref, push, onValue }         from "./config.js";
-import { QUICK_EMOJI, TYPE_EMOJI, TRADERS } from "./constants.js";
+import { QUICK_EMOJI, TYPE_EMOJI, TYPE_LABEL, TRADERS } from "./constants.js";
 import { state }                          from "./state.js";
 import { mapEl, mapWrapper, filterSel, searchInput,
          traderFilter, addTrader, editTrader,
@@ -12,9 +12,12 @@ import { mapEl, mapWrapper, filterSel, searchInput,
          addExtraFields, addConfirm,
          addCancel, addModeBtn, toast,
          addMarkerLinks, addVideos,
-         addHouseBox, addHouseName, addFloors,
+         addHouseBox, addHouseName, addFloors, addIsHouse,
+         addTypes, markerType,
+         addPvImg, addPvText, addPvSize, addPvTextSize,
          esc, isMobile, normalizeImageUrl } from "./ui.js";
 import { openModal }                      from "./modal.js";
+import { attachHover, hideHover }         from "./hover.js";
 import { addMarkerLinkRow, collectMarkerLinks,
          invalidateCatalog }              from "./links.js";
 import { addVideoRow, collectVideos }    from "./videos.js";
@@ -68,6 +71,7 @@ export function subscribe() {
 
 /* ── Рендер — только маркеры текущего уровня, с учётом фильтра и поиска ── */
 export function render() {
+  hideHover();
   document.querySelectorAll(".marker").forEach(m => m.remove());
   const f = filterSel.value;
   const tr = traderFilter.value;
@@ -75,7 +79,7 @@ export function render() {
   const frag = document.createDocumentFragment();
 
   Object.entries(state.allMarkers).forEach(([id, m]) => {
-    if (f !== "all" && m.type !== f) return;
+    if (f !== "all" && markerType(m) !== f && !(Array.isArray(m.types) && m.types.includes(f))) return;
     if (tr !== "all" && m.trader !== tr) return;
     if ((m.level ?? 0) !== state.currentLevel) return;
     if (q) {
@@ -111,13 +115,40 @@ traderFilter.addEventListener("change", () => {
   render();
 });
 
-/* Поле «Дом: этажи» показываем только для типа «Вход в дом» */
-export function syncHouseBox(typeSel, box, container) {
-  const on = typeSel.value === "house";
+/* ── Дополнительные типы (чипы): метка попадает в фильтр по основному и по любому из них ── */
+export function buildTypeChips(container) {
+  container.innerHTML = "";
+  Object.entries(TYPE_LABEL).forEach(([key, label]) => {
+    const l = document.createElement("label");
+    l.className = "chip";
+    l.dataset.type = key;
+    l.innerHTML = `<input type="checkbox" value="${esc(key)}"><span>${esc(TYPE_EMOJI[key] || "")} ${esc(label)}</span>`;
+    container.appendChild(l);
+  });
+}
+export function setTypeChips(container, primary, extra = []) {
+  container.querySelectorAll(".chip").forEach(l => {
+    const isPrimary = l.dataset.type === primary;
+    l.style.display = isPrimary ? "none" : "";
+    l.querySelector("input").checked = !isPrimary && extra.includes(l.dataset.type);
+  });
+}
+export function collectTypeChips(container, primary) {
+  return [...container.querySelectorAll(".chip input:checked")].map(i => i.value).filter(v => v !== primary);
+}
+export function syncTypeChips(typeSel, container) {
+  setTypeChips(container, typeSel.value, collectTypeChips(container, null));
+}
+buildTypeChips(addTypes);
+addType.addEventListener("change", () => syncTypeChips(addType, addTypes));
+
+/* Блок «Вход в дом» раскрывается галочкой (дом — отдельная функция метки, а не тип) */
+export function syncHouseBox(checkbox, box, container) {
+  const on = checkbox.checked;
   box.style.display = on ? "" : "none";
   if (on && !container.querySelector(".fl-row")) addFloorRow(container, { label: "1 этаж", imgUrl: "" }, true);
 }
-addType.addEventListener("change", () => syncHouseBox(addType, addHouseBox, addFloors));
+addIsHouse.addEventListener("change", () => syncHouseBox(addIsHouse, addHouseBox, addFloors));
 document.getElementById("addFloorBtn").addEventListener("click", () => addFloorRow(addFloors));
 
 let searchTimer = null;
@@ -131,6 +162,7 @@ export function createMarker(id, m) {
   const div = document.createElement("div");
   div.className  = "marker";
   div.dataset.id = id;
+  div.dataset.name = m.name || "";
   div.style.left = m.x + "%";
   div.style.top  = m.y + "%";
   if (isMobile()) div.classList.add("no-hover");
@@ -139,22 +171,18 @@ export function createMarker(id, m) {
   const size = parseMarkerSize(m.size);
   if (size) div.style.setProperty("--ms", String(size / 100));
 
-  const typeClass = TYPE_EMOJI[m.type] ? m.type : "custom";
+  const mtype = markerType(m);
+  const typeClass = TYPE_EMOJI[mtype] ? mtype : "custom";
   let iconHTML;
   if (m.iconUrl) {
     iconHTML = `<div class="marker-icon icon-img"><img src="${esc(normalizeImageUrl(m.iconUrl))}" alt="" draggable="false"></div>`;
   } else {
-    const displayEmoji = m.emoji || TYPE_EMOJI[m.type] || "📍";
+    const displayEmoji = m.emoji || (m.houseId ? "🏠" : TYPE_EMOJI[mtype]) || "📍";
     iconHTML = `<div class="marker-icon ${typeClass}"><span>${esc(displayEmoji)}</span></div>`;
   }
 
-  const previewHTML = (!isMobile() && m.imgUrl)
-    ? `<div class="marker-preview"><img src="${esc(normalizeImageUrl(m.imgUrl))}" alt="" draggable="false" loading="lazy"></div>`
-    : "";
-
-  const traderLabel = TRADERS[m.trader]?.label;
-  const sub = traderLabel ? `<small class="marker-tooltip-sub">${esc(traderLabel)}</small>` : "";
-  div.innerHTML = `${iconHTML}${previewHTML}<div class="marker-tooltip">${esc(m.name || "")}${sub}</div>`;
+  div.innerHTML = iconHTML;
+  attachHover(div, m);          // подсказка при наведении (ПК): размер не зависит от масштаба карты
 
   const iconImg = div.querySelector(".icon-img img");
   if (iconImg) iconImg.addEventListener("error", () => { iconImg.src = ICON_FALLBACK; }, { once: true });
@@ -165,7 +193,7 @@ export function createMarker(id, m) {
     if (state.addMode || wasDrag(e)) return;
     const cur = state.allMarkers[id] || m;
     /* Игрок: значок дома сразу открывает план дома. Админ: окно метки (там же кнопка «Войти в дом») */
-    if (cur.type === "house" && cur.houseId && !state.isAdmin && state.enterHouse) {
+    if (cur.houseId && !state.isAdmin && state.enterHouse) {
       state.enterHouse(cur.houseId, id);
       return;
     }
@@ -211,7 +239,13 @@ mapEl.addEventListener("click", e => {
   addSize.value = "";
   addFloors.innerHTML = "";
   addHouseName.value = "";
-  syncHouseBox(addType, addHouseBox, addFloors);
+  addIsHouse.checked = false;
+  syncHouseBox(addIsHouse, addHouseBox, addFloors);
+  setTypeChips(addTypes, addType.value, []);
+  addPvImg.checked = true;
+  addPvText.checked = true;
+  addPvSize.value = "";
+  addPvTextSize.value = "";
   if (state.addQuill) state.addQuill.setContents([]);
   addEmojiPicker.querySelectorAll(".emoji-btn").forEach(b => b.classList.remove("active"));
   addExtraFields.innerHTML = "";
@@ -231,19 +265,24 @@ addConfirm.onclick = async () => {
   const videos = collectVideos(addVideos);
   if (videos.invalid) { toast("Не удалось распознать ссылку на видео", true); return; }
   let houseId = null;
-  if (addType.value === "house") {
+  if (addIsHouse.checked) {
     const fl = collectFloors(addFloors);
     if (!fl.floors.length) { toast("Добавьте хотя бы один этаж с картинкой", true); return; }
     try {
       houseId = await saveHouse({ name: addHouseName.value.trim() || name, map: state.currentMap, ...fl });
     } catch (e) { toast(e.message, true); return; }
   }
-  push(state.currentRef, {
+  const pr = push(state.currentRef, {
     x: state.pendingPos.x, y: state.pendingPos.y,
     level:       state.currentLevel,
     name,
     text:        textVal,
     type:        addType.value,
+    types:       collectTypeChips(addTypes, addType.value).length ? collectTypeChips(addTypes, addType.value) : null,
+    noPvImg:     addPvImg.checked ? null : true,
+    noPvText:    addPvText.checked ? null : true,
+    pvSize:      parseMarkerSize(addPvSize.value),
+    pvTextSize:  parseMarkerSize(addPvTextSize.value),
     trader:      addTrader.value || null,
     houseId:     houseId || null,
     noBg:        addNoBg.checked ? true : null,
@@ -254,8 +293,17 @@ addConfirm.onclick = async () => {
     extraFields: extraFields.length ? extraFields : null,
     markerLinks: markerLinks.length ? markerLinks : null,
     videos:      videos.length ? videos : null,
-  }).then(() => { toast("Маркер добавлен"); invalidateCatalog(); exitAddMode(); })
-    .catch(e => toast(e.message, true));
+  });
+  pr.then(() => {
+    toast("Маркер добавлен");
+    invalidateCatalog();
+    exitAddMode();
+    /* Новый дом: сразу заходим внутрь, чтобы добавить метки на этажах */
+    if (houseId && state.enterHouse) {
+      toast("Дом создан — выберите этаж и добавляйте метки");
+      state.enterHouse(houseId, pr.key);
+    }
+  }).catch(e => toast(e.message, true));
 };
 
 addCancel.onclick = exitAddMode;

@@ -38,6 +38,18 @@ export const modalHouse     = document.getElementById("modalHouse");
 export const houseBar       = document.getElementById("houseBar");
 export const houseBack      = document.getElementById("houseBack");
 export const houseTitle     = document.getElementById("houseTitle");
+export const addTypes       = document.getElementById("addTypes");
+export const editTypes      = document.getElementById("editTypes");
+export const addIsHouse     = document.getElementById("addIsHouse");
+export const editIsHouse    = document.getElementById("editIsHouse");
+export const addPvImg       = document.getElementById("addPvImg");
+export const addPvText      = document.getElementById("addPvText");
+export const addPvSize      = document.getElementById("addPvSize");
+export const addPvTextSize  = document.getElementById("addPvTextSize");
+export const editPvImg      = document.getElementById("editPvImg");
+export const editPvText     = document.getElementById("editPvText");
+export const editPvSize     = document.getElementById("editPvSize");
+export const editPvTextSize = document.getElementById("editPvTextSize");
 export const addHouseBox    = document.getElementById("addHouseBox");
 export const addHouseName   = document.getElementById("addHouseName");
 export const addFloors      = document.getElementById("addFloors");
@@ -79,6 +91,12 @@ export function esc(s) {
     .replace(/>/g,  "&gt;")
     .replace(/"/g,  "&quot;")
     .replace(/'/g,  "&#39;");
+}
+
+/* Основной тип метки (старые метки типа «house» показываем как «Точка интереса») */
+export function markerType(m) {
+  const t = m && m.type;
+  return (!t || t === "house") ? (t ? "structure" : "loot") : t;
 }
 
 /* Размер маркера в процентах: пусто/некорректно → null (значит «как сейчас») */
