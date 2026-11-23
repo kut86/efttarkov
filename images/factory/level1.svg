@@ -1,9 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="svg176" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:svg="http://www.w3.org/2000/svg" viewBox="0 0 130.82 141.23">
+<svg width="6000" height="6000" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="6002" width="6002" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <defs>
+   <style>.cls-1{fill:#dff2ff;}.cls-12,.cls-2{fill:#ffffa9;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6{stroke:#000;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6,.cls-7,.cls-8,.cls-9{stroke-miterlimit:10;}.cls-11,.cls-3{fill:none;}.cls-14,.cls-3,.cls-5{stroke-width:4px;}.cls-4{fill:#0c0c0b;stroke-width:0.5px;}.cls-11,.cls-12,.cls-13,.cls-6,.cls-7,.cls-8,.cls-9{stroke-width:2px;}.cls-7{fill:#fff;}.cls-7,.cls-8,.cls-9{stroke:#888;}.cls-8{fill:#d1e3e8;}.cls-9{fill:#e9f7ff;}.cls-10{fill:#d3d190;}.cls-13{fill:#020201;}.cls-14{fill:#050502;}</style>
+  </defs>
   <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
   <defs>
-    <style>
-      .st0 {
+   <style>.st0 {
         fill: none;
         stroke: #000;
         stroke-width: .2px;
@@ -20,61 +32,242 @@
       .st3 {
         fill: #1a2632;
       }
-    </style>
+
+      .st4 {
+        fill: #c6c2c2;
+      }</style>
   </defs>
-  <g id="Second_Floor">
-    <g id="Floor-2">
-      <path class="st1" d="M33.38,98.47v-1.01h-1.26v-2.86h14.19v4.88h-12.93v-1.01Z"/>
-      <path class="st1" d="M51.19,15.38v2.08h1.32v9.99h18.55v-2.09h-1.32v-9.97h-18.55ZM59.02,17.46h4.5v7.89h-4.5v-7.89Z"/>
-      <path class="st1" d="M73.34,33.56h10.13v5.85h-10.13v-5.85Z"/>
-      <path class="st1" d="M25.27,29.67v9.72h5.05v.38h-5.75v3.21h6.64v.15h-12.59v11.87h2.02v2.56h-2.02v8.09h12.53v.19h-6.54v3.2h4.21s2.2,0,2.2,0v.28h-3.4v20.07h5.37v-20.07h-.25v-.28h.33v-3.21h-.95v-.19h.95v-22.51h-.95v-.15h.95v-3.21h-1.67v-.38h.8v-1.78h-2.69v-7.94h-4.25ZM22.13,51.3h8.96v6.22h-8.96v-1.18h.19v1.03h4.2v-2.86h-4.2v.76h-.19v-3.97Z"/>
-      <path class="st1" d="M84.08,39.77l-9.38.03v2.92s9.33-.02,9.33-.02v-1.5h.36v.63h3.32v.19h-3.32v9.24h7.56v-.82h.23v.82h3.3v-.82h.31v.82h7.09v-5.15h-.89v-.28h.89v-5.71h-11.96v.16h-.18v-.16h-6.35v.12h-.31v-.45ZM90.74,41.14h.18v.53h1.36v1.18h3.19v-1.18h4.7v4.14h.94v.28h-5.32v3.46h-.31v-.43h-3.3v.43h-.23v-7.54h-3.34v-.19h2.13v-.68Z"/>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <defs>
+   <style>.cls-1{fill:#dff2ff;}.cls-12,.cls-2{fill:#ffffa9;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6{stroke:#000;}.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6,.cls-7,.cls-8,.cls-9{stroke-miterlimit:10;}.cls-11,.cls-3{fill:none;}.cls-14,.cls-3,.cls-5{stroke-width:4px;}.cls-4{fill:#0c0c0b;stroke-width:0.5px;}.cls-11,.cls-12,.cls-13,.cls-6,.cls-7,.cls-8,.cls-9{stroke-width:2px;}.cls-7{fill:#fff;}.cls-7,.cls-8,.cls-9{stroke:#888;}.cls-8{fill:#d1e3e8;}.cls-9{fill:#e9f7ff;}.cls-10{fill:#d3d190;}.cls-13{fill:#020201;}.cls-14{fill:#050502;}</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }
+
+      .st4 {
+        fill: #c6c2c2;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: #70777f;
+      }
+
+      .st1 {
+        fill: gold;
+      }
+
+      .st2 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: #70777f;
+      }
+
+      .st1 {
+        fill: gold;
+      }
+
+      .st2 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }
+
+      .st4 {
+        fill: #c6c2c2;
+      }</style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+   <style>.st0 {
+        fill: none;
+        stroke: #000;
+        stroke-width: .2px;
+      }
+
+      .st1 {
+        fill: #70777f;
+      }
+
+      .st2 {
+        fill: gold;
+      }
+
+      .st3 {
+        fill: #1a2632;
+      }</style>
+  </defs>
+  <g stroke="null" id="svg_1670">
+   <g stroke="null" transform="matrix(61.896578541120036,0,0,54.73116464331633,-32343.01119630452,-28205.408679254382) " id="svg_1621">
+    <g stroke="null" id="svg_1646">
+     <path stroke="null" id="svg_1648" d="m546.39752,602.54745l0,-1.01l-1.26,0l0,-2.86l14.19,0l0,4.88l-12.93,0l0,-1.01z" class="st1"/>
+     <path stroke="null" id="svg_1649" d="m564.20752,519.45745l0,2.08l1.32,0l0,9.99l18.55,0l0,-2.09l-1.32,0l0,-9.97l-18.55,0l0,-0.01zm7.83,2.08l4.5,0l0,7.89l-4.5,0l0,-7.89z" class="st1"/>
+     <path stroke="null" id="svg_1650" d="m586.35752,537.63745l10.13,0l0,5.85l-10.13,0l0,-5.85z" class="st1"/>
+     <path stroke="null" id="svg_1651" d="m538.28752,533.74745l0,9.72l5.05,0l0,0.38l-5.75,0l0,3.21l6.64,0l0,0.15l-12.59,0l0,11.87l2.02,0l0,2.56l-2.02,0l0,8.09l12.53,0l0,0.19l-6.54,0l0,3.2l4.21,0s2.2,0 2.2,0l0,0.28l-3.4,0l0,20.07l5.37,0l0,-20.07l-0.25,0l0,-0.28l0.33,0l0,-3.21l-0.95,0l0,-0.19l0.95,0l0,-22.51l-0.95,0l0,-0.15l0.95,0l0,-3.21l-1.67,0l0,-0.38l0.8,0l0,-1.78l-2.69,0l0,-7.94l-4.25,0l0.01,0zm-3.14,21.63l8.96,0l0,6.22l-8.96,0l0,-1.18l0.19,0l0,1.03l4.2,0l0,-2.86l-4.2,0l0,0.76l-0.19,0l0,-3.97z" class="st1"/>
+     <path stroke="null" id="svg_1652" d="m597.09752,543.84745l-9.38,0.03l0,2.92s9.33,-0.02 9.33,-0.02l0,-1.5l0.36,0l0,0.63l3.32,0l0,0.19l-3.32,0l0,9.24l7.56,0l0,-0.82l0.23,0l0,0.82l3.3,0l0,-0.82l0.31,0l0,0.82l7.09,0l0,-5.15l-0.89,0l0,-0.28l0.89,0l0,-5.71l-11.96,0l0,0.16l-0.18,0l0,-0.16l-6.35,0l0,0.12l-0.31,0l0,-0.45l0,-0.02zm6.66,1.37l0.18,0l0,0.53l1.36,0l0,1.18l3.19,0l0,-1.18l4.7,0l0,4.14l0.94,0l0,0.28l-5.32,0l0,3.46l-0.31,0l0,-0.43l-3.3,0l0,0.43l-0.23,0l0,-7.54l-3.34,0l0,-0.19l2.13,0l0,-0.68z" class="st1"/>
     </g>
-    <g id="Obstacles-2">
-      <path class="st3" d="M21.35,48.34h10.65v.76h-10.65v-.76Z"/>
-      <path class="st3" d="M21,45.44h9.88v.76h-9.88v-.76Z"/>
-      <path class="st3" d="M21.76,43.13h8.64v.42h-8.64v-.42Z"/>
-      <path class="st3" d="M20.93,59.86h4.66v.56h-4.66v-.56Z"/>
-      <path class="st3" d="M28.2,59.86h4.66v.56h-4.66v-.56Z"/>
-      <path class="st3" d="M28.2,62.72h4.66v.56h-4.66v-.56Z"/>
-      <path class="st3" d="M20.93,62.72h4.66v.56h-4.66v-.56Z"/>
-      <path class="st3" d="M21.74,65.22h7.82v.42h-7.82v-.42Z"/>
-      <path class="st3" d="M24.73,57.52h1.7v.42h-1.7v-.42Z"/>
+    <g stroke="null" id="svg_1645">
+     <path stroke="null" id="svg_1653" d="m534.36752,552.41745l10.65,0l0,0.76l-10.65,0l0,-0.76z" class="st3"/>
+     <path stroke="null" id="svg_1654" d="m534.01752,549.51745l9.88,0l0,0.76l-9.88,0l0,-0.76z" class="st3"/>
+     <path stroke="null" id="svg_1655" d="m534.77752,547.20745l8.64,0l0,0.42l-8.64,0l0,-0.42z" class="st3"/>
+     <path stroke="null" id="svg_1656" d="m533.94752,563.93745l4.66,0l0,0.56l-4.66,0l0,-0.56z" class="st3"/>
+     <path stroke="null" id="svg_1657" d="m541.21752,563.93745l4.66,0l0,0.56l-4.66,0l0,-0.56z" class="st3"/>
+     <path stroke="null" id="svg_1658" d="m541.21752,566.79745l4.66,0l0,0.56l-4.66,0l0,-0.56z" class="st3"/>
+     <path stroke="null" id="svg_1659" d="m533.94752,566.79745l4.66,0l0,0.56l-4.66,0l0,-0.56z" class="st3"/>
+     <path stroke="null" id="svg_1660" d="m534.75752,569.29745l7.82,0l0,0.42l-7.82,0l0,-0.42z" class="st3"/>
+     <path stroke="null" id="svg_1661" d="m537.74752,561.59745l1.7,0l0,0.42l-1.7,0l0,-0.42z" class="st3"/>
     </g>
-    <g id="Stairs-2">
-      <g id="Stairs-2-down">
-        <path id="stair-62" class="st2" d="M28.03,29.73h-2.73v-4.16h2.73"/>
-        <path id="stair-63" class="st2" d="M24.73,87.38h2.91v1.28h-2.91"/>
-        <path id="stair-130" class="st2" d="M24.74,72.32h2.91v1.28h-2.91"/>
-        <path id="stair-131" class="st2" d="M84.05,42.67h-1.44s.01,3.73.01,3.73h1.44s-.01-3.73-.01-3.73Z"/>
-        <path id="stair-132" class="st2" d="M83.38,39.42h1.23v-5.46h-1.23v5.46Z"/>
-        <path id="stair-140" class="st2" d="M33.33,94.62h-1.28v2.9h1.28v-2.9Z"/>
-        <path id="stair-141" class="st2" d="M47.73,94.66h-1.28v2.9h1.28v-2.9Z"/>
-        <path id="stair-155" class="st2" d="M52.51,20.89v-3.45h-1.17v3.45h1.17Z"/>
-        <path id="stair-226" class="st2" d="M70.98,25.55v-3.6h-1.17v3.6h1.17Z"/>
-        <path id="stair-135" class="st2" d="M12.01,65.05h3.23v1.38h-3.23v-1.38Z"/>
-        <path id="stair-134" class="st2" d="M92.3,42.95v5.85h3.14v-5.85h-3.14ZM93.79,44.07h.15v3.6h-.15v-3.6Z"/>
-        <path class="st2" d="M24.39,56.18c.06-.13.06-.29.15-.38.05-.05.19-.03.25-.04.32-.08.51.13.8.21.21.06.42.04.52.22.03.05.17.25.12.37-.04.1-.15.13-.22.2-.07.07-.21.13-.3.15-.08.01-.51-.06-.62-.06-.11,0-.5-.04-.67-.22-.08-.08-.07-.37-.04-.44Z"/>
-      </g>
-      <g id="Stairs-2-up">
-        <path id="stair-127" class="st2" d="M30.34,39.71h-6.36v3.2h6.36v-3.2ZM28.77,41.23v.15h-3.31v-.15h3.31Z"/>
-        <path id="stair-128" class="st2" d="M30.34,65.87h-6.36v3.2h6.36v-3.2ZM28.77,67.39v.15h-3.31v-.15h3.31Z"/>
-        <path id="stair-69" class="st2" d="M18.21,111.32v6.07h2.74v-6.07h-2.74ZM19.52,112.48h.13v3.74h-.13v-3.74Z"/>
-        <path id="stair-96" class="st2" d="M14.18,69.46v5.85h2.74v-5.85h-2.74ZM15.48,70.59h.13v3.6h-.13v-3.6Z"/>
-        <path id="stair-97" class="st2" d="M52.09,93.47v6.05h2.74v-6.05h-2.74ZM53.39,94.63h.13v3.72h-.13v-3.72Z"/>
-        <path id="stair-100" class="st2" d="M70.33,93.47v6.05h2.74v-6.05h-2.74ZM71.64,94.63h.13v3.72h-.13v-3.72Z"/>
-        <path id="stair-101" class="st2" d="M96.73,21.85h-5.85v2.74h5.85v-2.74ZM95.6,23.16v.13h-3.6v-.13h3.6Z"/>
-        <path id="stair-129" class="st2" d="M46.68,43.54v6.05h2.74v-6.05h-2.74ZM47.99,44.7h.13v3.73h-.13v-3.73Z"/>
-      </g>
+    <g stroke="null" id="svg_1623">
+     <g stroke="null" id="svg_1633">
+      <path stroke="null" d="m541.04752,533.80745l-2.73,0l0,-4.16l2.73,0" class="st2" id="svg_1644"/>
+      <path stroke="null" d="m537.74752,591.45745l2.91,0l0,1.28l-2.91,0" class="st2" id="svg_1643"/>
+      <path stroke="null" d="m537.75752,576.39745l2.91,0l0,1.28l-2.91,0" class="st2" id="svg_1642"/>
+      <path stroke="null" d="m597.06752,546.74745l-1.44,0s0.01,3.73 0.01,3.73l1.44,0s-0.01,-3.73 -0.01,-3.73z" class="st2" id="svg_1641"/>
+      <path stroke="null" d="m596.39752,543.49745l1.23,0l0,-5.46l-1.23,0l0,5.46z" class="st2" id="svg_1640"/>
+      <path stroke="null" d="m546.34752,598.69745l-1.28,0l0,2.9l1.28,0l0,-2.9z" class="st2" id="svg_1639"/>
+      <path stroke="null" d="m560.74752,598.73745l-1.28,0l0,2.9l1.28,0l0,-2.9z" class="st2" id="svg_1638"/>
+      <path stroke="null" d="m565.52752,524.96745l0,-3.45l-1.17,0l0,3.45l1.17,0z" class="st2" id="svg_1637"/>
+      <path stroke="null" d="m583.99752,529.62745l0,-3.6l-1.17,0l0,3.6l1.17,0z" class="st2" id="svg_1636"/>
+      <path stroke="null" d="m525.02752,569.12745l3.23,0l0,1.38l-3.23,0l0,-1.38z" class="st2" id="svg_1635"/>
+      <path stroke="null" d="m605.31752,547.02745l0,5.85l3.14,0l0,-5.85l-3.14,0zm1.49,1.12l0.15,0l0,3.6l-0.15,0l0,-3.6z" class="st2" id="svg_1634"/>
+      <path stroke="null" id="svg_1662" d="m537.40752,560.25745c0.06,-0.13 0.06,-0.29 0.15,-0.38c0.05,-0.05 0.19,-0.03 0.25,-0.04c0.32,-0.08 0.51,0.13 0.8,0.21c0.21,0.06 0.42,0.04 0.52,0.22c0.03,0.05 0.17,0.25 0.12,0.37c-0.04,0.1 -0.15,0.13 -0.22,0.2c-0.07,0.07 -0.21,0.13 -0.3,0.15c-0.08,0.01 -0.51,-0.06 -0.62,-0.06c-0.11,0 -0.5,-0.04 -0.67,-0.22c-0.08,-0.08 -0.07,-0.37 -0.04,-0.44l0.01,-0.01z" class="st2"/>
+     </g>
+     <g stroke="null" id="svg_1624">
+      <path stroke="null" d="m543.35752,543.78745l-6.36,0l0,3.2l6.36,0l0,-3.2zm-1.57,1.52l0,0.15l-3.31,0l0,-0.15l3.31,0z" class="st2" id="svg_1632"/>
+      <path stroke="null" d="m543.35752,569.94745l-6.36,0l0,3.2l6.36,0l0,-3.2zm-1.57,1.52l0,0.15l-3.31,0l0,-0.15l3.31,0z" class="st2" id="svg_1631"/>
+      <path stroke="null" d="m531.22752,615.39745l0,6.07l2.74,0l0,-6.07l-2.74,0zm1.31,1.16l0.13,0l0,3.74l-0.13,0l0,-3.74z" class="st2" id="svg_1630"/>
+      <path stroke="null" d="m527.19752,573.53745l0,5.85l2.74,0l0,-5.85l-2.74,0zm1.3,1.13l0.13,0l0,3.6l-0.13,0l0,-3.6z" class="st2" id="svg_1629"/>
+      <path stroke="null" d="m565.10752,597.54745l0,6.05l2.74,0l0,-6.05l-2.74,0zm1.3,1.16l0.13,0l0,3.72l-0.13,0l0,-3.72z" class="st2" id="svg_1628"/>
+      <path stroke="null" d="m583.34752,597.54745l0,6.05l2.74,0l0,-6.05l-2.74,0zm1.31,1.16l0.13,0l0,3.72l-0.13,0l0,-3.72z" class="st2" id="svg_1627"/>
+      <path stroke="null" d="m609.74752,525.92745l-5.85,0l0,2.74l5.85,0l0,-2.74zm-1.13,1.31l0,0.13l-3.6,0l0,-0.13l3.6,0z" class="st2" id="svg_1626"/>
+      <path stroke="null" d="m559.69752,547.61745l0,6.05l2.74,0l0,-6.05l-2.74,0zm1.31,1.16l0.13,0l0,3.73l-0.13,0l0,-3.73z" class="st2" id="svg_1625"/>
+     </g>
     </g>
-    <g id="Wall-2">
-      <path class="st0" d="M28.05,31.87v-.46h-2.78"/>
-      <path class="st0" d="M28.05,33.26v5.62h-2.78"/>
-      <path class="st0" d="M23.26,55.89v-1.39"/>
-      <path class="st0" d="M24.42,55.89v-1.39"/>
-      <path class="st0" d="M25.57,55.89v-1.39"/>
-      <path class="st0" d="M20.56,55.01v-3.66h-.46"/>
-      <path class="st0" d="M19.08,51.34h-.46"/>
+    <g stroke="null" id="svg_1622">
+     <path stroke="null" id="svg_1663" d="m541.06752,535.94745l0,-0.46l-2.78,0" class="st0"/>
+     <path stroke="null" id="svg_1664" d="m541.06752,537.33745l0,5.62l-2.78,0" class="st0"/>
+     <path stroke="null" id="svg_1665" d="m536.27752,559.96745l0,-1.39" class="st0"/>
+     <path stroke="null" id="svg_1666" d="m537.43752,559.96745l0,-1.39" class="st0"/>
+     <path stroke="null" id="svg_1667" d="m538.58752,559.96745l0,-1.39" class="st0"/>
+     <path stroke="null" id="svg_1668" d="m533.57752,559.08745l0,-3.66l-0.46,0" class="st0"/>
+     <path stroke="null" id="svg_1669" d="m532.09752,555.41745l-0.46,0" class="st0"/>
     </g>
+   </g>
   </g>
+ </g>
 </svg>
