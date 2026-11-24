@@ -912,3 +912,39 @@ body.offline #addModeBtn   { display: none !important; }
 .chip input { accent-color: var(--accent); width: 15px; height: 15px; }
 .chip:has(input:checked) { border-color: var(--accent); background: rgba(255,102,0,.12); }
 .extra-badge { opacity: .85; font-size: .85em; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ОКНО НАСТРОЙКИ ЗУМА (только админ)
+═══════════════════════════════════════════════════════════════ */
+#zoomAdmin {
+  position: fixed; right: 10px; bottom: 172px; z-index: 9000;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+}
+#zoomAdmin[hidden] { display: none; }
+body.modal-open #zoomAdmin { display: none !important; }
+#zoomAdminToggle {
+  background: rgba(8,10,8,.9); border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text-dim); font: inherit; font-size: 13px; padding: 7px 10px; cursor: pointer;
+  touch-action: manipulation;
+}
+#zoomAdminToggle:hover { color: var(--accent); border-color: var(--accent); }
+#zoomAdminPanel {
+  width: 250px; max-width: calc(100vw - 24px);
+  background: rgba(10,11,12,.96); border: 1px solid var(--border2); border-top: 2px solid var(--accent);
+  border-radius: 10px; padding: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.8);
+  display: flex; flex-direction: column; gap: 10px;
+}
+#zoomAdminPanel[hidden] { display: none; }
+.za-title { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); }
+.za-row { display: flex; flex-direction: column; gap: 4px; }
+.za-row label { color: var(--text-bright); font-size: 14px; display: flex; justify-content: space-between; }
+.za-row b { color: var(--accent); font-family: 'Share Tech Mono', monospace; }
+.za-row input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; touch-action: pan-y; }
+.za-actions { display: flex; gap: 8px; }
+.za-actions button {
+  flex: 1; padding: 8px 6px; font: inherit; font-size: 13px; cursor: pointer;
+  background: rgba(255,255,255,.05); border: 1px solid var(--border2); border-radius: 6px; color: var(--text-bright);
+}
+.za-actions .za-save { border-color: var(--accent); color: var(--accent); background: rgba(255,102,0,.12); }
+.za-note { font-size: 11px; color: var(--text-dim); line-height: 1.3; }

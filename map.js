@@ -10,6 +10,7 @@ import { subscribe, render }             from "./markers.js";
 import { openModal, closeModal,
          flashMarker }                    from "./modal.js";
 import { HOUSES }                         from "./houses.js";
+import { zoomSettings, applyPinchStep }   from "./settings.js";
 
 const FIT = 1;                       // единый коэффициент вписывания карты в экран
 const missingLevels = new Set();     // "map:level" — картинки, которых нет на сервере
@@ -129,7 +130,7 @@ export function initPanzoom() {
   requestAnimationFrame(() => requestAnimationFrame(() => fitView(false)));
 }
 
-mapEl.addEventListener("panzoomstart", () => { state.touched = true; });
+mapEl.addEventListener("panzoomstart", () => { state.touched = true; applyPinchStep(); });
 
 /* ── Единый размер маркеров на любом устройстве ──
    Ширина карты на экране зависит от устройства (телефон ≈ 400px, ПК ≈ 1900px),
@@ -162,7 +163,7 @@ export function fitView(animate = false) {
 
 mapEl.parentElement.addEventListener("wheel", e => {
   e.preventDefault();
-  if (state.pz) state.pz.zoomWithWheel(e);
+  if (state.pz) state.pz.zoomWithWheel(e, { step: 0.3 });   // колёсико: свой шаг, не зависит от щипка
 }, { passive: false });
 
 function zoomBy(k) {
@@ -172,8 +173,8 @@ function zoomBy(k) {
     clientX: window.innerWidth / 2, clientY: window.innerHeight / 2
   });
 }
-document.getElementById("zoomIn").onclick    = () => zoomBy(2.5);
-document.getElementById("zoomOut").onclick   = () => zoomBy(1 / 2.5);
+document.getElementById("zoomIn").onclick    = () => zoomBy(zoomSettings.button);
+document.getElementById("zoomOut").onclick   = () => zoomBy(1 / zoomSettings.button);
 document.getElementById("zoomReset").onclick = () => { fitView(true); state.touched = false; };
 
 let resizeTimer = null;

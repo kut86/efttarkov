@@ -11,6 +11,8 @@ import { exitAddMode, buildEmojiPicker }   from "./markers.js";
 import { refreshModalControls }            from "./modal.js";
 import { initAuth }                        from "./auth.js";
 import { loadHouses }                      from "./houses.js";
+import { loadZoomSettings,
+         setZoomAdminVisible }             from "./settings.js";
 import { downloadForOffline }              from "./offline.js";
 
 /* ── Emoji pickers ── */
@@ -35,6 +37,7 @@ function applyAuth(user, profile) {
   state.isAdmin = !!profile && profile.role === "admin" && !profile.banned;
 
   adminBadge.style.display = state.isAdmin ? "" : "none";
+  setZoomAdminVisible(state.isAdmin);
   addModeBtn.style.display = state.isAdmin ? "" : "none";
   if (!state.isAdmin) exitAddMode();
   refreshModalControls();
@@ -42,6 +45,9 @@ function applyAuth(user, profile) {
   if (profile?.banned) toast("Аккаунт заблокирован — доступен только просмотр", true);
 }
 initAuth(applyAuth);
+
+/* ── Настройки зума (кнопки и щипок) ── */
+loadZoomSettings();
 
 /* ── Дома загружаются в фоне (из кеша и с сервера) ── */
 const housesReady = loadHouses().catch(e => console.warn("Дома не загружены:", e));
