@@ -172,8 +172,8 @@ function zoomBy(k) {
     clientX: window.innerWidth / 2, clientY: window.innerHeight / 2
   });
 }
-document.getElementById("zoomIn").onclick    = () => zoomBy(1.9);
-document.getElementById("zoomOut").onclick   = () => zoomBy(1 / 1.9);
+document.getElementById("zoomIn").onclick    = () => zoomBy(2.5);
+document.getElementById("zoomOut").onclick   = () => zoomBy(1 / 2.5);
 document.getElementById("zoomReset").onclick = () => { fitView(true); state.touched = false; };
 
 let resizeTimer = null;
