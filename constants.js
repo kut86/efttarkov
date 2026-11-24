@@ -8,7 +8,7 @@ export const MAPS = {
       "1":  { label: "1 этаж", imgUrl: "images/groundzero/level1.png" },
       "2":  { label: "2 этаж", imgUrl: "images/groundzero/level2.png" },
     },
-    fallback: ""
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/groundzero/groundzero.webp?raw=true"
   },
   streetsoftarkov: {
     label: "Улицы Таркова",
@@ -24,7 +24,7 @@ export const MAPS = {
       "0":  { label: "Б1", imgUrl: "images/labs/labs.svg" },
       "-1": { label: "Б2", imgUrl: "images/labs/labsB2.svg" },
     },
-    fallback: ""
+    fallback: "https://raw.githubusercontent.com/kut86/amigos-wiki/3b703c6b42941e6fc08ebaaf27ea7ef54d328452/map/images/labs/labs.svg"
   },
   interchange: {
     label: "Развязка",
@@ -40,7 +40,7 @@ export const MAPS = {
     levels: {
       "0": { label: "Основной", imgUrl: "images/customs/customs.webp" },
     },
-    fallback: ""
+    fallback: "https://github.com/kut86/amigos-wiki/blob/main/map/images/customs/customs.webp?raw=true"
   },
   factory: {
     label: "Завод",
@@ -114,7 +114,7 @@ export const TYPE_LABEL = {
 
 export const QUICK_EMOJI = [
   "📍","⭐","🔥","💎","⚔️","🧨","💊","🗺","🏴","🔑",
-  "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡","⚙️","✈️","🛑","🛄","🪤","🎥","🛢️"
+  "☠️","🎯","👁","🔒","📻","🚁","🪖","🧰","⚡"
 ];
 
 /* Уровни доступа пользователей (используются в profile.js и access.js) */

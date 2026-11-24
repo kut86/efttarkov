@@ -60,6 +60,9 @@ function showImage(url) {
   });
 }
 
+/* Заранее декодируем большую картинку, иначе первые кадры после показа «подвисают» */
+const decodeImg = () => (mapImg.decode ? mapImg.decode().catch(() => {}) : Promise.resolve());
+
 /* Фоново проверяем, какие этажи реально существуют (HEAD-запросы, картинки не качаются) */
 function probeLevels(mapId) {
   Object.entries(MAPS[mapId]?.levels || {}).forEach(([key, lv]) => {
@@ -99,6 +102,7 @@ export async function setLevel(lvl) {
 
   state.currentLevel = lvl;
   await showImage(data.imgUrl);
+  await decodeImg();
   if (token !== state.loadToken) return false;
 
   mapImg.style.opacity = "1";
@@ -142,6 +146,7 @@ updateMarkerScale();
 
 export function fitView(animate = false) {
   if (!state.pz) return;
+  state.pz.setOptions({ contain: "outside" });
   const iw = mapImg.naturalWidth, ih = mapImg.naturalHeight;
   if (!iw || !ih) return;
   const vw = window.innerWidth, vh = window.innerHeight;
@@ -221,6 +226,7 @@ export async function switchMap(id, { pending = null, startLevel = null } = {}) 
   }
 
   await showImage(url);
+  await decodeImg();
   if (token !== state.loadToken) return;
 
   mapImg.style.opacity = "1";
@@ -233,53 +239,47 @@ export async function switchMap(id, { pending = null, startLevel = null } = {}) 
 mapSelect.addEventListener("change", e => switchMap(e.target.value));
 
 /* ── Ссылки на маркеры ── */
-/* Свободная от окна метки зона экрана: туда ставим метку, чтобы окно её не закрывало */
-function freeSpot() {
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const box = document.querySelector("#modal.open .modal-box");
-  if (!box) return { x: vw / 2, y: vh / 2 };
-  const r = box.getBoundingClientRect();
-  const TOP = 64;                                   // ниже кнопок меню / панели дома
-  const zones = [
-    { x0: 0,       x1: vw, y0: TOP,      y1: r.top },
-    { x0: 0,       x1: vw, y0: r.bottom, y1: vh    },
-    { x0: 0,       x1: r.left,  y0: TOP, y1: vh    },
-    { x0: r.right, x1: vw,      y0: TOP, y1: vh    },
-  ].map(z => ({ ...z, w: z.x1 - z.x0, h: z.y1 - z.y0 })).filter(z => z.w >= 90 && z.h >= 90);
-  if (!zones.length) return { x: vw / 2, y: vh / 2 };
-  const best = zones.reduce((a, b) => (b.w * b.h > a.w * a.h ? b : a));
-  return { x: (best.x0 + best.x1) / 2, y: (best.y0 + best.y1) / 2 };
-}
-
-/* Приближает метку (значок не мельче ~56px) и ставит её на видное место */
+/* Приближает метку (значок не мельче ~56px) и ставит её ТОЧНО в центр экрана.
+   Окно метки (если открыто) стоит по центру экрана — после его закрытия метка видна ровно там, где была под ним. */
 const MIN_ICON_PX = 56;
 const nextFrames = (n = 2) => new Promise(res => {
   const step = k => requestAnimationFrame(() => (k <= 1 ? res() : step(k - 1)));
   step(n);
 });
+const markerEl = id => mapEl.querySelector(`.marker[data-id="${CSS.escape(id)}"]`);
 
 async function focusMarker(id) {
-  const el = mapEl.querySelector(`.marker[data-id="${CSS.escape(id)}"]`);
+  let el = markerEl(id);
   if (!el || !state.pz) return;
-  const icon = el.querySelector(".marker-icon") || el;
+  let icon = el.querySelector(".marker-icon") || el;
 
   const s0   = state.pz.getScale();
   const iw   = icon.getBoundingClientRect().width || 1;
-  const maxS = (state.pz.getOptions && state.pz.getOptions().maxScale) || 8;
+  const maxS = (state.pz.getOptions && state.pz.getOptions().maxScale) || 20;
   const wanted = Math.min(maxS, Math.max(s0, state.fitScale * 2, s0 * (MIN_ICON_PX / iw)));
   if (wanted > s0 + 0.01) state.pz.zoom(wanted, { animate: false });
 
   /* Panzoom применяет масштаб/сдвиг в следующем кадре — ждём, иначе измерим старое положение */
   await nextFrames(2);
   if (!state.pz) return;
+  el = markerEl(id);                       // метки могли перерисоваться (пришли данные с сервера)
+  if (!el) return;
+  icon = el.querySelector(".marker-icon") || el;
 
-  const target = freeSpot();
-  const r   = icon.getBoundingClientRect();
-  const s   = state.pz.getScale();
-  const pan = state.pz.getPan();
-  const dx  = target.x - (r.left + r.width  / 2);
-  const dy  = target.y - (r.top  + r.height / 2);
-  state.pz.pan(pan.x + dx / s, pan.y + dy / s, { animate: true });
+  const tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+  const r  = icon.getBoundingClientRect();
+  const s  = state.pz.getScale();
+  const p0 = state.pz.getPan();
+  const want = { x: p0.x + (tx - (r.left + r.width / 2)) / s, y: p0.y + (ty - (r.top + r.height / 2)) / s };
+
+  state.pz.pan(want.x, want.y, { animate: false });
+  const got = state.pz.getPan();
+  if (Math.abs(got.x - want.x) * s > 2 || Math.abs(got.y - want.y) * s > 2) {
+    /* Метка у самого края карты: «зажим» карты не даёт поставить её по центру — снимаем его.
+       Вернётся при нажатии «⊙» или при смене карты. */
+    state.pz.setOptions({ contain: false });
+    state.pz.pan(want.x, want.y, { animate: false });
+  }
   state.touched = true;
 }
 
@@ -308,7 +308,7 @@ export function tryOpenPending() {
   const open = () => {
     if (p.focusOnly) { focusMarker(p.id); flashMarker(p.id); return; }
     openModal(p.id, m);
-    setTimeout(() => focusMarker(p.id), 320);          // после появления окна — ставим метку в свободную зону
+    focusMarker(p.id);                                  // метка по центру экрана — под окном; видна после его закрытия
   };
   if (lvl !== state.currentLevel) setLevel(lvl).then(open);
   else open();
