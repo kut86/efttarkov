@@ -10,7 +10,8 @@ import { subscribe, render }             from "./markers.js";
 import { openModal, closeModal,
          flashMarker }                    from "./modal.js";
 import { HOUSES }                         from "./houses.js";
-import { zoomSettings, applyPinchStep }   from "./settings.js";
+import { zoomSettings,
+         installPinchControl }            from "./settings.js";
 
 const FIT = 1;                       // единый коэффициент вписывания карты в экран
 const missingLevels = new Set();     // "map:level" — картинки, которых нет на сервере
@@ -126,11 +127,32 @@ export function initPanzoom() {
   if (state.pz) { state.pz.destroy(); state.pz = null; }
   state.fitted  = false;
   state.touched = false;
+  state.loose   = false;
   state.pz = Panzoom(mapEl, { maxScale: 20, minScale: 0.5, contain: "outside" });
+  updateMinScale();
   requestAnimationFrame(() => requestAnimationFrame(() => fitView(false)));
 }
 
-mapEl.addEventListener("panzoomstart", () => { state.touched = true; applyPinchStep(); });
+mapEl.addEventListener("panzoomstart", () => { state.touched = true; });
+installPinchControl();
+
+/* Метка у края карты ставилась по центру со снятым «зажимом» — после отпускания пальца плавно возвращаем карту в рамки */
+mapEl.addEventListener("panzoomend", () => {
+  if (!state.loose || !state.pz) return;
+  state.loose = false;
+  state.pz.setOptions({ contain: "outside" });
+  const p = state.pz.getPan();
+  state.pz.pan(p.x, p.y, { animate: true });
+});
+
+/* Нижний предел масштаба = карта целиком закрывает экран. Считаем сами по размерам вёрстки:
+   внутренний расчёт Panzoom использует устаревшие размеры и пропускает слишком маленький масштаб. */
+function updateMinScale() {
+  if (!state.pz) return;
+  const wrap = mapEl.parentElement;
+  const cover = Math.max(wrap.clientWidth / (mapEl.offsetWidth || 1), wrap.clientHeight / (mapEl.offsetHeight || 1));
+  if (isFinite(cover) && cover > 0) state.pz.setOptions({ minScale: cover });
+}
 
 /* ── Единый размер маркеров на любом устройстве ──
    Ширина карты на экране зависит от устройства (телефон ≈ 400px, ПК ≈ 1900px),
@@ -140,25 +162,38 @@ const MARKER_REF_WIDTH = 1800;   // при ширине карты 1800px мар
 function updateMarkerScale() {
   const w = mapEl.offsetWidth;
   if (w) mapEl.style.setProperty("--mk", (w / MARKER_REF_WIDTH).toFixed(4));
+  updateMinScale();
 }
 if (window.ResizeObserver) new ResizeObserver(updateMarkerScale).observe(mapEl);
 window.addEventListener("resize", updateMarkerScale);
 updateMarkerScale();
 
-export function fitView(animate = false) {
+/* Исходный вид: карта целиком закрывает экран и стоит по центру.
+   Положение считаем сами по размерам вёрстки (не зависит от внутренних размеров Panzoom, которые отстают на кадр). */
+export function fitView() {
   if (!state.pz) return;
+  const wrap = mapEl.parentElement;
+  const vw = wrap.clientWidth, vh = wrap.clientHeight;
+  const W = mapEl.offsetWidth, H = mapEl.offsetHeight;
+  if (!W || !H || !vw || !vh) return;
+
+  state.loose = false;
   state.pz.setOptions({ contain: "outside" });
-  const iw = mapImg.naturalWidth, ih = mapImg.naturalHeight;
-  if (!iw || !ih) return;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const scale = Math.min(vw / iw, vh / ih) * FIT;
+  updateMinScale();
+
+  const scale = Math.max(vw / W, vh / H) * FIT;
   state.fitScale = scale;
-  state.pz.zoom(scale, { animate });
-  state.pz.pan((vw - iw * scale) / 2, (vh - ih * scale) / 2, { animate });
-  if (!state.fitted) {
-    state.fitted = true;
-    tryOpenPending();
-  }
+  state.pz.zoom(scale, { animate: false });
+
+  /* сдвиг ставим после того, как масштаб применился (Panzoom делает это в следующем кадре) */
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (!state.pz) return;
+    state.pz.pan((vw - W) / (2 * scale), (vh - H) / (2 * scale), { animate: false });
+    if (!state.fitted) {
+      state.fitted = true;
+      tryOpenPending();
+    }
+  }));
 }
 
 mapEl.parentElement.addEventListener("wheel", e => {
@@ -279,6 +314,7 @@ async function focusMarker(id) {
     /* Метка у самого края карты: «зажим» карты не даёт поставить её по центру — снимаем его.
        Вернётся при нажатии «⊙» или при смене карты. */
     state.pz.setOptions({ contain: false });
+    state.loose = true;
     state.pz.pan(want.x, want.y, { animate: false });
   }
   state.touched = true;

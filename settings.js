@@ -11,13 +11,11 @@ const CACHE_KEY = "tm:zoomSettings";
 export const DEFAULTS = { button: 1.3, pinch: 1.0 };
 export const zoomSettings = { ...DEFAULTS };      // button — множитель за одно нажатие «+», pinch — чувствительность щипка (1.0 ≈ как в обычных картах)
 
-const PINCH_K = 0.8;        // 80px раздвижения пальцев = +80% масштаба при чувствительности 1.0
-
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 function normalize(v) {
   return {
     button: clamp(Number(v?.button) || DEFAULTS.button, 1.05, 4),
-    pinch:  clamp(Number(v?.pinch)  || DEFAULTS.pinch,  0.1,  5),
+    pinch:  clamp(Number(v?.pinch)  || DEFAULTS.pinch,  0.2,  3),
   };
 }
 function apply(v) {
@@ -26,12 +24,50 @@ function apply(v) {
   zoomSettings.pinch  = n.pinch;
 }
 
-/* Щипок: Panzoom прибавляет к масштабу (на 80px раздвижения) величину step — одинаковую при любом приближении,
-   поэтому на сильном зуме щипок «не работает». Задаём step пропорционально текущему масштабу —
-   тогда щипок действует одинаково на любом приближении. Вызывается в начале каждого касания. */
-export function applyPinchStep() {
-  if (!state.pz) return;
-  state.pz.setOptions({ step: Math.max(0.01, zoomSettings.pinch * PINCH_K * state.pz.getScale()) });
+/* ── Щипок двумя пальцами ──
+   Проблемы стандартного щипка Panzoom:
+   1) масштаб растёт ЛИНЕЙНО от раздвижения пальцев — на сильном зуме почти не работает, а при сведении резко падает до минимума;
+   2) библиотека применяет масштаб/сдвиг только в следующем кадре, а следующее движение пальца уже считает по устаревшим размерам
+      карты — при высокой чувствительности карту «дёргает» и она может сжаться в угол.
+   Здесь: (а) масштаб считается экспоненциально: новый = старый × (расстояние / начальное)^чувствительность — плавно в обе стороны
+   и одинаково на любом приближении; (б) на время обработки касания кадры применяются сразу, поэтому размеры всегда актуальны. */
+export function installPinchControl() {
+  const ptrs = new Map();
+  let startDist = 0, startScale = 1;
+  const nativeRAF = window.requestAnimationFrame.bind(window);
+
+  const touchLike = e => e.pointerType === "touch" || e.pointerType === "pen";
+  const dist = () => {
+    const [a, b] = [...ptrs.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+
+  document.addEventListener("pointerdown", e => {
+    if (!touchLike(e)) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size >= 2 && state.pz) { startDist = dist(); startScale = state.pz.getScale(); }
+  }, true);
+
+  document.addEventListener("pointermove", e => {
+    if (!touchLike(e) || !state.pz) return;
+    if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size >= 2 && startDist > 1) {
+      const d = dist(), diff = d - startDist;
+      if (Math.abs(diff) > 0.01) {
+        const target = startScale * Math.pow(d / startDist, zoomSettings.pinch);
+        /* Panzoom считает: масштаб = старый + diff × step / 80 — подбираем step так, чтобы получилась наша формула */
+        state.pz.setOptions({ step: ((target - startScale) * 80) / diff });
+      }
+    }
+    /* пока Panzoom обрабатывает это касание, его «следующий кадр» выполняется сразу */
+    window.requestAnimationFrame = cb => { cb(performance.now()); return 0; };
+  }, true);
+
+  window.addEventListener("pointermove", () => { window.requestAnimationFrame = nativeRAF; });   // после обработчика Panzoom
+
+  const up = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) startDist = 0; };
+  document.addEventListener("pointerup", up, true);
+  document.addEventListener("pointercancel", up, true);
 }
 
 /* ── Загрузка: сначала из кеша (мгновенно и офлайн), потом из Firebase ── */
@@ -101,7 +137,7 @@ function buildPanel() {
 
   pinchVal = document.createElement("b");
   pinchRange = document.createElement("input");
-  pinchRange.type = "range"; pinchRange.min = "0.2"; pinchRange.max = "4"; pinchRange.step = "0.05";
+  pinchRange.type = "range"; pinchRange.min = "0.2"; pinchRange.max = "3"; pinchRange.step = "0.05";
   pinchRange.oninput = () => { apply({ button: zoomSettings.button, pinch: pinchRange.value }); syncPanel(); };
   panel.appendChild(row("Пальцы (щипок)", pinchVal, pinchRange));
 
