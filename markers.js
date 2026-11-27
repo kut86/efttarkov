@@ -32,7 +32,11 @@ const ICON_FALLBACK = "data:image/svg+xml," +
 
 /* ── Отличаем клик от перетаскивания карты ── */
 let downPos = null;
-mapWrapper.addEventListener("pointerdown", e => { downPos = { x: e.clientX, y: e.clientY }; });
+/* Точку касания запоминаем на уровне ВСЕГО документа (фаза перехвата): Panzoom останавливает событие на карте,
+   и раньше точка «залипала» старой, если палец когда-то коснулся пустой области вне карты — метки переставали нажиматься. */
+document.addEventListener("pointerdown", e => { downPos = { x: e.clientX, y: e.clientY }; }, true);
+document.addEventListener("pointercancel", () => { downPos = null; }, true);
+document.addEventListener("click", () => { setTimeout(() => { downPos = null; }, 0); }, true);   // после нажатия сбрасываем
 function wasDrag(e) {
   return downPos && Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 6;
 }

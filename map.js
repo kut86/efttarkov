@@ -136,14 +136,17 @@ export function initPanzoom() {
 mapEl.addEventListener("panzoomstart", () => { state.touched = true; });
 installPinchControl();
 
-/* Метка у края карты ставилась по центру со снятым «зажимом» — после отпускания пальца плавно возвращаем карту в рамки */
-mapEl.addEventListener("panzoomend", () => {
+/* Метка у края карты ставилась по центру со снятым «зажимом» — при первом же касании возвращаем карту в рамки */
+function releaseLoose() {
   if (!state.loose || !state.pz) return;
   state.loose = false;
   state.pz.setOptions({ contain: "outside" });
   const p = state.pz.getPan();
   state.pz.pan(p.x, p.y, { animate: true });
-});
+}
+mapEl.addEventListener("panzoomend", releaseLoose);
+/* Касание пустой области за краем карты (Panzoom его не видит) — тоже возвращаем карту, чтобы чёрной области не оставалось */
+mapEl.parentElement.addEventListener("pointerdown", e => { if (e.target === mapEl.parentElement) releaseLoose(); });
 
 /* Нижний предел масштаба = карта целиком закрывает экран. Считаем сами по размерам вёрстки:
    внутренний расчёт Panzoom использует устаревшие размеры и пропускает слишком маленький масштаб. */
